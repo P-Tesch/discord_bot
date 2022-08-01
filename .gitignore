@@ -24,3 +24,6 @@ hs_err_pid*
 
 #IDE Settings
 .vscode
+
+#Discord bot id
+id.txt
