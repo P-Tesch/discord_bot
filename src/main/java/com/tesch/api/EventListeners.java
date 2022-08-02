@@ -52,10 +52,19 @@ public class EventListeners extends ListenerAdapter {
             this.onPauseCommand();
             return;
         }
+
+        if (event.getMessage().getContentRaw().startsWith("disconnect")) {
+            this.onDisconnectCommand(event);
+            return;
+        }
     }
     
     private void onMention(MessageReceivedEvent event) {
         event.getChannel().sendMessage(event.getAuthor().getAsMention()).queue();
+    }
+
+    private void onDisconnectCommand(MessageReceivedEvent event) {
+        event.getGuild().getAudioManager().closeAudioConnection();
     }
 
     private void onPauseCommand() {
