@@ -64,10 +64,21 @@ public class EventListeners extends ListenerAdapter {
             this.onSkipCommand(event);
             return;
         }
+
+        if (message.startsWith("queue")) {
+            this.onQueueCommand(event);
+            return;
+        }
     }
     
     private void onMention(MessageReceivedEvent event) {
         event.getChannel().sendMessage(event.getAuthor().getAsMention()).queue();
+    }
+
+    private void onQueueCommand(MessageReceivedEvent event) {
+        StringBuilder queueString = new StringBuilder();
+        this.queue.getPlaylist().stream().map(x -> x.getInfo().title).forEach(x -> queueString.append(x + "\n"));
+        event.getChannel().sendMessage("Queue:\n" + queueString).queue();
     }
 
     private void onSkipCommand(MessageReceivedEvent event) {

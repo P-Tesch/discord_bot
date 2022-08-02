@@ -1,5 +1,6 @@
 package com.tesch.api;
 
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -19,6 +20,10 @@ public class SongQueue extends AudioEventAdapter{
 
     public void setPlayer(AudioPlayer player) {
         this.player = player;
+    }
+
+    public List<AudioTrack> getPlaylist() {
+        return playlist.stream().toList();
     }
 
     public void addToPlaylist(AudioTrack track) {
