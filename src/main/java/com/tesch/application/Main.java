@@ -26,7 +26,7 @@ public class Main {
     public static void main(String[] args) throws LoginException, InterruptedException, IOException, FileNotFoundException {
 
         JDA builder = JDABuilder
-        .createDefault(readId())
+        .createDefault("MTAwMzY0MzgyOTgwMDQwNzA1MA.GaUg7O.lEZWCq9R72tDD7f4D5E63z5LVnDTkYJ1i525d8")
         .enableIntents(getIntents())
         .setActivity(Activity.listening("Boate Azul"))
         .build();
