@@ -14,9 +14,22 @@ public class SongQueue extends AudioEventAdapter{
 
     private Queue<AudioTrack> playlist;
     private AudioPlayer player;
+    private boolean loop;
 
     public SongQueue() {
         playlist = new LinkedBlockingQueue<>();
+        this.loop = false;
+    }
+
+    public boolean getLoop() {
+        return this.loop;
+    }
+
+    public void setLoop(boolean loop) {
+        this.loop = loop;
+        if (this.loop) {
+            this.addToPlaylist(player.getPlayingTrack());
+        }
     }
 
     public void setPlayer(AudioPlayer player) {
@@ -27,18 +40,28 @@ public class SongQueue extends AudioEventAdapter{
         return playlist.stream().toList();
     }
 
+    public void clearPlaylist() {
+        playlist.clear();
+        player.stopTrack();
+    }
+
     public void addToPlaylist(AudioPlaylist playlist) {
         playlist.getTracks().stream().forEach(this::addToPlaylist);
     }
 
     public void addToPlaylist(AudioTrack track) {
-        playlist.offer(track);
-        this.playNextTrack(false);
+        if (!this.playlist.contains(track)) {
+            playlist.offer(track);
+            this.playNextTrack(false);
+        }
     }
     
     public void playNextTrack(Boolean skip) {
         if (player.startTrack(playlist.peek(), !skip)) {
-            playlist.poll();
+            AudioTrack played = playlist.poll();
+            if (loop) {
+                playlist.offer(played);
+            }
         }
     }
 

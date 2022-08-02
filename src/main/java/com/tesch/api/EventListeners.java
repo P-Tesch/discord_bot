@@ -69,10 +69,30 @@ public class EventListeners extends ListenerAdapter {
             this.onQueueCommand(event);
             return;
         }
+
+        if (message.startsWith("clear")) {
+            this.onClearCommand(event);
+            return;
+        }
+
+        if (message.startsWith("loop")) {
+            this.onLoopCommand(event);
+            return;
+        }
     }
     
     private void onMention(MessageReceivedEvent event) {
         event.getChannel().sendMessage(event.getAuthor().getAsMention()).queue();
+    }
+
+    private void onLoopCommand(MessageReceivedEvent event) {
+        this.queue.setLoop(!this.queue.getLoop());
+        event.getChannel().sendMessage("Loop set to " + this.queue.getLoop()).queue();
+    }
+
+    private void onClearCommand(MessageReceivedEvent event) {
+        this.queue.clearPlaylist();
+        event.getChannel().sendMessage("Cleared queue").queue();;
     }
 
     private void onQueueCommand(MessageReceivedEvent event) {
@@ -87,6 +107,7 @@ public class EventListeners extends ListenerAdapter {
 
     private void onDisconnectCommand(MessageReceivedEvent event) {
         event.getGuild().getAudioManager().closeAudioConnection();
+        this.onClearCommand(event);
     }
 
     private void onPauseCommand() {
