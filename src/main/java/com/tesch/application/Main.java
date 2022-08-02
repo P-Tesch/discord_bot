@@ -26,7 +26,7 @@ public class Main {
     public static void main(String[] args) throws LoginException, InterruptedException, IOException, FileNotFoundException {
 
         JDA builder = JDABuilder
-        .createDefault("MTAwMzY0MzgyOTgwMDQwNzA1MA.GaUg7O.lEZWCq9R72tDD7f4D5E63z5LVnDTkYJ1i525d8")
+        .createDefault(System.getenv("DISCORD_TOKEN"))
         .enableIntents(getIntents())
         .setActivity(Activity.listening("Boate Azul"))
         .build();
@@ -37,16 +37,6 @@ public class Main {
 
         builder.addEventListener(new EventListeners(builder, playerManager, queue));
         builder.awaitReady();
-    }
-
-    private static String readId() throws IOException, FileNotFoundException {
-        try (BufferedReader br = new BufferedReader(new FileReader("D:\\Personal Projects\\Java Projects\\Discord Bot\\tesch_discord_bot\\id.txt"));){
-            return br.readLine();
-        }
-        catch (FileNotFoundException e) {
-            e.printStackTrace();
-            return null;
-        }
     }
 
     private static List<GatewayIntent> getIntents() {
