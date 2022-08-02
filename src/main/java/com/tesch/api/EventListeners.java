@@ -103,7 +103,7 @@ public class EventListeners extends ListenerAdapter {
         audioManager.setSendingHandler(new AudioPlayerSendHandler(audioPlayer));
         audioManager.openAudioConnection(voiceChannel);
 
-        AudioResultHandler resultHandler = new AudioResultHandler(textChannel, queue, audioPlayer);
+        AudioResultHandler resultHandler = new AudioResultHandler(textChannel, queue);
 
         playerManager.loadItem(message[1], resultHandler);
     }

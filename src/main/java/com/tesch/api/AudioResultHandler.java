@@ -1,7 +1,6 @@
 package com.tesch.api;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
-import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
@@ -12,12 +11,10 @@ public class AudioResultHandler implements AudioLoadResultHandler {
 
     private TextChannel textChannel;
     private SongQueue queue;
-    private AudioPlayer player;
 
-    public AudioResultHandler(TextChannel textChannel, SongQueue queue, AudioPlayer player) {
+    public AudioResultHandler(TextChannel textChannel, SongQueue queue) {
         this.textChannel = textChannel;
         this.queue = queue;
-        this.player = player;
     }
 
     @Override
