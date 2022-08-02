@@ -17,12 +17,16 @@ public class EventListeners extends ListenerAdapter {
 
     private JDA jda;
     private AudioPlayerManager playerManager;
+    private AudioPlayer audioPlayer;
     private SongQueue queue;
+    private Integer volume;
 
     public EventListeners(JDA jda, AudioPlayerManager playerManager, SongQueue queue) {
         this.jda = jda;
         this.playerManager = playerManager;
+        this.audioPlayer = playerManager.createPlayer();
         this.queue = queue;
+        this.volume = 100;
     }
     
     @Override
@@ -38,10 +42,21 @@ public class EventListeners extends ListenerAdapter {
             this.onPlayCommand(event);
             return;
         }
+
+        if (event.getMessage().getContentRaw().startsWith("volume ")) {
+            this.onVolumeCommand(event);
+            return;
+        }
     }
     
     private void onMention(MessageReceivedEvent event) {
         event.getChannel().sendMessage(event.getAuthor().getAsMention()).queue();
+    }
+
+    private void onVolumeCommand(MessageReceivedEvent event) {
+        this.volume = Integer.parseInt(event.getMessage().getContentRaw().replace("volume ", ""));
+        this.audioPlayer.setVolume(this.volume);
+        event.getChannel().sendMessage("Volume set to: " + this.volume);
     }
 
     private void onPlayCommand(MessageReceivedEvent event) {
@@ -49,8 +64,8 @@ public class EventListeners extends ListenerAdapter {
         TextChannel textChannel = event.getMessage().getChannel().asTextChannel();
         AudioChannel voiceChannel = event.getMember().getVoiceState().getChannel();
         AudioManager audioManager = event.getGuild().getAudioManager();
-        AudioPlayer audioPlayer = playerManager.createPlayer();
         audioManager.setSendingHandler(new AudioPlayerSendHandler(audioPlayer));
+        audioPlayer.setVolume(this.volume);
         audioPlayer.addListener(this.queue);
         AudioResultHandler resultHandler = new AudioResultHandler(textChannel, queue, audioPlayer);
 
