@@ -29,11 +29,11 @@ public class Main {
         .setActivity(Activity.listening("Boate Azul"))
         .build();
 
-        //AudioPlayerManager playerManager = new DefaultAudioPlayerManager();
-        //AudioSourceManagers.registerRemoteSources(playerManager);
-        //SongQueue queue = new SongQueue();
+        AudioPlayerManager playerManager = new DefaultAudioPlayerManager();
+        AudioSourceManagers.registerRemoteSources(playerManager);
+        SongQueue queue = new SongQueue();
 
-        //builder.addEventListener(new EventListeners(builder, playerManager, queue));
+        builder.addEventListener(new EventListeners(builder, playerManager, queue));
         builder.awaitReady();
     }
 
