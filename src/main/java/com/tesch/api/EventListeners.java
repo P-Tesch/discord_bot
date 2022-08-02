@@ -47,10 +47,19 @@ public class EventListeners extends ListenerAdapter {
             this.onVolumeCommand(event);
             return;
         }
+
+        if (event.getMessage().getContentRaw().startsWith("pause")) {
+            this.onPauseCommand();
+            return;
+        }
     }
     
     private void onMention(MessageReceivedEvent event) {
         event.getChannel().sendMessage(event.getAuthor().getAsMention()).queue();
+    }
+
+    private void onPauseCommand() {
+        this.audioPlayer.setPaused(this.audioPlayer.isPaused() ? false : true);
     }
 
     private void onVolumeCommand(MessageReceivedEvent event) {
