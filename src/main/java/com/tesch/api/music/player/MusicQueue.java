@@ -1,4 +1,4 @@
-package com.tesch.api;
+package com.tesch.api.music.player;
 
 import java.util.List;
 import java.util.Queue;
@@ -10,13 +10,13 @@ import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 
-public class SongQueue extends AudioEventAdapter{
+public class MusicQueue extends AudioEventAdapter{
 
     private Queue<AudioTrack> playlist;
     private AudioPlayer player;
     private boolean loop;
 
-    public SongQueue() {
+    public MusicQueue() {
         playlist = new LinkedBlockingQueue<>();
         this.loop = false;
     }

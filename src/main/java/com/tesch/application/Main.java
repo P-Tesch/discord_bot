@@ -1,7 +1,8 @@
 package com.tesch.application;
 
 import com.tesch.api.EventListeners;
-import com.tesch.api.SongQueue;
+import com.tesch.api.music.player.MusicEventHandler;
+import com.tesch.api.music.player.MusicQueue;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -31,9 +32,8 @@ public class Main {
 
         AudioPlayerManager playerManager = new DefaultAudioPlayerManager();
         AudioSourceManagers.registerRemoteSources(playerManager);
-        SongQueue queue = new SongQueue();
 
-        builder.addEventListener(new EventListeners(builder, playerManager, queue));
+        builder.addEventListener(new EventListeners(builder, new MusicEventHandler(playerManager, new MusicQueue())));
         builder.awaitReady();
     }
 

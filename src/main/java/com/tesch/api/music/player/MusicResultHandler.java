@@ -1,4 +1,4 @@
-package com.tesch.api;
+package com.tesch.api.music.player;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
@@ -7,12 +7,12 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
 import net.dv8tion.jda.api.entities.TextChannel;
 
-public class AudioResultHandler implements AudioLoadResultHandler {
+public class MusicResultHandler implements AudioLoadResultHandler {
 
     private TextChannel textChannel;
-    private SongQueue queue;
+    private MusicQueue queue;
 
-    public AudioResultHandler(TextChannel textChannel, SongQueue queue) {
+    public MusicResultHandler(TextChannel textChannel, MusicQueue queue) {
         this.textChannel = textChannel;
         this.queue = queue;
     }
