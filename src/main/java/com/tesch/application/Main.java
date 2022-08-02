@@ -18,6 +18,7 @@ import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 
 public class Main {
@@ -27,6 +28,7 @@ public class Main {
         JDA builder = JDABuilder
         .createDefault(readId())
         .enableIntents(getIntents())
+        .setActivity(Activity.listening("Boate Azul"))
         .build();
 
         AudioPlayerManager playerManager = new DefaultAudioPlayerManager();
