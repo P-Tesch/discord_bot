@@ -73,7 +73,7 @@
               <manifest>
                 <addClasspath>true</addClasspath>
                 <classpathPrefix>lib/</classpathPrefix>
-                <mainClass>com.tesch.apllication.Main</mainClass>
+                <mainClass>com.tesch.application.Main</mainClass>
               </manifest>
             </archive>
           </configuration>
