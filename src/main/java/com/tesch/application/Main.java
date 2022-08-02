@@ -3,9 +3,7 @@ package com.tesch.application;
 import com.tesch.api.EventListeners;
 import com.tesch.api.SongQueue;
 
-import java.io.BufferedReader;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
