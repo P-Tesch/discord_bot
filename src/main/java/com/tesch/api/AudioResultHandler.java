@@ -37,8 +37,7 @@ public class AudioResultHandler implements AudioLoadResultHandler {
 
     @Override
     public void trackLoaded(AudioTrack track) {
-        queue.addToPlaylist(track.makeClone());
-        player.playTrack(track);
+        queue.addToPlaylist(track);
         textChannel.sendMessage("Track loaded " + track.getInfo().title).queue();;
     }
     

@@ -25,40 +25,53 @@ public class EventListeners extends ListenerAdapter {
         this.playerManager = playerManager;
         this.audioPlayer = playerManager.createPlayer();
         this.queue = queue;
+        this.audioPlayer.addListener(this.queue);
+        this.queue.setPlayer(this.audioPlayer);
     }
     
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
         if (event.getAuthor().isBot()) return;
 
+        String message = event.getMessage().getContentRaw();
+
         if (event.getMessage().getMentions().isMentioned(jda.getSelfUser(), MentionType.USER)) {
             this.onMention(event);
             return;
         }
 
-        if (event.getMessage().getContentRaw().startsWith("play ")) {
+        if (message.startsWith("play")) {
             this.onPlayCommand(event);
             return;
         }
 
-        if (event.getMessage().getContentRaw().startsWith("volume")) {
+        if (message.startsWith("volume")) {
             this.onVolumeCommand(event);
             return;
         }
 
-        if (event.getMessage().getContentRaw().startsWith("pause")) {
+        if (message.startsWith("pause")) {
             this.onPauseCommand();
             return;
         }
 
-        if (event.getMessage().getContentRaw().startsWith("disconnect")) {
+        if (message.startsWith("disconnect")) {
             this.onDisconnectCommand(event);
+            return;
+        }
+
+        if (message.startsWith("skip")) {
+            this.onSkipCommand(event);
             return;
         }
     }
     
     private void onMention(MessageReceivedEvent event) {
         event.getChannel().sendMessage(event.getAuthor().getAsMention()).queue();
+    }
+
+    private void onSkipCommand(MessageReceivedEvent event) {
+        this.queue.playNextTrack(true);
     }
 
     private void onDisconnectCommand(MessageReceivedEvent event) {
@@ -81,15 +94,17 @@ public class EventListeners extends ListenerAdapter {
     }
 
     private void onPlayCommand(MessageReceivedEvent event) {
-        String source = event.getMessage().getContentRaw().replace("play ", "");
+        String[] message = event.getMessage().getContentRaw().split(" ");
+
         TextChannel textChannel = event.getMessage().getChannel().asTextChannel();
         AudioChannel voiceChannel = event.getMember().getVoiceState().getChannel();
+        
         AudioManager audioManager = event.getGuild().getAudioManager();
         audioManager.setSendingHandler(new AudioPlayerSendHandler(audioPlayer));
-        audioPlayer.addListener(this.queue);
+        audioManager.openAudioConnection(voiceChannel);
+
         AudioResultHandler resultHandler = new AudioResultHandler(textChannel, queue, audioPlayer);
 
-        playerManager.loadItem(source, resultHandler);
-        audioManager.openAudioConnection(voiceChannel);
+        playerManager.loadItem(message[1], resultHandler);
     }
 }
