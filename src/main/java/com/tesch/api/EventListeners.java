@@ -19,14 +19,12 @@ public class EventListeners extends ListenerAdapter {
     private AudioPlayerManager playerManager;
     private AudioPlayer audioPlayer;
     private SongQueue queue;
-    private Integer volume;
 
     public EventListeners(JDA jda, AudioPlayerManager playerManager, SongQueue queue) {
         this.jda = jda;
         this.playerManager = playerManager;
         this.audioPlayer = playerManager.createPlayer();
         this.queue = queue;
-        this.volume = 100;
     }
     
     @Override
@@ -43,7 +41,7 @@ public class EventListeners extends ListenerAdapter {
             return;
         }
 
-        if (event.getMessage().getContentRaw().startsWith("volume ")) {
+        if (event.getMessage().getContentRaw().startsWith("volume")) {
             this.onVolumeCommand(event);
             return;
         }
@@ -72,9 +70,14 @@ public class EventListeners extends ListenerAdapter {
     }
 
     private void onVolumeCommand(MessageReceivedEvent event) {
-        this.volume = Integer.parseInt(event.getMessage().getContentRaw().replace("volume ", ""));
-        this.audioPlayer.setVolume(this.volume);
-        event.getChannel().sendMessage("Volume set to: " + this.volume);
+        String[] volume = event.getMessage().getContentRaw().split(" ");
+        if (volume.length == 1) {
+            event.getChannel().sendMessage("Current volume: " + this.audioPlayer.getVolume()).queue();
+        }
+        else {
+            this.audioPlayer.setVolume(Integer.parseInt(volume[1]));
+            event.getChannel().sendMessage("Volume set to: " + this.audioPlayer.getVolume()).queue();
+        }
     }
 
     private void onPlayCommand(MessageReceivedEvent event) {
@@ -83,7 +86,6 @@ public class EventListeners extends ListenerAdapter {
         AudioChannel voiceChannel = event.getMember().getVoiceState().getChannel();
         AudioManager audioManager = event.getGuild().getAudioManager();
         audioManager.setSendingHandler(new AudioPlayerSendHandler(audioPlayer));
-        audioPlayer.setVolume(this.volume);
         audioPlayer.addListener(this.queue);
         AudioResultHandler resultHandler = new AudioResultHandler(textChannel, queue, audioPlayer);
 
