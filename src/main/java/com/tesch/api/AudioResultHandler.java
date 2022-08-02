@@ -29,6 +29,7 @@ public class AudioResultHandler implements AudioLoadResultHandler {
 
     @Override
     public void playlistLoaded(AudioPlaylist playlist) {
+        queue.addToPlaylist(playlist);
         textChannel.sendMessage("Playlist loaded").queue();
     }
 

@@ -6,6 +6,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
+import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 
@@ -24,6 +25,10 @@ public class SongQueue extends AudioEventAdapter{
 
     public List<AudioTrack> getPlaylist() {
         return playlist.stream().toList();
+    }
+
+    public void addToPlaylist(AudioPlaylist playlist) {
+        playlist.getTracks().stream().forEach(this::addToPlaylist);
     }
 
     public void addToPlaylist(AudioTrack track) {
