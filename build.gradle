@@ -27,6 +27,9 @@ jar {
     }
 }
 
+task stage(dependsOn: ['build', 'clean'])
+build.mustRunAfter clean
+
 startScripts {
     mainClass.set('com.tesch.Main')
 }
