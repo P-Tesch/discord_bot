@@ -1,6 +1,7 @@
 package com.tesch;
 
 import com.tesch.api.EventListeners;
+import com.tesch.api.music.musicle.MusicleManager;
 import com.tesch.api.music.player.MusicEventHandler;
 import com.tesch.api.music.player.MusicQueue;
 
@@ -33,7 +34,10 @@ public class Main {
         AudioPlayerManager playerManager = new DefaultAudioPlayerManager();
         AudioSourceManagers.registerRemoteSources(playerManager);
 
-        builder.addEventListener(new EventListeners(builder, new MusicEventHandler(playerManager, new MusicQueue())));
+        MusicEventHandler musicEventHandler = new MusicEventHandler(playerManager, new MusicQueue());
+        MusicleManager musicleManager = new MusicleManager(musicEventHandler);
+
+        builder.addEventListener(new EventListeners(builder, musicEventHandler, musicleManager));
         builder.awaitReady();
     }
 

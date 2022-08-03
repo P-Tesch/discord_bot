@@ -2,10 +2,12 @@ package com.tesch.api;
 
 import org.jetbrains.annotations.NotNull;
 
+import com.tesch.api.music.musicle.MusicleManager;
 import com.tesch.api.music.player.MusicEventHandler;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Message.MentionType;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
@@ -13,10 +15,12 @@ public class EventListeners extends ListenerAdapter {
 
     private JDA jda;
     private MusicEventHandler musicEventHandler;
+    private MusicleManager musicleManager;
 
-    public EventListeners(JDA jda, MusicEventHandler musicEventHandler) {
+    public EventListeners(JDA jda, MusicEventHandler musicEventHandler, MusicleManager musicleManager) {
         this.jda = jda;
         this.musicEventHandler = musicEventHandler;
+        this.musicleManager = musicleManager;
     }
     
     @Override
@@ -69,6 +73,20 @@ public class EventListeners extends ListenerAdapter {
             musicEventHandler.onLoopCommand(event);
             return;
         }
+
+        if (message.startsWith("musicle")) {
+            try {
+                musicleManager.onMusicleCommand(event);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return;
+        }
+    }
+
+    @Override
+    public void onButtonInteraction(ButtonInteractionEvent event) {
+        this.musicleManager.onButtonInteraction(event);
     }
     
     private void onMention(MessageReceivedEvent event) {

@@ -19,12 +19,12 @@ public class MusicResultHandler implements AudioLoadResultHandler {
 
     @Override
     public void loadFailed(FriendlyException e) {
-        textChannel.sendMessage("Error loading track: " + e.getMessage()).queue();;
+        textChannel.sendMessage("Error loading track: " + e.getMessage()).queue();
     }
 
     @Override
     public void noMatches() {
-        textChannel.sendMessage("No match for track").queue();;
+        textChannel.sendMessage("No match for track").queue();
     }
 
     @Override
@@ -36,7 +36,7 @@ public class MusicResultHandler implements AudioLoadResultHandler {
     @Override
     public void trackLoaded(AudioTrack track) {
         queue.addToPlaylist(track);
-        textChannel.sendMessage("Track loaded " + track.getInfo().title).queue();;
+        textChannel.sendMessage("Track loaded " + track.getInfo().title).queue();
     }
     
 }

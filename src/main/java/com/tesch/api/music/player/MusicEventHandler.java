@@ -24,6 +24,18 @@ public class MusicEventHandler {
         this.audioPlayer.addListener(this.queue);
     }
 
+    public AudioPlayer getAudioPlayer() {
+        return this.audioPlayer;
+    }
+
+    public AudioPlayerManager getPlayerManager() {
+        return this.playerManager;
+    }
+
+    public MusicQueue getQueue() {
+        return this.queue;
+    }
+
     public void onPlayCommand(MessageReceivedEvent event) {
         String[] message = event.getMessage().getContentRaw().split(" ");
 
