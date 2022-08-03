@@ -56,7 +56,10 @@ public class MusicleManager {
             textChannel.sendMessage("Scoreboard:\n" + this.getScoreboard()).queue();;
             return;
         }
-        if (!Arrays.asList(MusicGenres.values()).contains(MusicGenres.valueOf(message[1].toUpperCase()))) {
+        try {
+            MusicGenres.valueOf(message[1].toUpperCase());
+        }
+        catch (IllegalArgumentException e) {
             textChannel.sendMessage("Invalid music genre. Possible genres:\n" + this.getPossibleGenres()).queue();
             return;
         }
@@ -89,7 +92,7 @@ public class MusicleManager {
             Button.primary("4", Emoji.fromUnicode("4️⃣")),
             Button.primary("5", Emoji.fromUnicode("5️⃣"))
             )
-        .queue();;
+        .queue();
     }
 
     public synchronized void generateAnswers(List<String> songAuthors, List<String> songTitles) {
@@ -107,13 +110,18 @@ public class MusicleManager {
         answers[this.answerIndex] = this.answerName;
 
         StringBuilder stringBuilder = new StringBuilder();
-        Arrays.asList(answers).stream().forEach(x -> stringBuilder.append(x + "\n"));
+        int i = 1;
+        for (String string : answers) {
+            stringBuilder.append(i + ". " + string + "\n");
+            i++;
+        }
         this.stringBuilder = stringBuilder;
         this.notify();
     }
 
     public void onButtonInteraction(ButtonInteractionEvent event) {
         if (event.getUser() == this.player) {
+            event.getMessage().editMessageEmbeds().setActionRows().queue();
             if (Integer.parseInt(event.getButton().getId()) == this.answerIndex + 1) {
                 this.playerScore.get(this.player).addWin();
                 event.editMessage("Correct answer").queue();
@@ -122,7 +130,6 @@ public class MusicleManager {
                 this.playerScore.get(this.player).addLoss();
                 event.editMessage("Wrong answer. Correct answer: " + this.answerName).queue();
             }
-            event.getMessage().editMessageEmbeds().setActionRows().queue();
             this.stop(event);
         }
     }
