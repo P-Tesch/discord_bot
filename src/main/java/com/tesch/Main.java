@@ -1,4 +1,4 @@
-package com.tesch.application;
+package com.tesch;
 
 import com.tesch.api.EventListeners;
 import com.tesch.api.music.player.MusicEventHandler;

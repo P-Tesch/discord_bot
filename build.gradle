@@ -1,0 +1,51 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+group 'com.tesch'
+version '1.0'
+
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+
+jar {
+    classes.dependsOn(clean)
+
+    manifest {
+        attributes 'Implementation-Title': 'tesch_discord_bot',
+                   'Implementation-Version': project.version,
+                   'Main-Class': 'com.tesch.Main'
+    }
+
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+
+    from {
+        configurations.runtimeClasspath.collect {
+            it.isDirectory() ? it : zipTree(it) 
+        } 
+    }
+}
+
+task stage(dependsOn: ['build', 'clean'])
+build.mustRunAfter clean
+
+startScripts {
+    mainClass.set('com.tesch.Main')
+}
+
+repositories {
+    mavenCentral()
+
+    maven {
+        url 'https://m2.dv8tion.net/releases'
+    }
+}
+
+dependencies {
+
+    implementation 'com.discord4j:discord4j-core:3.2.1'
+    implementation 'com.discord4j:discord4j-voice:3.2.1'
+    implementation 'com.sedmelluq:lavaplayer:1.3.78'
+    implementation 'net.dv8tion:JDA:5.0.0-alpha.14'
+}

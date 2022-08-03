@@ -3,6 +3,7 @@ package com.tesch.api.music.player;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.stream.Collectors;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
@@ -37,7 +38,7 @@ public class MusicQueue extends AudioEventAdapter{
     }
 
     public List<AudioTrack> getPlaylist() {
-        return playlist.stream().toList();
+        return playlist.stream().collect(Collectors.toList());
     }
 
     public void clearPlaylist() {
