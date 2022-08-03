@@ -94,6 +94,8 @@ public class MusicleManager {
 
     public synchronized void generateAnswers(List<String> songAuthors, List<String> songTitles) {
         Set<String> possibleAnswers = new HashSet<>(this.titleMode ? songTitles : songAuthors);
+        this.answerName = this.titleMode ? musicEventHandler.getAudioPlayer().getPlayingTrack().getInfo().title : musicEventHandler.getAudioPlayer().getPlayingTrack().getInfo().author;
+        possibleAnswers.remove(this.answerName);
         String[] answers = new String[5];
         for (int i = 0; i < 5; i++) {
             answers[i] = possibleAnswers.stream().collect(Collectors.toList()).get((int) Math.floor(Math.random()*(possibleAnswers.size())));
@@ -101,8 +103,7 @@ public class MusicleManager {
         }
 
         this.answerIndex = (int) Math.floor(Math.random()*(answers.length - 1));
-        this.answerName = this.titleMode ? musicEventHandler.getAudioPlayer().getPlayingTrack().getInfo().title : musicEventHandler.getAudioPlayer().getPlayingTrack().getInfo().author;
-
+        
         answers[this.answerIndex] = this.answerName;
 
         StringBuilder stringBuilder = new StringBuilder();
