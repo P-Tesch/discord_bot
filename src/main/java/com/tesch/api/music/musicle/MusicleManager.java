@@ -27,6 +27,7 @@ public class MusicleManager {
     private boolean titleMode;
     private StringBuilder stringBuilder;
     private User player;
+    private String[] answers;
     private Integer answerIndex;
     private String answerName;
     private Map<User, MusicleScore> playerScore;
@@ -99,37 +100,40 @@ public class MusicleManager {
         Set<String> possibleAnswers = new HashSet<>(this.titleMode ? songTitles : songAuthors);
         this.answerName = this.titleMode ? musicEventHandler.getAudioPlayer().getPlayingTrack().getInfo().title : musicEventHandler.getAudioPlayer().getPlayingTrack().getInfo().author;
         possibleAnswers.remove(this.answerName);
-        String[] answers = new String[5];
+        this.answers = new String[5];
         for (int i = 0; i < 5; i++) {
-            answers[i] = possibleAnswers.stream().collect(Collectors.toList()).get((int) Math.floor(Math.random()*(possibleAnswers.size())));
+            this.answers[i] = possibleAnswers.stream().collect(Collectors.toList()).get((int) Math.floor(Math.random()*(possibleAnswers.size())));
             possibleAnswers.remove(answers[i]);
         }
 
         this.answerIndex = (int) Math.floor(Math.random()*(answers.length - 1));
-        
-        answers[this.answerIndex] = this.answerName;
-
-        StringBuilder stringBuilder = new StringBuilder();
-        int i = 1;
-        for (String string : answers) {
-            stringBuilder.append(i + ". " + string + "\n");
-            i++;
+        this.answers[this.answerIndex] = this.answerName;
+        this.stringBuilder = new StringBuilder();
+        for (int i = 0; i < this.answers.length; i++) {
+            this.answers[i] = (i + 1 + ". " + this.answers[i]);
+            stringBuilder.append(this.answers[i] + "\n");
         }
-        this.stringBuilder = stringBuilder;
         this.notify();
     }
 
     public void onButtonInteraction(ButtonInteractionEvent event) {
         if (event.getUser() == this.player) {
             event.getMessage().editMessageEmbeds().setActionRows().queue();
-            if (Integer.parseInt(event.getButton().getId()) == this.answerIndex + 1) {
+            int selected = Integer.parseInt(event.getButton().getId());
+            StringBuilder builder = new StringBuilder();
+            if (selected == this.answerIndex + 1) {
+                this.answers[this.answerIndex] = this.answers[this.answerIndex] + " ✅";
+                Arrays.asList(this.answers).stream().forEach(x -> builder.append(x + "\n"));
                 this.playerScore.get(this.player).addWin();
-                event.editMessage("Correct answer").queue();
             }
             else {
+                this.answers[this.answerIndex] = this.answers[this.answerIndex] + " ☑️";
+                this.answers[selected - 1] = this.answers[selected - 1] + " ❌";
+                Arrays.asList(this.answers).stream().forEach(x -> builder.append(x + "\n"));
                 this.playerScore.get(this.player).addLoss();
-                event.editMessage("Wrong answer. Correct answer: " + this.answerName).queue();
             }
+            builder.append("\nTitle: " + this.musicEventHandler.getAudioPlayer().getPlayingTrack().getInfo().title);
+            event.editMessage(builder.toString()).queue();
             this.stop(event);
         }
     }
@@ -145,7 +149,7 @@ public class MusicleManager {
         this.answerIndex = null;
         this.answerName = null;
         this.player = null;
-        event.getGuild().getAudioManager().closeAudioConnection();
+        this.answers = null;
         this.musicEventHandler.getQueue().clearPlaylist();
     }
 
