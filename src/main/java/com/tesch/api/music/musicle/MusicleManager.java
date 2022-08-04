@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.tesch.api.music.musicle.enums.MusicGenres;
 import com.tesch.api.music.player.MusicEventHandler;
 import com.tesch.api.music.player.MusicPlayerSendHandler;
@@ -25,6 +26,7 @@ public class MusicleManager {
 
     private MusicEventHandler musicEventHandler;
     private boolean titleMode;
+    private boolean startMode;
     private StringBuilder stringBuilder;
     private User player;
     private String[] answers;
@@ -35,6 +37,7 @@ public class MusicleManager {
     public MusicleManager(MusicEventHandler musicEventHandler) {
         this.musicEventHandler = musicEventHandler;
         this.titleMode = false;
+        this.startMode = true;
         this.player = null;
         this.answerIndex = null;
         this.answerName = null;
@@ -49,8 +52,13 @@ public class MusicleManager {
             return;
         }
         if (message[1].equals("mode")) {
-            this.changeMode();
-            textChannel.sendMessage(this.titleMode ? "Set to title mode" : "Set to author mode").queue();;
+            this.changeTitleMode();
+            textChannel.sendMessage(this.titleMode ? "Set to title mode" : "Set to author mode").queue();
+            return;
+        }
+        if (message[1].equals("start")) {
+            this.changeStartMode();
+            textChannel.sendMessage(this.startMode ? "Set to start mode" : "Set to random mode").queue();
             return;
         }
         if (message[1].equals("score")) {
@@ -85,6 +93,10 @@ public class MusicleManager {
         MusicleResultHandler resultHandler = new MusicleResultHandler(event.getChannel().asTextChannel(), musicEventHandler.getQueue(), this);
         musicEventHandler.getPlayerManager().loadItem(url, resultHandler);
         this.wait();
+        if (!this.startMode) {
+            AudioTrack track = this.musicEventHandler.getAudioPlayer().getPlayingTrack();
+            track.setPosition((int) Math.floor(Math.random()*(3 * track.getDuration() / 4)));
+        }
 
         textChannel.sendMessage(this.stringBuilder).setActionRow(
             Button.primary("1", Emoji.fromUnicode("1️⃣")),
@@ -153,8 +165,12 @@ public class MusicleManager {
         this.musicEventHandler.getQueue().clearPlaylist();
     }
 
-    private void changeMode() {
+    private void changeTitleMode() {
         this.titleMode = !this.titleMode;
+    }
+
+    private void changeStartMode() {
+        this.startMode = !this.startMode;
     }
 
     private String getScoreboard() {
