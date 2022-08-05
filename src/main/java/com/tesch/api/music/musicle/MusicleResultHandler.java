@@ -26,12 +26,12 @@ public class MusicleResultHandler implements AudioLoadResultHandler {
 
     @Override
     public void loadFailed(FriendlyException e) {
-        textChannel.sendMessage("Error loading track: " + e.getMessage()).queue();;
+        textChannel.sendMessage("Error loading track: " + e.getMessage()).queue();
     }
 
     @Override
     public void noMatches() {
-        textChannel.sendMessage("Error loading track: Track not found").queue();;
+        textChannel.sendMessage("Error loading track: Track not found").queue();
     }
 
     @Override

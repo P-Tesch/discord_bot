@@ -6,6 +6,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
@@ -25,6 +28,7 @@ import net.dv8tion.jda.api.managers.AudioManager;
 public class MusicleManager {
 
     private MusicEventHandler musicEventHandler;
+    private ScheduledExecutorService executorService;
     private boolean titleMode;
     private boolean startMode;
     private StringBuilder stringBuilder;
@@ -36,6 +40,7 @@ public class MusicleManager {
 
     public MusicleManager(MusicEventHandler musicEventHandler) {
         this.musicEventHandler = musicEventHandler;
+        this.executorService = Executors.newScheduledThreadPool(1);
         this.titleMode = false;
         this.startMode = true;
         this.player = null;
@@ -76,6 +81,8 @@ public class MusicleManager {
             textChannel.sendMessage("Something is already playing, clear the queue to play").queue();
             return;
         }
+        this.executorService.shutdownNow();
+        this.executorService = Executors.newScheduledThreadPool(1);
         String url = null;
         for (MusicGenres genre : MusicGenres.values()) {
             if (genre == MusicGenres.valueOf(message[1].toUpperCase())) {
@@ -130,7 +137,6 @@ public class MusicleManager {
 
     public void onButtonInteraction(ButtonInteractionEvent event) {
         if (event.getUser() == this.player) {
-            event.getMessage().editMessageEmbeds().setActionRows().queue();
             int selected = Integer.parseInt(event.getButton().getId());
             StringBuilder builder = new StringBuilder();
             if (selected == this.answerIndex + 1) {
@@ -145,7 +151,7 @@ public class MusicleManager {
                 this.playerScore.get(this.player).addLoss();
             }
             builder.append("\nTitle: " + this.musicEventHandler.getAudioPlayer().getPlayingTrack().getInfo().title);
-            event.editMessage(builder.toString()).queue();
+            event.editMessage(builder.toString()).queue(msg -> event.getMessage().editMessageEmbeds().setActionRows().queue());
             this.stop(event);
         }
     }
@@ -162,6 +168,8 @@ public class MusicleManager {
         this.answerName = null;
         this.player = null;
         this.answers = null;
+        Runnable disconnect = () -> event.getGuild().getAudioManager().closeAudioConnection();
+        this.executorService.schedule(disconnect, 60, TimeUnit.SECONDS);
         this.musicEventHandler.getQueue().clearPlaylist();
     }
 
