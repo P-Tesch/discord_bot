@@ -86,9 +86,15 @@ public class MusicEventHandler {
     }
 
     public void onQueueCommand(MessageReceivedEvent event) {
-        StringBuilder queueString = new StringBuilder();
-        this.queue.getPlaylist().stream().map(x -> x.getInfo().title).forEach(x -> queueString.append(x + "\n"));
-        event.getChannel().sendMessage("Queue:\n" + queueString).queue();
+        try {
+            StringBuilder queueString = new StringBuilder();
+            queueString.append(this.audioPlayer.getPlayingTrack().getInfo().title + "\n");
+            this.queue.getPlaylist().stream().map(x -> x.getInfo().title).forEach(x -> queueString.append(x + "\n"));
+            event.getChannel().sendMessage("Queue:\n" + queueString).queue();
+        }
+        catch (NullPointerException e) {
+            event.getChannel().sendMessage("Queue empty").queue();
+        }
     }
 
     public void onClearCommand(MessageReceivedEvent event) {
