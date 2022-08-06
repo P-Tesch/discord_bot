@@ -15,6 +15,7 @@ import javax.security.auth.login.LoginException;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
+import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeSearchProvider;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -34,7 +35,7 @@ public class Main {
         AudioPlayerManager playerManager = new DefaultAudioPlayerManager();
         AudioSourceManagers.registerRemoteSources(playerManager);
 
-        MusicEventHandler musicEventHandler = new MusicEventHandler(playerManager, new MusicQueue());
+        MusicEventHandler musicEventHandler = new MusicEventHandler(playerManager, new MusicQueue(), new YoutubeSearchProvider());
         MusicleManager musicleManager = new MusicleManager(musicEventHandler);
 
         builder.addEventListener(new EventListeners(builder, musicEventHandler, musicleManager));

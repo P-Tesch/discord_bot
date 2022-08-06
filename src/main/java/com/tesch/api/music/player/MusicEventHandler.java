@@ -2,6 +2,11 @@ package com.tesch.api.music.player;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
+import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
+import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioTrack;
+import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeSearchProvider;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import com.sedmelluq.discord.lavaplayer.track.BasicAudioPlaylist;
 
 import net.dv8tion.jda.api.entities.AudioChannel;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -13,10 +18,12 @@ public class MusicEventHandler {
     private AudioPlayer audioPlayer;
     private AudioPlayerManager playerManager;
     private MusicQueue queue;
+    private YoutubeSearchProvider youtubeSearch;
     
-    public MusicEventHandler(AudioPlayerManager playerManager, MusicQueue queue) {
+    public MusicEventHandler(AudioPlayerManager playerManager, MusicQueue queue, YoutubeSearchProvider youtubeSearch) {
         this.playerManager = playerManager;
         this.queue = queue;
+        this.youtubeSearch = youtubeSearch;
 
         this.audioPlayer = playerManager.createPlayer();
 
@@ -37,7 +44,7 @@ public class MusicEventHandler {
     }
 
     public void onPlayCommand(MessageReceivedEvent event) {
-        String[] message = event.getMessage().getContentRaw().split(" ");
+        String message = event.getMessage().getContentRaw().replace("play ", "");
 
         TextChannel textChannel = event.getMessage().getChannel().asTextChannel();
         AudioChannel voiceChannel = event.getMember().getVoiceState().getChannel();
@@ -48,7 +55,10 @@ public class MusicEventHandler {
 
         MusicResultHandler resultHandler = new MusicResultHandler(textChannel, queue);
 
-        playerManager.loadItem(message[1], resultHandler);
+        BasicAudioPlaylist songs = (BasicAudioPlaylist) youtubeSearch.loadSearchResult(message, info -> new YoutubeAudioTrack(info, new YoutubeAudioSourceManager()));
+
+        AudioTrack song = songs.getTracks().get(0);
+        playerManager.loadItem(song.getInfo().uri, resultHandler);
     }
 
     public void onVolumeCommand(MessageReceivedEvent event) {

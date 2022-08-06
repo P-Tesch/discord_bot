@@ -53,7 +53,7 @@ public class MusicleManager {
         TextChannel textChannel = event.getChannel().asTextChannel();
         String[] message = event.getMessage().getContentRaw().split(" ");
         if (message.length == 1) {
-            textChannel.sendMessage("Must input a music genre. Possible genres:\n" + this.getPossibleGenres()).queue();
+            textChannel.sendMessage("Must input a music genre. Possible genres:\n" + this.getPossibleGenres().toLowerCase()).queue();
             return;
         }
         if (message[1].equals("mode")) {
