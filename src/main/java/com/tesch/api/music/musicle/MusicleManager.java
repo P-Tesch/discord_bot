@@ -96,6 +96,7 @@ public class MusicleManager {
         AudioManager audioManager = event.getGuild().getAudioManager();
         audioManager.setSendingHandler(new MusicPlayerSendHandler(this.musicEventHandler.getAudioPlayer()));
         audioManager.openAudioConnection(voiceChannel);
+        audioManager.setSelfDeafened(true);
 
         MusicleResultHandler resultHandler = new MusicleResultHandler(event.getChannel().asTextChannel(), musicEventHandler.getQueue(), this);
         musicEventHandler.getPlayerManager().loadItem(url, resultHandler);

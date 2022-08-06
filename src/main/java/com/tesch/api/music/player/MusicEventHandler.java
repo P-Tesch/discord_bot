@@ -52,6 +52,7 @@ public class MusicEventHandler {
         AudioManager audioManager = event.getGuild().getAudioManager();
         audioManager.setSendingHandler(new MusicPlayerSendHandler(audioPlayer));
         audioManager.openAudioConnection(voiceChannel);
+        audioManager.setSelfDeafened(true);
 
         MusicResultHandler resultHandler = new MusicResultHandler(textChannel, queue);
 
