@@ -40,7 +40,7 @@ public class MusicleManager {
         this.discordUtils = this.musicEventHandler.getDiscordUtils();
         this.scheduler = new TaskScheduler();
         this.titleMode = false;
-        this.startMode = true;
+        this.startMode = false;
         this.player = null;
         this.answerIndex = null;
         this.answerName = null;
