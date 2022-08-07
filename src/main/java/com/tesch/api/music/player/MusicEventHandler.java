@@ -48,6 +48,10 @@ public class MusicEventHandler {
         return this.queue;
     }
 
+    public DiscordUtils getDiscordUtils() {
+        return this.discordUtils;
+    }
+
     public void onPlayCommand(MessageReceivedEvent event) {
         String message = event.getMessage().getContentRaw().replace("play ", "");
 
