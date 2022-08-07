@@ -10,12 +10,15 @@ import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
+import com.tesch.api.utils.TaskScheduler;
 
 public class MusicQueue extends AudioEventAdapter{
 
     private Queue<AudioTrack> playlist;
     private AudioPlayer player;
     private boolean loop;
+    private TaskScheduler scheduler;
+    private MusicEventHandler musicManager;
 
     public MusicQueue() {
         playlist = new LinkedBlockingQueue<>();
@@ -33,8 +36,16 @@ public class MusicQueue extends AudioEventAdapter{
         }
     }
 
+    public void setScheduler(TaskScheduler scheduler) {
+        this.scheduler = scheduler;
+    }
+
     public void setPlayer(AudioPlayer player) {
         this.player = player;
+    }
+
+    public void setMusicManager(MusicEventHandler musicManager) {
+        this.musicManager = musicManager;
     }
 
     public List<AudioTrack> getPlaylist() {
@@ -44,6 +55,7 @@ public class MusicQueue extends AudioEventAdapter{
     public void clearPlaylist() {
         playlist.clear();
         player.stopTrack();
+        this.scheduler.schedule(() -> this.musicManager.onDisconnectCommand(), 120);
     }
 
     public void addToPlaylist(AudioPlaylist playlist) {
@@ -60,9 +72,13 @@ public class MusicQueue extends AudioEventAdapter{
     public void playNextTrack(Boolean skip) {
         if (player.startTrack(playlist.peek(), !skip)) {
             AudioTrack played = playlist.poll();
+            this.scheduler.cancelAll();
             if (loop) {
                 playlist.offer(played);
             }
+        }
+        if (this.playlist.isEmpty() && this.player.getPlayingTrack() == null) {
+            this.scheduler.schedule(() -> this.musicManager.onDisconnectCommand(), 120);
         }
     }
 

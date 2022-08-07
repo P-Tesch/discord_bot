@@ -50,27 +50,27 @@ public class EventListeners extends ListenerAdapter {
         }
 
         if (message.startsWith("disconnect")) {
-            musicEventHandler.onDisconnectCommand(event);
+            musicEventHandler.onDisconnectCommand();
             return;
         }
 
         if (message.startsWith("skip")) {
-            musicEventHandler.onSkipCommand(event);
+            musicEventHandler.onSkipCommand();
             return;
         }
 
         if (message.startsWith("queue")) {
-            musicEventHandler.onQueueCommand(event);
+            musicEventHandler.onQueueCommand();
             return;
         }
 
         if (message.startsWith("clear")) {
-            musicEventHandler.onClearCommand(event);
+            musicEventHandler.onClearCommand();
             return;
         }
 
         if (message.startsWith("loop")) {
-            musicEventHandler.onLoopCommand(event);
+            musicEventHandler.onLoopCommand();
             return;
         }
 
