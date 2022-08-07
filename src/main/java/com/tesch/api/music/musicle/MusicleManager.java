@@ -15,6 +15,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.tesch.api.music.musicle.enums.MusicGenres;
 import com.tesch.api.music.player.MusicEventHandler;
 import com.tesch.api.music.player.MusicPlayerSendHandler;
+import com.tesch.api.utils.TaskScheduler;
 
 import net.dv8tion.jda.api.entities.AudioChannel;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -28,7 +29,7 @@ import net.dv8tion.jda.api.managers.AudioManager;
 public class MusicleManager {
 
     private MusicEventHandler musicEventHandler;
-    private ScheduledExecutorService executorService;
+    private TaskScheduler scheduler;
     private boolean titleMode;
     private boolean startMode;
     private StringBuilder stringBuilder;
@@ -40,7 +41,7 @@ public class MusicleManager {
 
     public MusicleManager(MusicEventHandler musicEventHandler) {
         this.musicEventHandler = musicEventHandler;
-        this.executorService = Executors.newScheduledThreadPool(1);
+        this.scheduler = new TaskScheduler();
         this.titleMode = false;
         this.startMode = true;
         this.player = null;
@@ -81,8 +82,9 @@ public class MusicleManager {
             textChannel.sendMessage("Something is already playing, clear the queue to play").queue();
             return;
         }
-        this.executorService.shutdownNow();
-        this.executorService = Executors.newScheduledThreadPool(1);
+
+        this.scheduler.cancelAll();
+
         String url = null;
         for (MusicGenres genre : MusicGenres.values()) {
             if (genre == MusicGenres.valueOf(message[1].toUpperCase())) {
@@ -170,7 +172,7 @@ public class MusicleManager {
         this.player = null;
         this.answers = null;
         Runnable disconnect = () -> event.getGuild().getAudioManager().closeAudioConnection();
-        this.executorService.schedule(disconnect, 60, TimeUnit.SECONDS);
+        this.scheduler.schedule(disconnect, 60);
         this.musicEventHandler.getQueue().clearPlaylist();
     }
 
