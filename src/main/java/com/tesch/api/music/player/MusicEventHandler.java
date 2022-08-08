@@ -1,5 +1,8 @@
 package com.tesch.api.music.player;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
@@ -56,15 +59,14 @@ public class MusicEventHandler {
         String message = event.getMessage().getContentRaw().replace("play ", "");
 
         discordUtils.buildFromMessageEvent(event);
-        
         discordUtils.connectToVoice(new MusicPlayerSendHandler(audioPlayer));
 
-        MusicResultHandler resultHandler = new MusicResultHandler(this.discordUtils.getText(), queue);
-
-        BasicAudioPlaylist songs = (BasicAudioPlaylist) youtubeSearch.loadSearchResult(message, info -> new YoutubeAudioTrack(info, new YoutubeAudioSourceManager()));
-
-        AudioTrack song = songs.getTracks().get(0);
-        playerManager.loadItem(song.getInfo().uri, resultHandler);
+        if (this.isUrl(message)) {
+            this.playFromUrl(message);
+        }
+        else {
+            this.playFromSearch(message);
+        }
     }
 
     public void onVolumeCommand(MessageReceivedEvent event) {
@@ -118,5 +120,29 @@ public class MusicEventHandler {
     public void onShuffleCommand() {
         this.queue.shufflePlaylist();
         this.discordUtils.sendMessage("Queue Suffled");
+    }
+
+    private boolean isUrl(String test) {
+        try {
+            new URL(test);
+            return true;
+        } 
+        catch (MalformedURLException e) {
+            return false;
+        }
+    }
+
+    private void playFromUrl(String url) {
+        MusicResultHandler resultHandler = new MusicResultHandler(this.discordUtils.getText(), queue);
+        playerManager.loadItem(url, resultHandler);
+    }
+
+    private void playFromSearch(String search) {
+        MusicResultHandler resultHandler = new MusicResultHandler(this.discordUtils.getText(), queue);
+
+        BasicAudioPlaylist songs = (BasicAudioPlaylist) youtubeSearch.loadSearchResult(search, info -> new YoutubeAudioTrack(info, new YoutubeAudioSourceManager()));
+        AudioTrack song = songs.getTracks().get(0);
+        
+        playerManager.loadItem(song.getInfo().uri, resultHandler);
     }
 }
