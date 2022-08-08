@@ -1,6 +1,7 @@
 package com.tesch;
 
 import com.tesch.api.EventListeners;
+import com.tesch.api.games.RNGManager;
 import com.tesch.api.music.musicle.MusicleManager;
 import com.tesch.api.music.player.MusicEventHandler;
 import com.tesch.api.music.player.MusicQueue;
@@ -37,8 +38,9 @@ public class Main {
 
         MusicEventHandler musicEventHandler = new MusicEventHandler(playerManager, new MusicQueue(), new YoutubeSearchProvider());
         MusicleManager musicleManager = new MusicleManager(musicEventHandler);
+        RNGManager rngManager = new RNGManager();
 
-        builder.addEventListener(new EventListeners(builder, musicEventHandler, musicleManager));
+        builder.addEventListener(new EventListeners(builder, musicEventHandler, musicleManager, rngManager));
         builder.awaitReady();
     }
 

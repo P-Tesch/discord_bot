@@ -2,6 +2,7 @@ package com.tesch.api;
 
 import org.jetbrains.annotations.NotNull;
 
+import com.tesch.api.games.RNGManager;
 import com.tesch.api.music.musicle.MusicleManager;
 import com.tesch.api.music.player.MusicEventHandler;
 
@@ -18,11 +19,13 @@ public class EventListeners extends ListenerAdapter {
     private JDA jda;
     private MusicEventHandler musicEventHandler;
     private MusicleManager musicleManager;
+    private RNGManager rngManager;
 
-    public EventListeners(JDA jda, MusicEventHandler musicEventHandler, MusicleManager musicleManager) {
+    public EventListeners(JDA jda, MusicEventHandler musicEventHandler, MusicleManager musicleManager, RNGManager rngManager) {
         this.jda = jda;
         this.musicEventHandler = musicEventHandler;
         this.musicleManager = musicleManager;
+        this.rngManager = rngManager;
     }
     
     @Override
@@ -88,6 +91,10 @@ public class EventListeners extends ListenerAdapter {
                 e.printStackTrace();
             }
             return;
+        }
+
+        if (message.startsWith("coinflip")) {
+            rngManager.coinFlip(event);
         }
     }
 
