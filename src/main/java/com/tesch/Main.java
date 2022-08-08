@@ -2,10 +2,6 @@ package com.tesch;
 
 import com.tesch.api.EventListeners;
 import com.tesch.api.ManagerFactory;
-import com.tesch.api.games.RNGManager;
-import com.tesch.api.music.musicle.MusicleManager;
-import com.tesch.api.music.player.MusicManager;
-import com.tesch.api.music.player.MusicQueue;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -13,11 +9,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.security.auth.login.LoginException;
-
-import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
-import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
-import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
-import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeSearchProvider;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;

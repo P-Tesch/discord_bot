@@ -20,7 +20,7 @@ public class EventListeners extends ListenerAdapter {
 
     public EventListeners(ManagerFactory managerFactory) {
         this.musicManager = managerFactory.buildMusicManager();
-        this.musicleManager = managerFactory.buildMusicleManager(this.musicManager);
+        this.musicleManager = managerFactory.buildMusicleManager();
         this.rngManager = managerFactory.buildRngManager();
     }
     
@@ -102,9 +102,5 @@ public class EventListeners extends ListenerAdapter {
     @Override
     public void onButtonInteraction(ButtonInteractionEvent event) {
         this.musicleManager.onButtonInteraction(event);
-    }
-    
-    private void onMention(MessageReceivedEvent event) {
-        event.getChannel().sendMessage(event.getAuthor().getAsMention()).queue();
     }
 }
