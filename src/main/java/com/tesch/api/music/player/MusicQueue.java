@@ -1,5 +1,6 @@
 package com.tesch.api.music.player;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -50,6 +51,12 @@ public class MusicQueue extends AudioEventAdapter{
 
     public List<AudioTrack> getPlaylist() {
         return playlist.stream().collect(Collectors.toList());
+    }
+
+    public void shufflePlaylist() {
+        List<AudioTrack> shuffledPlaylist = new ArrayList<>();
+        playlist.stream().forEach(track -> shuffledPlaylist.add((int)Math.floor(Math.random() * shuffledPlaylist.size()), track));
+        this.playlist = new LinkedBlockingQueue<>(shuffledPlaylist);
     }
 
     public void clearPlaylist() {

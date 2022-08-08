@@ -114,4 +114,9 @@ public class MusicEventHandler {
         this.queue.setLoop(!this.queue.getLoop());
         this.discordUtils.sendMessage("Loop set to " + this.queue.getLoop());
     }
+
+    public void onShuffleCommand() {
+        this.queue.shufflePlaylist();
+        this.discordUtils.sendMessage("Queue Suffled");
+    }
 }
