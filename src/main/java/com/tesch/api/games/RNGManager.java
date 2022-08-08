@@ -1,7 +1,5 @@
 package com.tesch.api.games;
 
-import java.net.URL;
-
 import com.tesch.api.utils.DiscordUtils;
 
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
