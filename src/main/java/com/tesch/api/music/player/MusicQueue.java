@@ -20,7 +20,7 @@ public class MusicQueue extends AudioEventAdapter{
     private AudioPlayer player;
     private boolean loop;
     private TaskScheduler scheduler;
-    private MusicEventHandler musicManager;
+    private MusicManager musicManager;
 
     public MusicQueue() {
         playlist = new LinkedBlockingQueue<>();
@@ -46,7 +46,7 @@ public class MusicQueue extends AudioEventAdapter{
         this.player = player;
     }
 
-    public void setMusicManager(MusicEventHandler musicManager) {
+    public void setMusicManager(MusicManager musicManager) {
         this.musicManager = musicManager;
     }
 

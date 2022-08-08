@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.tesch.api.music.musicle.enums.MusicGenres;
-import com.tesch.api.music.player.MusicEventHandler;
+import com.tesch.api.music.player.MusicManager;
 import com.tesch.api.music.player.MusicPlayerSendHandler;
 import com.tesch.api.utils.DiscordUtils;
 import com.tesch.api.utils.MiscUtils;
@@ -24,7 +24,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 public class MusicleManager {
 
-    private MusicEventHandler musicEventHandler;
+    private MusicManager musicEventHandler;
     private TaskScheduler scheduler;
     private DiscordUtils discordUtils;
     private boolean titleMode;
@@ -36,7 +36,7 @@ public class MusicleManager {
     private String answerName;
     private Map<User, MusicleScore> playerScore;
 
-    public MusicleManager(MusicEventHandler musicEventHandler) {
+    public MusicleManager(MusicManager musicEventHandler) {
         this.musicEventHandler = musicEventHandler;
         this.discordUtils = this.musicEventHandler.getDiscordUtils();
         this.scheduler = new TaskScheduler();

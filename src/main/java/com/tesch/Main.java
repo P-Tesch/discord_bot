@@ -1,9 +1,10 @@
 package com.tesch;
 
 import com.tesch.api.EventListeners;
+import com.tesch.api.ManagerFactory;
 import com.tesch.api.games.RNGManager;
 import com.tesch.api.music.musicle.MusicleManager;
-import com.tesch.api.music.player.MusicEventHandler;
+import com.tesch.api.music.player.MusicManager;
 import com.tesch.api.music.player.MusicQueue;
 
 import java.io.FileNotFoundException;
@@ -33,14 +34,7 @@ public class Main {
         .setActivity(Activity.listening("Boate Azul"))
         .build();
 
-        AudioPlayerManager playerManager = new DefaultAudioPlayerManager();
-        AudioSourceManagers.registerRemoteSources(playerManager);
-
-        MusicEventHandler musicEventHandler = new MusicEventHandler(playerManager, new MusicQueue(), new YoutubeSearchProvider());
-        MusicleManager musicleManager = new MusicleManager(musicEventHandler);
-        RNGManager rngManager = new RNGManager();
-
-        builder.addEventListener(new EventListeners(builder, musicEventHandler, musicleManager, rngManager));
+        builder.addEventListener(new EventListeners(new ManagerFactory()));
         builder.awaitReady();
     }
 

@@ -15,7 +15,7 @@ import com.tesch.api.utils.TaskScheduler;
 
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
-public class MusicEventHandler {
+public class MusicManager {
 
     private AudioPlayer audioPlayer;
     private AudioPlayerManager playerManager;
@@ -24,7 +24,7 @@ public class MusicEventHandler {
     private TaskScheduler scheduler;
     private DiscordUtils discordUtils;
     
-    public MusicEventHandler(AudioPlayerManager playerManager, MusicQueue queue, YoutubeSearchProvider youtubeSearch) {
+    public MusicManager(AudioPlayerManager playerManager, MusicQueue queue, YoutubeSearchProvider youtubeSearch) {
         this.playerManager = playerManager;
         this.queue = queue;
         this.youtubeSearch = youtubeSearch;

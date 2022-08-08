@@ -4,11 +4,9 @@ import org.jetbrains.annotations.NotNull;
 
 import com.tesch.api.games.RNGManager;
 import com.tesch.api.music.musicle.MusicleManager;
-import com.tesch.api.music.player.MusicEventHandler;
+import com.tesch.api.music.player.MusicManager;
 
-import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Message.MentionType;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -16,16 +14,14 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 public class EventListeners extends ListenerAdapter {
 
-    private JDA jda;
-    private MusicEventHandler musicEventHandler;
+    private MusicManager musicManager;
     private MusicleManager musicleManager;
     private RNGManager rngManager;
 
-    public EventListeners(JDA jda, MusicEventHandler musicEventHandler, MusicleManager musicleManager, RNGManager rngManager) {
-        this.jda = jda;
-        this.musicEventHandler = musicEventHandler;
-        this.musicleManager = musicleManager;
-        this.rngManager = rngManager;
+    public EventListeners(ManagerFactory managerFactory) {
+        this.musicManager = managerFactory.buildMusicManager();
+        this.musicleManager = managerFactory.buildMusicleManager(this.musicManager);
+        this.rngManager = managerFactory.buildRngManager();
     }
     
     @Override
@@ -34,53 +30,48 @@ public class EventListeners extends ListenerAdapter {
 
         String message = event.getMessage().getContentRaw();
 
-        if (event.getMessage().getMentions().isMentioned(jda.getSelfUser(), MentionType.USER)) {
-            this.onMention(event);
-            return;
-        }
-
         if (message.startsWith("play")) {
-            musicEventHandler.onPlayCommand(event);
+            musicManager.onPlayCommand(event);
             return;
         }
 
         if (message.startsWith("volume")) {
-            musicEventHandler.onVolumeCommand(event);
+            musicManager.onVolumeCommand(event);
             return;
         }
 
         if (message.startsWith("pause")) {
-            musicEventHandler.onPauseCommand();
+            musicManager.onPauseCommand();
             return;
         }
 
         if (message.startsWith("disconnect")) {
-            musicEventHandler.onDisconnectCommand();
+            musicManager.onDisconnectCommand();
             return;
         }
 
         if (message.startsWith("skip")) {
-            musicEventHandler.onSkipCommand();
+            musicManager.onSkipCommand();
             return;
         }
 
         if (message.startsWith("queue")) {
-            musicEventHandler.onQueueCommand();
+            musicManager.onQueueCommand();
             return;
         }
 
         if (message.startsWith("clear")) {
-            musicEventHandler.onClearCommand();
+            musicManager.onClearCommand();
             return;
         }
 
         if (message.startsWith("loop")) {
-            musicEventHandler.onLoopCommand();
+            musicManager.onLoopCommand();
             return;
         }
 
         if (message.startsWith("shuffle")) {
-            musicEventHandler.onShuffleCommand();
+            musicManager.onShuffleCommand();
             return;
         }
 
