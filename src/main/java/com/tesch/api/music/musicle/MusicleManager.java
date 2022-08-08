@@ -13,6 +13,7 @@ import com.tesch.api.music.musicle.enums.MusicGenres;
 import com.tesch.api.music.player.MusicEventHandler;
 import com.tesch.api.music.player.MusicPlayerSendHandler;
 import com.tesch.api.utils.DiscordUtils;
+import com.tesch.api.utils.MiscUtils;
 import com.tesch.api.utils.TaskScheduler;
 
 import net.dv8tion.jda.api.entities.User;
@@ -98,7 +99,7 @@ public class MusicleManager {
         this.wait();
         if (!this.startMode) {
             AudioTrack track = this.musicEventHandler.getAudioPlayer().getPlayingTrack();
-            track.setPosition((int) Math.floor(Math.random()*(3 * track.getDuration() / 4)));
+            track.setPosition(MiscUtils.randomInt(0, (int) (3 * track.getDuration() / 4))); 
         }
 
         event.getChannel().sendMessage(this.stringBuilder).setActionRow(
@@ -118,11 +119,11 @@ public class MusicleManager {
         possibleAnswers.remove(this.answerName);
         this.answers = new String[5];
         for (int i = 0; i < 5; i++) {
-            this.answers[i] = possibleAnswers.stream().collect(Collectors.toList()).get((int) Math.floor(Math.random()*(possibleAnswers.size())));
+            this.answers[i] = possibleAnswers.stream().collect(Collectors.toList()).get(MiscUtils.randomInt(0, possibleAnswers.size()));
             possibleAnswers.remove(answers[i]);
         }
 
-        this.answerIndex = (int) Math.floor(Math.random()*(answers.length - 1));
+        this.answerIndex = MiscUtils.randomInt(0, answers.length - 1);
         this.answers[this.answerIndex] = this.answerName;
         this.stringBuilder = new StringBuilder();
         for (int i = 0; i < this.answers.length; i++) {

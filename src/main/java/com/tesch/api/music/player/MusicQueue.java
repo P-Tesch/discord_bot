@@ -11,6 +11,7 @@ import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
+import com.tesch.api.utils.MiscUtils;
 import com.tesch.api.utils.TaskScheduler;
 
 public class MusicQueue extends AudioEventAdapter{
@@ -55,7 +56,7 @@ public class MusicQueue extends AudioEventAdapter{
 
     public void shufflePlaylist() {
         List<AudioTrack> shuffledPlaylist = new ArrayList<>();
-        playlist.stream().forEach(track -> shuffledPlaylist.add((int)Math.floor(Math.random() * shuffledPlaylist.size()), track));
+        playlist.stream().forEach(track -> shuffledPlaylist.add(MiscUtils.randomInt(0, shuffledPlaylist.size()), track));
         this.playlist = new LinkedBlockingQueue<>(shuffledPlaylist);
     }
 
