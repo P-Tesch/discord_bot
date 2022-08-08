@@ -6,7 +6,9 @@ import com.tesch.api.music.musicle.MusicleManager;
 import com.tesch.api.music.player.MusicEventHandler;
 
 import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message.MentionType;
+import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -82,6 +84,12 @@ public class EventListeners extends ListenerAdapter {
             }
             return;
         }
+    }
+
+    @Override
+    public void onGuildMemberJoin(GuildMemberJoinEvent event) {
+        Guild guild = event.getGuild();
+        guild.addRoleToMember(event.getMember(), guild.getRoleById(698247997091479652L)).queue();
     }
 
     @Override
