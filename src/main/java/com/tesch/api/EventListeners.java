@@ -96,6 +96,10 @@ public class EventListeners extends ListenerAdapter {
         if (message.startsWith("coinflip")) {
             rngManager.coinFlip(event);
         }
+
+        if (message.startsWith("roll")) {
+            rngManager.diceRoll(event);
+        }
     }
 
     @Override
