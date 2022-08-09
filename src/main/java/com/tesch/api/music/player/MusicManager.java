@@ -23,6 +23,7 @@ public class MusicManager {
     private YoutubeSearchProvider youtubeSearch;
     private TaskScheduler scheduler;
     private DiscordUtils discordUtils;
+    private boolean musicleMode;
     
     public MusicManager(AudioPlayerManager playerManager, MusicQueue queue, YoutubeSearchProvider youtubeSearch) {
         this.playerManager = playerManager;
@@ -37,6 +38,7 @@ public class MusicManager {
 
         this.queue.setPlayer(this.audioPlayer);
         this.audioPlayer.addListener(this.queue);
+        this.musicleMode = false;
     }
 
     public AudioPlayer getAudioPlayer() {
@@ -55,10 +57,18 @@ public class MusicManager {
         return this.discordUtils;
     }
 
+    public void setMusicleMode(boolean mode) {
+        this.musicleMode = mode;
+    }
+
     public void onPlayCommand(MessageReceivedEvent event) {
         String message = event.getMessage().getContentRaw().replace("play ", "");
 
         discordUtils.buildFromMessageEvent(event);
+        if (this.musicleMode) {
+            discordUtils.sendMessage("Wait for musicle finish");
+            return;
+        }
         discordUtils.connectToVoice(new MusicPlayerSendHandler(audioPlayer));
 
         if (this.isUrl(message)) {
@@ -81,6 +91,10 @@ public class MusicManager {
     }
 
     public void onPauseCommand() {
+        if (this.musicleMode) {
+            discordUtils.sendMessage("Wait for musicle finish");
+            return;
+        }
         this.audioPlayer.setPaused(this.audioPlayer.isPaused() ? false : true);
     }
 
@@ -90,10 +104,18 @@ public class MusicManager {
     }
 
     public void onSkipCommand() {
+        if (this.musicleMode) {
+            discordUtils.sendMessage("Wait for musicle finish");
+            return;
+        }
         this.queue.playNextTrack(true);
     }
 
     public void onQueueCommand() {
+        if (this.musicleMode) {
+            discordUtils.sendMessage("Wait for musicle finish");
+            return;
+        }
         try {
             StringBuilder queueString = new StringBuilder();
             queueString.append(this.audioPlayer.getPlayingTrack().getInfo().title + "\n");
@@ -106,6 +128,10 @@ public class MusicManager {
     }
 
     public void onClearCommand() {
+        if (this.musicleMode) {
+            discordUtils.sendMessage("Wait for musicle finish");
+            return;
+        }
         if (this.audioPlayer.getPlayingTrack() != null) {
             this.discordUtils.sendMessage("Cleared queue");
         }
@@ -113,11 +139,19 @@ public class MusicManager {
     }
 
     public void onLoopCommand() {
+        if (this.musicleMode) {
+            discordUtils.sendMessage("Wait for musicle finish");
+            return;
+        }
         this.queue.setLoop(!this.queue.getLoop());
         this.discordUtils.sendMessage("Loop set to " + this.queue.getLoop());
     }
 
     public void onShuffleCommand() {
+        if (this.musicleMode) {
+            discordUtils.sendMessage("Wait for musicle finish");
+            return;
+        }
         this.queue.shufflePlaylist();
         this.discordUtils.sendMessage("Queue Suffled");
     }

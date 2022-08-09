@@ -91,6 +91,7 @@ public class MusicleManager {
         }
         this.player = event.getAuthor();
         this.setupPlayerScore();
+        this.musicEventHandler.setMusicleMode(true);
         
         discordUtils.connectToVoice(new MusicPlayerSendHandler(this.musicEventHandler.getAudioPlayer()));
 
@@ -164,12 +165,13 @@ public class MusicleManager {
     }
 
     private void stop() {
+        this.musicEventHandler.setMusicleMode(false);
         this.stringBuilder = null;
         this.answerIndex = null;
         this.answerName = null;
         this.player = null;
         this.answers = null;
-        Runnable disconnect = () -> this.musicEventHandler.onDisconnectCommand();;
+        Runnable disconnect = () -> this.musicEventHandler.onDisconnectCommand();
         this.scheduler.schedule(disconnect, 60);
         this.musicEventHandler.getQueue().clearPlaylist();
     }
