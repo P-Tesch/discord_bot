@@ -18,7 +18,7 @@ public class RNGManager {
 
     public void coinFlip(MessageReceivedEvent event) {
         this.discordUtils.buildFromMessageEvent(event);
-        this.discordUtils.sendMessage(Math.random() <= 0.5 ? "https://imgur.com/QiQ63s7" : "https://imgur.com/UbuR3zg");
+        this.discordUtils.sendMessage(MiscUtils.randomInt(0, 100) < 50 ? "https://imgur.com/QiQ63s7" : "https://imgur.com/UbuR3zg");
     }
 
     public void diceRoll(MessageReceivedEvent event) {

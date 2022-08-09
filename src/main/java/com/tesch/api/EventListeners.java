@@ -20,7 +20,7 @@ public class EventListeners extends ListenerAdapter {
 
     public EventListeners(ManagerFactory managerFactory) {
         this.musicManager = managerFactory.buildMusicManager();
-        this.musicleManager = managerFactory.buildMusicleManager();
+        this.musicleManager = managerFactory.buildMusicleManager(this.musicManager);
         this.rngManager = managerFactory.buildRngManager();
     }
     
