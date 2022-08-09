@@ -34,4 +34,8 @@ public class ManagerFactory {
     public RNGManager buildRngManager() {
         return new RNGManager();
     }
+
+    public HelpManager buildHelpManager() {
+        return new HelpManager();
+    }
 }

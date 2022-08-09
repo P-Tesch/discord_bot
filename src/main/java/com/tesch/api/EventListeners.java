@@ -17,11 +17,13 @@ public class EventListeners extends ListenerAdapter {
     private MusicManager musicManager;
     private MusicleManager musicleManager;
     private RNGManager rngManager;
+    private HelpManager helpManager;
 
     public EventListeners(ManagerFactory managerFactory) {
         this.musicManager = managerFactory.buildMusicManager();
         this.musicleManager = managerFactory.buildMusicleManager(this.musicManager);
         this.rngManager = managerFactory.buildRngManager();
+        this.helpManager = managerFactory.buildHelpManager();
     }
     
     @Override
@@ -90,6 +92,10 @@ public class EventListeners extends ListenerAdapter {
 
         if (message.startsWith("roll")) {
             rngManager.diceRoll(event);
+        }
+
+        if (message.startsWith("help")) {
+            helpManager.onHelpCommand(event);
         }
     }
 
