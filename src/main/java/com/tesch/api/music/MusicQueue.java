@@ -1,4 +1,4 @@
-package com.tesch.api.music.player;
+package com.tesch.api.music;
 
 import java.util.ArrayList;
 import java.util.List;

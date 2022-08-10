@@ -1,4 +1,4 @@
-package com.tesch.api.music.musicle;
+package com.tesch.api.games.musicle;
 
 public class MusicleScore {
     

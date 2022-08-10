@@ -3,7 +3,7 @@ package com.tesch.api.utils;
 import java.util.function.Consumer;
 
 import com.tesch.api.exceptions.BotException;
-import com.tesch.api.music.player.MusicPlayerSendHandler;
+import com.tesch.api.music.MusicPlayerSendHandler;
 
 import net.dv8tion.jda.api.entities.AudioChannel;
 import net.dv8tion.jda.api.entities.Guild;

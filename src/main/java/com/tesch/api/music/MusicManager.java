@@ -1,4 +1,4 @@
-package com.tesch.api.music.player;
+package com.tesch.api.music;
 
 import java.net.MalformedURLException;
 import java.net.URL;

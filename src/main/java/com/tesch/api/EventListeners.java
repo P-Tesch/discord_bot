@@ -3,8 +3,8 @@ package com.tesch.api;
 import org.jetbrains.annotations.NotNull;
 
 import com.tesch.api.games.RNGManager;
-import com.tesch.api.music.musicle.MusicleManager;
-import com.tesch.api.music.player.MusicManager;
+import com.tesch.api.games.musicle.MusicleManager;
+import com.tesch.api.music.MusicManager;
 
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;

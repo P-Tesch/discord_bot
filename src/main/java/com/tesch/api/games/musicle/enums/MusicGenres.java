@@ -1,4 +1,4 @@
-package com.tesch.api.music.musicle.enums;
+package com.tesch.api.games.musicle.enums;
 
 public enum MusicGenres {
     SERTANEJO ("https://youtube.com/playlist?list=PL_1G4wR0BflkZJwiCHEWHmde66uVsI_lC"), 

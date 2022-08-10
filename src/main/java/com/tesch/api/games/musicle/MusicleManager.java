@@ -1,4 +1,4 @@
-package com.tesch.api.music.musicle;
+package com.tesch.api.games.musicle;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -9,9 +9,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import com.tesch.api.music.musicle.enums.MusicGenres;
-import com.tesch.api.music.player.MusicManager;
-import com.tesch.api.music.player.MusicPlayerSendHandler;
+import com.tesch.api.games.musicle.enums.MusicGenres;
+import com.tesch.api.music.MusicManager;
+import com.tesch.api.music.MusicPlayerSendHandler;
 import com.tesch.api.utils.DiscordUtils;
 import com.tesch.api.utils.MiscUtils;
 import com.tesch.api.utils.TaskScheduler;

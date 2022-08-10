@@ -4,9 +4,9 @@ import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeSearchProvider;
 import com.tesch.api.games.RNGManager;
-import com.tesch.api.music.musicle.MusicleManager;
-import com.tesch.api.music.player.MusicManager;
-import com.tesch.api.music.player.MusicQueue;
+import com.tesch.api.games.musicle.MusicleManager;
+import com.tesch.api.music.MusicManager;
+import com.tesch.api.music.MusicQueue;
 
 public class ManagerFactory {
     

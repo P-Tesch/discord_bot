@@ -1,4 +1,4 @@
-package com.tesch.api.music.player;
+package com.tesch.api.music;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
