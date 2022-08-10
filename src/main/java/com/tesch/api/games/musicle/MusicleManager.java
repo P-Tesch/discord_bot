@@ -51,6 +51,7 @@ public class MusicleManager {
     public synchronized void onMusicleCommand(MessageReceivedEvent event) throws InterruptedException {
         this.discordUtils.buildFromMessageEvent(event);
         String[] message = event.getMessage().getContentRaw().split(" ");
+        String url = null;
         if (message.length == 1) {
             discordUtils.sendMessage("Must input a music genre. Possible genres:\n" + this.getPossibleGenres().toLowerCase());
             return;
@@ -69,26 +70,25 @@ public class MusicleManager {
             discordUtils.sendMessage("Scoreboard:\n" + this.getScoreboard());
             return;
         }
-        try {
-            MusicGenres.valueOf(message[1].toUpperCase());
-        }
-        catch (IllegalArgumentException e) {
-            discordUtils.sendMessage("Invalid music genre. Possible genres:\n" + this.getPossibleGenres());
-            return;
-        }
         if (this.musicEventHandler.getAudioPlayer().getPlayingTrack() != null) {
             discordUtils.sendMessage("Something is already playing, clear the queue to play");
             return;
         }
-
-        this.scheduler.cancelAll();
-
-        String url = null;
-        for (MusicGenres genre : MusicGenres.values()) {
-            if (genre == MusicGenres.valueOf(message[1].toUpperCase())) {
-                url = genre.getUrl();
+        if (message[1].equals("random")) {
+            url = MusicGenres.values()[MiscUtils.randomInt(0, MusicGenres.values().length - 1)].getUrl();
+        }
+        else {
+            try {
+                url = MusicGenres.valueOf(message[1].toUpperCase()).getUrl();
+            }
+            catch (IllegalArgumentException e) {
+                discordUtils.sendMessage("Invalid music genre. Possible genres:\n" + this.getPossibleGenres());
+                return;
             }
         }
+
+        this.scheduler.cancelAll();
+    
         this.player = event.getAuthor();
         this.setupPlayerScore();
         this.musicEventHandler.setMusicleMode(true);
