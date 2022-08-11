@@ -21,8 +21,9 @@ public class TaskScheduler {
         return this.scheduledTasks;
     }
 
-    public ScheduledFuture<?> schedule(Runnable runnable, Integer time) {
-        return this.scheduler.schedule(runnable, time, TimeUnit.SECONDS);
+    public void schedule(Runnable runnable, Integer time) {
+        System.out.println("Scheduler disabled");
+        //scheduledTasks.add(this.scheduler.schedule(runnable, time, TimeUnit.SECONDS));
     }
 
     public void cancelTask(ScheduledFuture<?> task) {

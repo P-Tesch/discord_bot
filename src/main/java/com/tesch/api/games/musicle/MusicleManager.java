@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
@@ -24,11 +25,13 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 public class MusicleManager {
 
-    private MusicManager musicEventHandler;
+    private MusicManager musicManager;
+    private MusicleLobby lobby;
     private TaskScheduler scheduler;
     private DiscordUtils discordUtils;
     private boolean titleMode;
     private boolean startMode;
+    private boolean lobbyMode;
     private StringBuilder stringBuilder;
     private User player;
     private String[] answers;
@@ -37,18 +40,60 @@ public class MusicleManager {
     private Map<User, MusicleScore> playerScore;
 
     public MusicleManager(MusicManager musicEventHandler) {
-        this.musicEventHandler = musicEventHandler;
-        this.discordUtils = this.musicEventHandler.getDiscordUtils();
+        this.musicManager = musicEventHandler;
+        this.lobby = null;
+        this.discordUtils = this.musicManager.getDiscordUtils();
         this.scheduler = new TaskScheduler();
         this.titleMode = false;
         this.startMode = false;
+        this.lobbyMode = false;
         this.player = null;
         this.answerIndex = null;
         this.answerName = null;
         this.playerScore = new HashMap<>();
     }
 
-    public synchronized void onMusicleCommand(MessageReceivedEvent event) throws InterruptedException {
+    protected TaskScheduler getScheduler() {
+        return this.scheduler;
+    }
+
+    protected MusicManager getMusicManager() {
+        return this.musicManager;
+    }
+
+    protected DiscordUtils getDiscordUtils() {
+        return this.discordUtils;
+    }
+
+    protected boolean getStartMode() {
+        return this.startMode;
+    }
+
+    protected StringBuilder getStringBuilder() {
+        return this.stringBuilder;
+    }
+
+    protected String[] getAnswers() {
+        return this.answers;
+    }
+
+    protected Integer getAnswerIndex() {
+        return this.answerIndex;
+    }
+
+    protected String getAnswerName() {
+        return this.answerName;
+    } 
+
+    protected Map<User, MusicleScore> getPlayerScore() {
+        return this.playerScore;
+    }
+
+    protected MusicleLobby getMusicleLobby() {
+        return this.lobby;
+    }
+
+    public void onMusicleCommand(MessageReceivedEvent event) throws InterruptedException {
         this.discordUtils.buildFromMessageEvent(event);
         String[] message = event.getMessage().getContentRaw().split(" ");
         String url = null;
@@ -70,7 +115,7 @@ public class MusicleManager {
             discordUtils.sendMessage("Scoreboard:\n" + this.getScoreboard());
             return;
         }
-        if (this.musicEventHandler.getAudioPlayer().getPlayingTrack() != null) {
+        if (this.musicManager.getAudioPlayer().getPlayingTrack() != null) {
             discordUtils.sendMessage("Something is already playing, clear the queue to play");
             return;
         }
@@ -86,21 +131,49 @@ public class MusicleManager {
                 return;
             }
         }
+        if (event.getMessage().getMentions().getUsers().size() > 0) {
+            this.lobbyMode = true;
+            this.lobby = new MusicleLobby(this, event);
+            lobby.setup(url);
+            return;
+        }
 
         this.scheduler.cancelAll();
     
         this.player = event.getAuthor();
-        this.setupPlayerScore();
-        this.musicEventHandler.setMusicleMode(true);
+        this.setupPlayerScore(this.player);
+        this.musicManager.setMusicleMode(true);
         
-        discordUtils.connectToVoice(new MusicPlayerSendHandler(this.musicEventHandler.getAudioPlayer()));
+        discordUtils.connectToVoice(new MusicPlayerSendHandler(this.musicManager.getAudioPlayer()));
 
-        MusicleResultHandler resultHandler = new MusicleResultHandler(event.getChannel().asTextChannel(), musicEventHandler.getQueue(), this);
-        musicEventHandler.getPlayerManager().loadItem(url, resultHandler);
-        this.wait();
+        MusicleResultHandler resultHandler = new MusicleResultHandler(event.getChannel().asTextChannel(), musicManager.getQueue(), this);
+        Future<Void> wait = musicManager.getPlayerManager().loadItem(url, resultHandler);
+
+        int i = 0;
+        while (!wait.isDone()) {
+            Thread.sleep(500L);
+            if (i >= 10) {
+               this.discordUtils.sendMessage("Failed");
+               this.stop();
+                return;
+            }
+            i++;
+        }
+
         if (!this.startMode) {
-            AudioTrack track = this.musicEventHandler.getAudioPlayer().getPlayingTrack();
+            AudioTrack track = this.musicManager.getAudioPlayer().getPlayingTrack();
             track.setPosition(MiscUtils.randomInt(0, (int) (3 * track.getDuration() / 4))); 
+        }
+
+        i = 0;
+        while (this.stringBuilder == null) {
+            Thread.sleep(500L);
+            if (i >= 10) {
+                this.discordUtils.sendMessage("Failed");
+                this.stop();
+                 return;
+             }
+             i++;
         }
 
         event.getChannel().sendMessage(this.stringBuilder).setActionRow(
@@ -114,9 +187,9 @@ public class MusicleManager {
         this.timeLimit();
     }
 
-    public synchronized void generateAnswers(List<String> songAuthors, List<String> songTitles) {
+    public void generateAnswers(List<String> songAuthors, List<String> songTitles) {
         Set<String> possibleAnswers = new HashSet<>(this.titleMode ? songTitles : songAuthors);
-        this.answerName = this.titleMode ? musicEventHandler.getAudioPlayer().getPlayingTrack().getInfo().title : musicEventHandler.getAudioPlayer().getPlayingTrack().getInfo().author;
+        this.answerName = this.titleMode ? musicManager.getAudioPlayer().getPlayingTrack().getInfo().title : musicManager.getAudioPlayer().getPlayingTrack().getInfo().author;
         possibleAnswers.remove(this.answerName);
         this.answers = new String[5];
         for (int i = 0; i < 5; i++) {
@@ -131,10 +204,13 @@ public class MusicleManager {
             this.answers[i] = (i + 1 + ". " + this.answers[i]);
             stringBuilder.append(this.answers[i] + "\n");
         }
-        this.notify();
     }
 
     public void onButtonInteraction(ButtonInteractionEvent event) {
+        if (this.lobbyMode) {
+            this.lobby.onButtonInteraction(event);
+            return;
+        }
         if (this.player == null) {
             event.editMessage("Time's up").queue(msg -> event.getMessage().editMessageEmbeds().setActionRows().queue());
         }
@@ -152,28 +228,30 @@ public class MusicleManager {
                 Arrays.asList(this.answers).stream().forEach(x -> builder.append(x + "\n"));
                 this.playerScore.get(this.player).addLoss();
             }
-            builder.append("\nTitle: " + this.musicEventHandler.getAudioPlayer().getPlayingTrack().getInfo().title);
+            builder.append("\nTitle: " + this.musicManager.getAudioPlayer().getPlayingTrack().getInfo().title);
             event.editMessage(builder.toString()).queue(msg -> event.getMessage().editMessageEmbeds().setActionRows().queue());
             this.stop();
         }
     }
 
-    private void setupPlayerScore() {
-        if (!this.playerScore.keySet().contains(this.player)) {
-            this.playerScore.put(this.player, new MusicleScore());
+    protected void setupPlayerScore(User player) {
+        if (!this.playerScore.keySet().contains(player)) {
+            this.playerScore.put(player, new MusicleScore());
         }
     }
 
-    private void stop() {
-        this.musicEventHandler.setMusicleMode(false);
+    protected void stop() {
+        this.musicManager.setMusicleMode(false);
+        this.lobby = null;
         this.stringBuilder = null;
         this.answerIndex = null;
         this.answerName = null;
         this.player = null;
         this.answers = null;
-        Runnable disconnect = () -> this.musicEventHandler.onDisconnectCommand();
+        this.lobbyMode = false;
+        Runnable disconnect = () -> this.musicManager.onDisconnectCommand();
         this.scheduler.schedule(disconnect, 60);
-        this.musicEventHandler.getQueue().clearPlaylist();
+        this.musicManager.getQueue().clearPlaylist();
     }
 
     private void changeTitleMode() {
@@ -198,7 +276,7 @@ public class MusicleManager {
         return stringBuilder.toString();
     }
 
-    private void timeLimit() {
+    protected void timeLimit() {
         this.scheduler.schedule(() -> this.stop(), 45);
     }
 }
