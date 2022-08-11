@@ -37,6 +37,11 @@ public class MusicleLobby {
 
         players.add(event.getAuthor());
         event.getMessage().getMentions().getUsers().forEach(players::add);
+        if (this.players.size() < 2) {
+            this.manager.getDiscordUtils().sendMessage("Musicle lobby min players is 2");
+            this.manager.stop();
+            return;
+        }
         if (this.players.size() + 1 > 9) {
             this.manager.getDiscordUtils().sendMessage("Musicle lobby max players is 9");
             this.manager.stop();
@@ -88,6 +93,9 @@ public class MusicleLobby {
     }
 
     protected void onButtonInteraction(ButtonInteractionEvent event) {
+        if (!this.players.contains(event.getUser())) {
+            return;
+        }
         if (this.players.size() == 0) {
             event.editMessage("Time's up").queue(msg -> event.getMessage().editMessageEmbeds().setActionRows().queue());
         }
