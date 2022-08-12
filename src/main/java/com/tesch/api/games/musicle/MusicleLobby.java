@@ -31,7 +31,7 @@ public class MusicleLobby {
         this.selections = new HashMap<>();
     }
     
-    public synchronized void setup(String url) throws InterruptedException {
+    public void setup(String url) throws InterruptedException {
         this.manager.getScheduler().cancelAll();
         this.manager.getMusicManager().setMusicleMode(true);
 
@@ -54,7 +54,7 @@ public class MusicleLobby {
         MusicleResultHandler resultHandler = new MusicleResultHandler(event.getChannel().asTextChannel(), this.manager.getMusicManager().getQueue(), this.manager);
         Future<Void> wait = this.manager.getMusicManager().getPlayerManager().loadItem(url, resultHandler);
 
-        int i = 0;
+        byte i = 0;
         while (!wait.isDone()) {
             Thread.sleep(500L);
             if (i >= 10) {

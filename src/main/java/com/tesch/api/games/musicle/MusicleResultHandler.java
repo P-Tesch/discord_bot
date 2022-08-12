@@ -1,6 +1,5 @@
 package com.tesch.api.games.musicle;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
@@ -38,12 +37,8 @@ public class MusicleResultHandler implements AudioLoadResultHandler {
     public void playlistLoaded(AudioPlaylist playlist) {
         this.songs = playlist.getTracks();
         AudioTrack track = this.songs.remove((int) Math.floor(Math.random()*(this.songs.size() - 1)));
-        List<String> songTitles = new ArrayList<>();
-        List<String> songAuthors = new ArrayList<>();
-        this.songs.stream().forEach(x -> songTitles.add(x.getInfo().title));
-        this.songs.stream().forEach(x -> songAuthors.add(x.getInfo().author));
         queue.addToPlaylist(track);
-        this.musicleManager.generateAnswers(songAuthors, songTitles);
+        this.musicleManager.generateAnswers(this.songs);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.tesch.api.games.musicle;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -7,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Future;
-import java.util.stream.Collectors;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.tesch.api.games.musicle.enums.MusicGenres;
@@ -187,13 +187,20 @@ public class MusicleManager {
         this.timeLimit();
     }
 
-    public void generateAnswers(List<String> songAuthors, List<String> songTitles) {
-        Set<String> possibleAnswers = new HashSet<>(this.titleMode ? songTitles : songAuthors);
+    public void generateAnswers(List<AudioTrack> songs) {
+        Set<String> possibleAnswers = new HashSet<>();
+        if (this.titleMode) {
+            songs.forEach(x -> possibleAnswers.add(x.getInfo().title));
+        }
+        else {
+            songs.forEach(x -> possibleAnswers.add(x.getInfo().author));
+        }
         this.answerName = this.titleMode ? musicManager.getAudioPlayer().getPlayingTrack().getInfo().title : musicManager.getAudioPlayer().getPlayingTrack().getInfo().author;
         possibleAnswers.remove(this.answerName);
         this.answers = new String[5];
+        List<String> possibleAnswersList = new ArrayList<>(possibleAnswers);
         for (int i = 0; i < 5; i++) {
-            this.answers[i] = possibleAnswers.stream().collect(Collectors.toList()).get(MiscUtils.randomInt(0, possibleAnswers.size()));
+            this.answers[i] = possibleAnswersList.get(MiscUtils.randomInt(0, possibleAnswersList.size()));
             possibleAnswers.remove(answers[i]);
         }
 
