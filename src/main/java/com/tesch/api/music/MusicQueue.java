@@ -78,15 +78,21 @@ public class MusicQueue extends AudioEventAdapter{
     }
     
     public void playNextTrack(Boolean skip) {
-        if (player.startTrack(playlist.peek(), !skip)) {
-            AudioTrack played = playlist.poll();
+        if (this.playlist.isEmpty()) {
+            if (skip) {
+                player.stopTrack();
+            }
+            if (this.player.getPlayingTrack() == null) {
+                this.scheduler.schedule(() -> this.musicManager.onDisconnectCommand(), 120);
+            }
+            return;
+        }
+        if (player.startTrack(playlist.peek().makeClone(), !skip)) {
+            AudioTrack toPlay = playlist.poll();
             this.scheduler.cancelAll();
             if (loop) {
-                playlist.offer(played);
+                playlist.offer(toPlay);
             }
-        }
-        if (this.playlist.isEmpty() && this.player.getPlayingTrack() == null) {
-            this.scheduler.schedule(() -> this.musicManager.onDisconnectCommand(), 120);
         }
     }
 
