@@ -4,10 +4,14 @@ import org.jetbrains.annotations.NotNull;
 
 import com.tesch.api.games.RNGManager;
 import com.tesch.api.games.musicle.MusicleManager;
+import com.tesch.api.games.tictactoe.TicTacToeManager;
 import com.tesch.api.music.MusicManager;
+import com.tesch.api.utils.TaskScheduler;
 
+import net.dv8tion.jda.api.entities.AudioChannel;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
+import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -18,12 +22,16 @@ public class EventListeners extends ListenerAdapter {
     private MusicleManager musicleManager;
     private RNGManager rngManager;
     private HelpManager helpManager;
+    private TicTacToeManager ticTacToeManager;
+    private TaskScheduler taskScheduler;
 
     public EventListeners(ManagerFactory managerFactory) {
         this.musicManager = managerFactory.buildMusicManager();
         this.musicleManager = managerFactory.buildMusicleManager(this.musicManager);
         this.rngManager = managerFactory.buildRngManager();
         this.helpManager = managerFactory.buildHelpManager();
+        this.ticTacToeManager = managerFactory.buildTicTacToeManager();
+        this.taskScheduler = new TaskScheduler();
     }
     
     @Override
@@ -97,6 +105,10 @@ public class EventListeners extends ListenerAdapter {
         if (message.startsWith("help")) {
             helpManager.onHelpCommand(event);
         }
+
+        if (message.startsWith("tictactoe")) {
+            ticTacToeManager.onTicTacToeCommand(event);
+        }
     }
 
     @Override
@@ -106,7 +118,25 @@ public class EventListeners extends ListenerAdapter {
     }
 
     @Override
+    public void onGuildVoiceLeave(GuildVoiceLeaveEvent event) {
+        Runnable scheduleLeave = () -> {
+            AudioChannel channel = event.getGuild().getAudioManager().getConnectedChannel();
+            if (channel == event.getChannelLeft()) {
+                if (channel.getMembers().size() == 1) {
+                    this.musicManager.onDisconnectCommand();
+                }
+            }
+        };
+        this.taskScheduler.schedule(scheduleLeave, 5);
+    }
+
+    @Override
     public void onButtonInteraction(ButtonInteractionEvent event) {
-        this.musicleManager.onButtonInteraction(event);
+        if (this.musicleManager.isInGame()) {
+            this.musicleManager.onButtonInteraction(event);
+        }
+        if (this.ticTacToeManager.isInGame()) {
+            this.ticTacToeManager.onButtonInteraction(event);
+        }
     }
 }

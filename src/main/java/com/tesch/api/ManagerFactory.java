@@ -5,6 +5,7 @@ import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeSearchProvider;
 import com.tesch.api.games.RNGManager;
 import com.tesch.api.games.musicle.MusicleManager;
+import com.tesch.api.games.tictactoe.TicTacToeManager;
 import com.tesch.api.music.MusicManager;
 import com.tesch.api.music.MusicQueue;
 
@@ -37,5 +38,9 @@ public class ManagerFactory {
 
     public HelpManager buildHelpManager() {
         return new HelpManager();
+    }
+
+    public TicTacToeManager buildTicTacToeManager() {
+        return new TicTacToeManager();
     }
 }

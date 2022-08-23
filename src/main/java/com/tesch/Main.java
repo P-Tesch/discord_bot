@@ -19,14 +19,14 @@ public class Main {
 
     public static void main(String[] args) throws LoginException, InterruptedException, IOException, FileNotFoundException {
 
-        JDA builder = JDABuilder
+        JDA jda = JDABuilder
         .createDefault(System.getenv("DISCORD_TOKEN"))
         .enableIntents(getIntents())
         .setActivity(Activity.listening("Boate Azul"))
         .build();
 
-        builder.addEventListener(new EventListeners(new ManagerFactory()));
-        builder.awaitReady();
+        jda.addEventListener(new EventListeners(new ManagerFactory()));
+        jda.awaitReady();
     }
 
     private static List<GatewayIntent> getIntents() {

@@ -265,8 +265,6 @@ public class MusicleManager {
         this.answers = null;
         this.lobbyMode = false;
         this.inGame = false;
-        Runnable disconnect = () -> this.musicManager.onDisconnectCommand();
-        this.scheduler.schedule(disconnect, 60);
         this.musicManager.getQueue().clearPlaylist();
     }
 
@@ -293,6 +291,6 @@ public class MusicleManager {
     }
 
     private void timeLimit() {
-        this.scheduler.schedule(() -> this.stop(), 45);
+        this.scheduler.schedule(() -> {if (this.inGame) this.stop();}, 45);
     }
 }

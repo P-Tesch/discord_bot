@@ -11,7 +11,6 @@ import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeSearchProvider;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.BasicAudioPlaylist;
 import com.tesch.api.utils.DiscordUtils;
-import com.tesch.api.utils.TaskScheduler;
 
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
@@ -21,7 +20,6 @@ public class MusicManager {
     private AudioPlayerManager playerManager;
     private MusicQueue queue;
     private YoutubeSearchProvider youtubeSearch;
-    private TaskScheduler scheduler;
     private DiscordUtils discordUtils;
     private boolean musicleMode;
     
@@ -29,9 +27,6 @@ public class MusicManager {
         this.playerManager = playerManager;
         this.queue = queue;
         this.youtubeSearch = youtubeSearch;
-        this.scheduler = new TaskScheduler();
-        this.queue.setScheduler(scheduler);
-        this.queue.setMusicManager(this);
         this.discordUtils = new DiscordUtils();
 
         this.audioPlayer = this.playerManager.createPlayer();
