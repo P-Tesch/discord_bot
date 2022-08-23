@@ -38,6 +38,7 @@ public class MusicleManager {
     private Integer answerIndex;
     private String answerName;
     private Map<User, MusicleScore> playerScore;
+    private boolean inGame;
 
     public MusicleManager(MusicManager musicEventHandler) {
         this.musicManager = musicEventHandler;
@@ -51,6 +52,7 @@ public class MusicleManager {
         this.answerIndex = null;
         this.answerName = null;
         this.playerScore = new HashMap<>();
+        this.inGame = false;
     }
 
     protected TaskScheduler getScheduler() {
@@ -93,6 +95,10 @@ public class MusicleManager {
         return this.lobby;
     }
 
+    public boolean isInGame() {
+        return this.inGame;
+    }
+
     public void onMusicleCommand(MessageReceivedEvent event) throws InterruptedException {
         this.discordUtils.buildFromMessageEvent(event);
         String[] message = event.getMessage().getContentRaw().split(" ");
@@ -131,17 +137,10 @@ public class MusicleManager {
                 return;
             }
         }
-        if (event.getMessage().getMentions().getUsers().size() > 0) {
-            this.lobbyMode = true;
-            this.lobby = new MusicleLobby(this, event);
-            lobby.setup(url);
-            return;
-        }
+        this.inGame = true;
 
         this.scheduler.cancelAll();
     
-        this.player = event.getAuthor();
-        this.setupPlayerScore(this.player);
         this.musicManager.setMusicleMode(true);
         
         discordUtils.connectToVoice(new MusicPlayerSendHandler(this.musicManager.getAudioPlayer()));
@@ -149,7 +148,7 @@ public class MusicleManager {
         MusicleResultHandler resultHandler = new MusicleResultHandler(event.getChannel().asTextChannel(), musicManager.getQueue(), this);
         Future<Void> wait = musicManager.getPlayerManager().loadItem(url, resultHandler);
 
-        int i = 0;
+        byte i = 0;
         while (!wait.isDone()) {
             Thread.sleep(500L);
             if (i >= 10) {
@@ -185,9 +184,19 @@ public class MusicleManager {
             )
         .queue();
         this.timeLimit();
+
+        if (event.getMessage().getMentions().getUsers().size() > 0) {
+            this.lobbyMode = true;
+            this.lobby = new MusicleLobby(this, event);
+            lobby.setup(url);
+            return;
+        }
+
+        this.player = event.getAuthor();
+        this.setupPlayerScore(this.player);
     }
 
-    public void generateAnswers(List<AudioTrack> songs) {
+    protected void generateAnswers(List<AudioTrack> songs) {
         Set<String> possibleAnswers = new HashSet<>();
         if (this.titleMode) {
             songs.forEach(x -> possibleAnswers.add(x.getInfo().title));
@@ -200,8 +209,7 @@ public class MusicleManager {
         this.answers = new String[5];
         List<String> possibleAnswersList = new ArrayList<>(possibleAnswers);
         for (int i = 0; i < 5; i++) {
-            this.answers[i] = possibleAnswersList.get(MiscUtils.randomInt(0, possibleAnswersList.size()));
-            possibleAnswers.remove(answers[i]);
+            this.answers[i] = possibleAnswersList.remove((int) MiscUtils.randomInt(0, possibleAnswersList.size()));
         }
 
         this.answerIndex = MiscUtils.randomInt(0, answers.length - 1);
@@ -256,6 +264,7 @@ public class MusicleManager {
         this.player = null;
         this.answers = null;
         this.lobbyMode = false;
+        this.inGame = false;
         Runnable disconnect = () -> this.musicManager.onDisconnectCommand();
         this.scheduler.schedule(disconnect, 60);
         this.musicManager.getQueue().clearPlaylist();
@@ -283,7 +292,7 @@ public class MusicleManager {
         return stringBuilder.toString();
     }
 
-    protected void timeLimit() {
+    private void timeLimit() {
         this.scheduler.schedule(() -> this.stop(), 45);
     }
 }
