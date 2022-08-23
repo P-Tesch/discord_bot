@@ -96,18 +96,22 @@ public class EventListeners extends ListenerAdapter {
 
         if (message.startsWith("coinflip")) {
             rngManager.coinFlip(event);
+            return;
         }
 
         if (message.startsWith("roll")) {
             rngManager.diceRoll(event);
+            return;
         }
 
         if (message.startsWith("help")) {
             helpManager.onHelpCommand(event);
+            return;
         }
 
         if (message.startsWith("tictactoe")) {
             ticTacToeManager.onTicTacToeCommand(event);
+            return;
         }
     }
 
@@ -127,7 +131,7 @@ public class EventListeners extends ListenerAdapter {
                 }
             }
         };
-        this.taskScheduler.schedule(scheduleLeave, 5);
+        this.taskScheduler.schedule(scheduleLeave, 30);
     }
 
     @Override
