@@ -1,5 +1,7 @@
 package com.tesch.api.games.tictactoe;
 
+import com.tesch.api.games.tictactoe.enums.TicTacToeTeams;
+import com.tesch.api.games.tictactoe.exceptions.TicTacToeException;
 import com.tesch.api.utils.DiscordUtils;
 
 import net.dv8tion.jda.api.entities.User;
@@ -16,7 +18,6 @@ public class TicTacToeManager {
     public TicTacToeManager() {
         this.players = new User[2];
         this.discordUtils = new DiscordUtils();
-        this.board = new TicTacToeBoard();
         this.inGame = false;
     }
 
@@ -25,22 +26,31 @@ public class TicTacToeManager {
     }
 
     public void onTicTacToeCommand(MessageReceivedEvent event) {
-        boolean disable = true;
-        if (disable) {
-            System.out.println("disabled");
-            return;
-        }
-
         this.discordUtils.buildFromMessageEvent(event);
 
         if (!this.instantiatePlayers(event)) return;
+
+        this.board = new TicTacToeBoard(this.players);
 
         this.inGame = true;
         event.getChannel().sendMessage(this.board.getBoardAsMessage()).queue();
     }
 
     public void onButtonInteraction(ButtonInteractionEvent event) {
-        //this.board.makeMove(new Position(event.getId()));
+        try {
+            try {
+                this.board.makeMove(new Position(event.getButton().getId()), event.getUser());
+            }
+            catch (TicTacToeException e) {
+                event.reply(e.getMessage()).queue();
+            }
+            event.editMessage(this.board.getBoardAsMessage()).queue();
+            if (this.board.getWin() != TicTacToeTeams.NULL) {
+                this.clear();
+            }
+        }
+        catch (IllegalStateException e) {
+        }
     }
 
     private boolean instantiatePlayers(MessageReceivedEvent event) {
@@ -59,6 +69,7 @@ public class TicTacToeManager {
 
     private void clear() {
         this.inGame = false;
+        this.board = null;
         this.players[0] = null;
         this.players[1] = null;
     }
