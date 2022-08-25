@@ -29,6 +29,10 @@ public class TicTacToeManager {
         this.discordUtils.buildFromMessageEvent(event);
 
         if (!this.instantiatePlayers(event)) return;
+        if (this.inGame) {
+            this.discordUtils.sendMessage("There is already a game running");
+            return;
+        }
 
         this.board = new TicTacToeBoard(this.players);
 
