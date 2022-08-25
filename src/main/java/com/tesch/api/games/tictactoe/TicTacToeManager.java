@@ -42,18 +42,17 @@ public class TicTacToeManager {
 
     public void onButtonInteraction(ButtonInteractionEvent event) {
         try {
-            try {
-                this.board.makeMove(new Position(event.getButton().getId()), event.getUser());
-            }
-            catch (TicTacToeException e) {
-                event.reply(e.getMessage()).queue();
-            }
+            this.board.makeMove(new Position(event.getButton().getId()), event.getUser());
             event.editMessage(this.board.getBoardAsMessage()).queue();
             if (this.board.getWin() != TicTacToeTeams.NULL) {
                 this.clear();
             }
         }
+        catch (TicTacToeException e) {
+            event.reply(e.getMessage()).queue();
+        }
         catch (IllegalStateException e) {
+            e.getMessage();
         }
     }
 
