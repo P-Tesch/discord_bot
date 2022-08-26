@@ -66,7 +66,7 @@ public class EventListeners extends ListenerAdapter {
         }
 
         if (message.startsWith("queue")) {
-            musicManager.onQueueCommand();
+            musicManager.onQueueCommand(event);
             return;
         }
 
@@ -136,6 +136,9 @@ public class EventListeners extends ListenerAdapter {
 
     @Override
     public void onButtonInteraction(ButtonInteractionEvent event) {
+        if (event.getButton().getId().startsWith("queue")) {
+            this.musicManager.onQueueButton(event);
+        }
         if (this.musicleManager.isInGame()) {
             this.musicleManager.onButtonInteraction(event);
         }

@@ -2,6 +2,8 @@ package com.tesch.api.music;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
@@ -12,7 +14,9 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.BasicAudioPlaylist;
 import com.tesch.api.utils.DiscordUtils;
 
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 public class MusicManager {
 
@@ -106,19 +110,50 @@ public class MusicManager {
         this.queue.playNextTrack(true);
     }
 
-    public void onQueueCommand() {
+    public void onQueueCommand(MessageReceivedEvent event) {
         if (this.musicleMode) {
             discordUtils.sendMessage("Wait for musicle finish");
             return;
         }
         try {
+            List<String> playlist = new ArrayList<>();
             StringBuilder queueString = new StringBuilder();
-            queueString.append(this.audioPlayer.getPlayingTrack().getInfo().title + "\n");
-            this.queue.getPlaylist().stream().map(x -> x.getInfo().title).forEach(x -> queueString.append(x + "\n"));
-            this.discordUtils.sendMessage("Queue:\n" + queueString);
+            playlist.add(this.audioPlayer.getPlayingTrack().getInfo().title);
+            this.queue.getPlaylist().stream().map(x -> x.getInfo().title).forEach(playlist::add);
+            for (int i = 0; i < 7; i++) {
+                queueString.append(i + ". " + playlist.get(i) + "\n");
+            }
+            event.getChannel().sendMessage("```\nPage 1:\n" + queueString + "\n```").setActionRow(Button.primary("queue previous", "⬅️"), Button.primary("queue next", "➡️")).queue();
         }
         catch (NullPointerException e) {
             this.discordUtils.sendMessage("Queue empty");
+        }
+    }
+
+    public void onQueueButton(ButtonInteractionEvent event) {
+        try {
+            List<String> playlist = new ArrayList<>();
+            playlist.add(this.audioPlayer.getPlayingTrack().getInfo().title);
+            this.queue.getPlaylist().stream().map(x -> x.getInfo().title).forEach(playlist::add);
+
+            Integer page = Integer.parseInt(event.getMessage().getContentRaw().split("\n")[1].split(" ")[1].replace(":", ""));
+            page = event.getButton().getId().equals("queue next") ? page + 1 : page - 1;
+
+            int lastPage = playlist.size() % 7 == 0 ? playlist.size() / 7 : playlist.size() / 7 + 1;
+            if (page == 0) page = lastPage;
+            if (page > lastPage) page = 1;
+
+            StringBuilder queueString = new StringBuilder();
+
+            for (int i = (page - 1) * 7; i < ((page - 1) * 7) + 7; i++) {
+                if (i < playlist.size()) {
+                    queueString.append(i + ". " + playlist.get(i) + "\n");
+                }
+            }
+            event.editMessage("```\nPage " + page + ":\n" + queueString + "\n```").queue();
+        }
+        catch (IllegalStateException e) {
+            e.getMessage();
         }
     }
 
