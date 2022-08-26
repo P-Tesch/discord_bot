@@ -186,6 +186,12 @@ public class MusicManager {
         this.discordUtils.sendMessage("Queue Suffled");
     }
 
+    public void onJumpToCommand(MessageReceivedEvent event) {
+        for (int i = 0; i < Integer.parseInt(event.getMessage().getContentRaw().split(" ")[1]); i++) {
+            this.onSkipCommand();
+        }
+    }
+
     private boolean isUrl(String test) {
         try {
             new URL(test);

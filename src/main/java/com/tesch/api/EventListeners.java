@@ -85,6 +85,11 @@ public class EventListeners extends ListenerAdapter {
             return;
         }
 
+        if (message.startsWith("jumpto")) {
+            musicManager.onJumpToCommand(event);
+            return;
+        }
+
         if (message.startsWith("musicle")) {
             try {
                 musicleManager.onMusicleCommand(event);
