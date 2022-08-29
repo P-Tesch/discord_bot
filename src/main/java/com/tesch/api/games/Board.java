@@ -1,20 +1,10 @@
 package com.tesch.api.games;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import com.tesch.api.games.tictactoe.enums.TicTacToeTeams;
-import com.tesch.api.games.tictactoe.exceptions.TicTacToeException;
-
-import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 public abstract class Board {
 

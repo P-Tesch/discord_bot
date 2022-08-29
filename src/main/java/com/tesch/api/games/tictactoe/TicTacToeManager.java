@@ -1,7 +1,6 @@
 package com.tesch.api.games.tictactoe;
 
 import com.tesch.api.games.Position;
-import com.tesch.api.games.tictactoe.enums.TicTacToeTeams;
 import com.tesch.api.games.tictactoe.exceptions.TicTacToeException;
 import com.tesch.api.utils.DiscordUtils;
 
