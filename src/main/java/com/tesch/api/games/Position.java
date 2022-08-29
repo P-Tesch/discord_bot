@@ -1,4 +1,4 @@
-package com.tesch.api.games.tictactoe;
+package com.tesch.api.games;
 
 public class Position {
 

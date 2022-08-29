@@ -2,11 +2,12 @@ package com.tesch.api.games.tictactoe;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import com.tesch.api.games.tictactoe.enums.TicTacToeTeams;
+import com.tesch.api.games.Board;
+import com.tesch.api.games.Piece;
+import com.tesch.api.games.Position;
+import com.tesch.api.games.Teams;
 import com.tesch.api.games.tictactoe.exceptions.TicTacToeException;
 
 import net.dv8tion.jda.api.MessageBuilder;
@@ -15,70 +16,50 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
-public class TicTacToeBoard {
+public class TicTacToeBoard extends Board {
 
-    private TicTacToeTeams[][] board;
-    private Map<User, TicTacToeTeams> players;
-    private TicTacToeTeams currentPlayer;
-    private TicTacToeTeams win;
     private List<String> winLine;
     
     public TicTacToeBoard(User[] players) {
-        board = new TicTacToeTeams[3][3];
-        for (int i = 0; i < this.board.length; i++) {
-            for (int j = 0; j < this.board[i].length; j++) {
-                this.board[i][j] = TicTacToeTeams.NULL;
-            }
-        }
-        this.players = new HashMap<>();
-        this.currentPlayer = TicTacToeTeams.X;
-        this.players.put(players[0], TicTacToeTeams.X);
-        this.players.put(players[1], TicTacToeTeams.O);
-        this.win = TicTacToeTeams.NULL;
+        super(3, players);
         this.winLine = new ArrayList<>();
     }
 
-    protected TicTacToeTeams getWin() {
-        return this.win;
-    }
-
-    private void nextPlayer() {
-        this.currentPlayer = this.currentPlayer == TicTacToeTeams.X ? TicTacToeTeams.O : TicTacToeTeams.X;
-    }
-
+    @Override
     protected void makeMove(Position position, User player) {
-        if (this.board[position.getRow()][position.getColumn()] != TicTacToeTeams.NULL) {
+        if (this.getBoard()[position.getRow()][position.getColumn()] != null) {
             throw new TicTacToeException("The selected place is not empty");
         }
-        if (this.currentPlayer != this.players.get(player)) {
+        if (this.getCurrentPlayer() != this.getPlayers().get(player)) {
             throw new TicTacToeException("This is not the current player");
         }
-        this.board[position.getRow()][position.getColumn()] = this.currentPlayer;
-        this.win = this.checkWin();
+        this.getBoard()[position.getRow()][position.getColumn()] = new TicTacToePiece(this.getCurrentPlayer());
+        this.checkWin();
+        if (this.getWin() != null) this.setFinished(true);
         this.nextPlayer();
     }
 
     protected Message getBoardAsMessage() {
         List<Button> buttons = new ArrayList<>();
-        for (int i = 0; i < this.board.length; i++) {
-            for (int j = 0; j < this.board.length; j++) {
+        for (int i = 0; i < this.getBoard().length; i++) {
+            for (int j = 0; j < this.getBoard().length; j++) {
                 if (winLine.contains(i + " " + j)) {
-                    buttons.add(Button.success(i + " " + j, board[i][j].toString()));
+                    buttons.add(Button.success(i + " " + j, this.getBoard()[i][j] != null ? this.getBoard()[i][j].toString() : " "));
                 }
                 else {
-                    buttons.add(Button.primary(i + " " + j, board[i][j].toString()));
+                    buttons.add(Button.primary(i + " " + j, this.getBoard()[i][j] != null ? this.getBoard()[i][j].toString() : " "));
                 }
             }
         }
         MessageBuilder message = new MessageBuilder();
-        this.players.keySet().forEach(x -> message.mentionUsers(x.getIdLong()));
-        if (this.win != TicTacToeTeams.NULL) {
+        this.getPlayers().keySet().forEach(x -> message.mentionUsers(x.getIdLong()));
+        if (this.getWin() != null) {
             message.setContent("Winner: ");
-            message.append(this.players.entrySet().stream().filter(x -> x.getValue() == this.win).toList().get(0).getKey().getAsMention());
+            message.append(this.getPlayers().entrySet().stream().filter(x -> x.getValue() == this.getWin()).toList().get(0).getKey().getAsMention());
         }
         else {
             message.setContent("Player: ");
-            message.append(this.players.entrySet().stream().filter(x -> x.getValue() == this.currentPlayer).toList().get(0).getKey().getAsMention());
+            message.append(this.getPlayers().entrySet().stream().filter(x -> x.getValue() == this.getCurrentPlayer()).toList().get(0).getKey().getAsMention());
         }
         
         message.setActionRows(
@@ -89,73 +70,49 @@ public class TicTacToeBoard {
         return message.build();
     }
 
-    private TicTacToeTeams checkWin() {
-        TicTacToeTeams[] column;
-		TicTacToeTeams[] diagonal1 = new TicTacToeTeams[this.board.length];
-		TicTacToeTeams[] diagonal2 = new TicTacToeTeams[this.board.length];
+    protected Teams checkWinImpl() {
+        Piece[] column;
+		Piece[] diagonal1 = new Piece[this.getBoard().length];
+		Piece[] diagonal2 = new Piece[this.getBoard().length];
 		
-		for (int i = 0; i < this.board.length; i++) {
+		for (int i = 0; i < this.getBoard().length; i++) {
 			// Rows
-			if (Arrays.stream(this.board[i]).allMatch(p -> p == TicTacToeTeams.X)) {
-                for (int l = 0; l < this.board.length; l++) {
+			if (Arrays.stream(this.getBoard()[i]).allMatch(p -> p != null && p.getOwner() == this.getCurrentPlayer())) {
+                for (int l = 0; l < this.getBoard().length; l++) {
                     this.winLine.add(i + " " + l);
                 }
-				return TicTacToeTeams.X;
-			}
-			if (Arrays.stream(this.board[i]).allMatch(p -> p == TicTacToeTeams.O)) {
-                for (int l = 0; l < this.board.length; l++) {
-                    this.winLine.add(i + " " + l);
-                }
-				return TicTacToeTeams.O;
-			}
+				return this.getCurrentPlayer();
+            }
 			
 			// Columns
-            column = new TicTacToeTeams[this.board.length];
-			for (int j = 0; j < this.board.length; j++) {
-				column[j] = this.board[j][i];
-				if (Arrays.stream(column).allMatch(p -> p == TicTacToeTeams.X)) {
-                    for (int l = 0; l < this.board.length; l++) {
+            column = new Piece[this.getBoard().length];
+			for (int j = 0; j < this.getBoard().length; j++) {
+				column[j] = this.getBoard()[j][i];
+				if (Arrays.stream(column).allMatch(p -> p != null && p.getOwner() == this.getCurrentPlayer())) {
+                    for (int l = 0; l < this.getBoard().length; l++) {
                         this.winLine.add(l + " " + i);
                     }
-					return TicTacToeTeams.X;
-				}
-				if (Arrays.stream(column).allMatch(p -> p == TicTacToeTeams.O)) {
-                    for (int l = 0; l < this.board.length; l++) {
-                        this.winLine.add(l + " " + i);
-                    }
-					return TicTacToeTeams.O;
+					return this.getCurrentPlayer();
 				}
 			}
 			
 			// Diagonals
-			diagonal1[i] = this.board[i][i];
-			if (Arrays.stream(diagonal1).allMatch(p -> p == TicTacToeTeams.X)) {
-                for (int l = 0; l < this.board.length; l++) {
+			diagonal1[i] = this.getBoard()[i][i];
+			if (Arrays.stream(diagonal1).allMatch(p -> p != null && p.getOwner() == this.getCurrentPlayer())) {
+                for (int l = 0; l < this.getBoard().length; l++) {
                     this.winLine.add(l + " " + l);
                 }
-				return TicTacToeTeams.X;
-			}
-			if (Arrays.stream(diagonal1).allMatch(p -> p == TicTacToeTeams.O)) {
-                for (int l = 0; l < this.board.length; l++) {
-                    this.winLine.add(l + " " + l);
-                }
-				return TicTacToeTeams.O;
-			}
-			diagonal2[i] = this.board[this.board.length - 1 - i][i];
-			if (Arrays.stream(diagonal2).allMatch(p -> p == TicTacToeTeams.X)) {
-                for (int l = 0; l < this.board.length; l++) {
-                    this.winLine.add(this.board.length - 1 - l + " " + l);
-                }
-				return TicTacToeTeams.X;
-			}
-			if (Arrays.stream(diagonal2).allMatch(p -> p == TicTacToeTeams.O)) {
-                for (int l = 0; l < this.board.length; l++) {
-                    this.winLine.add(this.board.length - 1 - l + " " + l);
-                }
-				return TicTacToeTeams.O;
+				return this.getCurrentPlayer();
 			}
 			
+			diagonal2[i] = this.getBoard()[this.getBoard().length - 1 - i][i];
+			if (Arrays.stream(diagonal2).allMatch(p -> p != null && p.getOwner() == this.getCurrentPlayer())) {
+                for (int l = 0; l < this.getBoard().length; l++) {
+                    this.winLine.add(this.getBoard().length - 1 - l + " " + l);
+                }
+				return this.getCurrentPlayer();
+			}
 		}
-		return TicTacToeTeams.NULL;
+		return null;
     }
 }

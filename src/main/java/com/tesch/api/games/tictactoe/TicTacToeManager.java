@@ -1,5 +1,6 @@
 package com.tesch.api.games.tictactoe;
 
+import com.tesch.api.games.Position;
 import com.tesch.api.games.tictactoe.enums.TicTacToeTeams;
 import com.tesch.api.games.tictactoe.exceptions.TicTacToeException;
 import com.tesch.api.utils.DiscordUtils;
@@ -44,7 +45,7 @@ public class TicTacToeManager {
         try {
             this.board.makeMove(new Position(event.getButton().getId()), event.getUser());
             event.editMessage(this.board.getBoardAsMessage()).queue();
-            if (this.board.getWin() != TicTacToeTeams.NULL) {
+            if (this.board.getFinished() == true) {
                 this.clear();
             }
         }
