@@ -40,4 +40,8 @@ public class MiscUtils {
     public static Integer randomInt(Integer min, Integer max) {
         return ThreadLocalRandom.current().nextInt(min, max + 1);
     }
+
+    public static boolean isEven(Integer number) {
+        return number % 2 == 0;
+    }
 }

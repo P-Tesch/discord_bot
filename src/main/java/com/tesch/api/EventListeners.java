@@ -3,6 +3,7 @@ package com.tesch.api;
 import org.jetbrains.annotations.NotNull;
 
 import com.tesch.api.games.RNGManager;
+import com.tesch.api.games.chess.ChessManager;
 import com.tesch.api.games.musicle.MusicleManager;
 import com.tesch.api.games.tictactoe.TicTacToeManager;
 import com.tesch.api.music.MusicManager;
@@ -24,6 +25,7 @@ public class EventListeners extends ListenerAdapter {
     private HelpManager helpManager;
     private TicTacToeManager ticTacToeManager;
     private TaskScheduler taskScheduler;
+    private ChessManager chessManager;
 
     public EventListeners(ManagerFactory managerFactory) {
         this.musicManager = managerFactory.buildMusicManager();
@@ -31,6 +33,7 @@ public class EventListeners extends ListenerAdapter {
         this.rngManager = managerFactory.buildRngManager();
         this.helpManager = managerFactory.buildHelpManager();
         this.ticTacToeManager = managerFactory.buildTicTacToeManager();
+        this.chessManager = managerFactory.buildChessManager();
         this.taskScheduler = new TaskScheduler();
     }
     
@@ -116,6 +119,11 @@ public class EventListeners extends ListenerAdapter {
 
         if (message.startsWith("tictactoe")) {
             ticTacToeManager.onTicTacToeCommand(event);
+            return;
+        }
+
+        if (message.startsWith("chess")) {
+            chessManager.onChessCommand(event);
             return;
         }
     }
