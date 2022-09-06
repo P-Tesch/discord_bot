@@ -6,13 +6,14 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import com.tesch.api.games.chess.ChessBoard;
 import com.tesch.api.games.chess.ChessPiece;
 import com.tesch.api.games.chess.enums.Color;
 
 public class King extends ChessPiece {
 
-    public King(Color color) {
-        super(color);
+    public King(Color color, ChessBoard chessBoard) {
+        super(color, chessBoard);
     }
     
     public BufferedImage getAsImage() {
@@ -25,5 +26,13 @@ public class King extends ChessPiece {
         }
         return null;
     }
+
+    @Override
+    public boolean[][] possibleMoves() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    
     
 }

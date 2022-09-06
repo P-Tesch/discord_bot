@@ -14,7 +14,7 @@ public abstract class Board {
     private Teams win;
     private boolean finished;
 
-    protected Piece[][] getBoard() {
+    public Piece[][] getBoard() {
         return board;
     }
 

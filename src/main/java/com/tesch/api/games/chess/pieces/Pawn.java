@@ -6,13 +6,21 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import com.tesch.api.games.chess.ChessBoard;
 import com.tesch.api.games.chess.ChessPiece;
 import com.tesch.api.games.chess.enums.Color;
 
 public class Pawn extends ChessPiece {
 
-    public Pawn(Color color) {
-        super(color);
+    private boolean firstMove;
+
+    public Pawn(Color color, ChessBoard chessBoard) {
+        super(color, chessBoard);
+        this.firstMove = true;
+    }
+
+    public void setFirstMove(boolean firstMove) {
+        this.firstMove = firstMove;
     }
     
     public BufferedImage getAsImage() {
@@ -24,5 +32,13 @@ public class Pawn extends ChessPiece {
             e.printStackTrace();
         }
         return null;
+    }
+
+    @Override
+    public boolean[][] possibleMoves() {
+        boolean[][] possibleMoves = new boolean[this.getChessBoard().getBoard().length][this.getChessBoard().getBoard().length];
+        possibleMoves[this.getPosition().getRow() + (this.getColor() == Color.BLACK ? 1 : -1)][this.getPosition().getColumn()] = true;
+        if (this.firstMove) possibleMoves[this.getPosition().getRow() + (this.getColor() == Color.BLACK ? 2 : -2)][this.getPosition().getColumn()] = true;
+        return possibleMoves;
     }
 }

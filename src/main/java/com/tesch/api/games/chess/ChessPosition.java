@@ -13,6 +13,12 @@ public class ChessPosition extends Position {
         this.chessColumn =  (char) ('a' + position.getColumn());
     }
 
+    public ChessPosition(int chessRow, char chessColumn) {
+        super(8 - chessRow, chessColumn - 'a');
+        this.chessRow = chessRow;
+        this.chessColumn = chessColumn;
+    }
+
     public Character getChessColumn() {
         return this.chessColumn;
     }
@@ -46,5 +52,10 @@ public class ChessPosition extends Position {
     public void setRow(Integer row) {
         super.setRow(row);
         this.setChessRow(8 - this.getRow());
+    }
+
+    @Override
+    public String toString() {
+        return "ChessPosition: " + this.chessRow + " " + this.chessColumn + "\nPosition: " + this.getRow() + " " + this.getColumn();
     }
 }

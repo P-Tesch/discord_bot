@@ -6,13 +6,15 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import com.tesch.api.games.chess.ChessBoard;
 import com.tesch.api.games.chess.ChessPiece;
+import com.tesch.api.games.chess.ChessPosition;
 import com.tesch.api.games.chess.enums.Color;
 
 public class Rook extends ChessPiece {
 
-    public Rook(Color color) {
-        super(color);
+    public Rook(Color color, ChessBoard ChessBoard) {
+        super(color, ChessBoard);
     }
     
     public BufferedImage getAsImage() {
@@ -23,6 +25,17 @@ public class Rook extends ChessPiece {
         catch (IOException e) {
             e.printStackTrace();
         }
+        return null;
+    }
+
+    @Override
+    public void MakeMove(ChessPosition chessPosition) {
+        // TODO Auto-generated method stub
+    }
+
+    @Override
+    public boolean[][] possibleMoves() {
+        // TODO Auto-generated method stub
         return null;
     }
 }

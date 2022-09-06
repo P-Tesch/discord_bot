@@ -126,6 +126,11 @@ public class EventListeners extends ListenerAdapter {
             chessManager.onChessCommand(event);
             return;
         }
+
+        if (this.chessManager.userIsInMatch(event.getAuthor())) {
+            this.chessManager.onMoveCommand(event);
+            return;
+        }
     }
 
     @Override
