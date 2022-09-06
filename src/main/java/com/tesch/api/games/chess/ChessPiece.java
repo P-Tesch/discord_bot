@@ -30,12 +30,12 @@ public abstract class ChessPiece extends Piece {
 
     public void setChessPosition(ChessPosition chessPosition) {
         this.chessPosition = chessPosition;
-        this.setPosition(chessPosition.getRow(), chessPosition.getColumn());
+        super.setPosition(chessPosition.getRow(), chessPosition.getColumn());
     }
 
     @Override
     public void setPosition(Position position) {
-        this.setPosition(position);
+        super.setPosition(position);
         this.chessPosition.setAllFromPosition(position);
     }
 

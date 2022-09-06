@@ -6,6 +6,7 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import com.tesch.api.games.Position;
 import com.tesch.api.games.chess.ChessBoard;
 import com.tesch.api.games.chess.ChessPiece;
 import com.tesch.api.games.chess.enums.Color;
@@ -37,8 +38,32 @@ public class Pawn extends ChessPiece {
     @Override
     public boolean[][] possibleMoves() {
         boolean[][] possibleMoves = new boolean[this.getChessBoard().getBoard().length][this.getChessBoard().getBoard().length];
-        possibleMoves[this.getPosition().getRow() + (this.getColor() == Color.BLACK ? 1 : -1)][this.getPosition().getColumn()] = true;
-        if (this.firstMove) possibleMoves[this.getPosition().getRow() + (this.getColor() == Color.BLACK ? 2 : -2)][this.getPosition().getColumn()] = true;
+
+        int nextRow = this.getChessPosition().getRow() + (this.getColor() == Color.BLACK ? 1 : -1);
+        int secondRow = this.getChessPosition().getRow() + (this.getColor() == Color.BLACK ? 2 : -2);
+        int nextColumn = this.getChessPosition().getColumn() + 1;
+        int previousColumn = this.getChessPosition().getColumn() - 1;
+
+        // Normal moves
+        if (this.getChessBoard().positionExists(new Position(nextRow, this.getChessPosition().getColumn()))) {
+            ChessPiece target = (ChessPiece) this.getChessBoard().getBoard()[nextRow][this.getChessPosition().getColumn()];
+            possibleMoves[nextRow][this.getChessPosition().getColumn()] = target == null;
+        }
+        if (this.firstMove && this.getChessBoard().positionExists(new Position(secondRow, this.getChessPosition().getColumn()))) {
+            ChessPiece target = (ChessPiece) this.getChessBoard().getBoard()[secondRow][this.getChessPosition().getColumn()];
+            possibleMoves[secondRow][this.getPosition().getColumn()] = target == null;
+        }
+
+        // Capture
+        if (this.getChessBoard().positionExists(new Position(nextRow, nextColumn))) {
+            ChessPiece target = ((ChessPiece) this.getChessBoard().getBoard()[nextRow][nextColumn]);
+            possibleMoves[nextRow][nextColumn] = target != null && target.getColor() != this.getColor();
+        }
+        if (this.getChessBoard().positionExists(new Position(nextRow, previousColumn))) {
+            ChessPiece target = (ChessPiece) this.getChessBoard().getBoard()[nextRow][previousColumn];
+            possibleMoves[nextRow][previousColumn] = target != null && target.getColor() != this.getColor();
+        }
+
         return possibleMoves;
     }
 }

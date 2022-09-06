@@ -107,7 +107,7 @@ public class ChessBoard extends Board {
         for (int i = 1; i <= 6; i += 5) {
             for (int j = 0; j < 8; j++) {
                 Pawn pawn = new Pawn(i == 1 ? Color.BLACK : Color.WHITE, this);
-                pawn.setPosition(i, j);
+                pawn.setChessPosition(new ChessPosition(new Position(i, j)));
                 this.getBoard()[i][j] = pawn;
             }
         }
@@ -124,14 +124,14 @@ public class ChessBoard extends Board {
             Queen queen = new Queen(color, this);
             King king = new King(color, this);
 
-            rook1.setPosition(i, 0);
-            rook2.setPosition(i, 7);
-            knight1.setPosition(i, 1);
-            knight2.setPosition(i, 6);
-            bishop1.setPosition(i, 2);
-            bishop2.setPosition(i, 5);
-            queen.setPosition(i, 3);
-            king.setPosition(i, 4);
+            rook1.setChessPosition(new ChessPosition(new Position(i, 0)));
+            rook2.setChessPosition(new ChessPosition(new Position(i, 7)));
+            knight1.setChessPosition(new ChessPosition(new Position(i, 1)));
+            knight2.setChessPosition(new ChessPosition(new Position(i, 6)));
+            bishop1.setChessPosition(new ChessPosition(new Position(i, 2)));
+            bishop2.setChessPosition(new ChessPosition(new Position(i, 5)));
+            queen.setChessPosition(new ChessPosition(new Position(i, 3)));
+            king.setChessPosition(new ChessPosition(new Position(i, 4)));
 
             this.getBoard()[i][0] = rook1;
             this.getBoard()[i][7] = rook2;
