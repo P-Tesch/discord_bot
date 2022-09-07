@@ -8,7 +8,6 @@ import javax.imageio.ImageIO;
 
 import com.tesch.api.games.chess.ChessBoard;
 import com.tesch.api.games.chess.ChessPiece;
-import com.tesch.api.games.chess.ChessPosition;
 import com.tesch.api.games.chess.enums.Color;
 
 public class Rook extends ChessPiece {
@@ -29,13 +28,69 @@ public class Rook extends ChessPiece {
     }
 
     @Override
-    public void MakeMove(ChessPosition chessPosition) {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
     public boolean[][] possibleMoves() {
-        // TODO Auto-generated method stub
-        return null;
+        boolean[][] possibleMoves = new boolean[this.getChessBoard().getBoard().length][this.getChessBoard().getBoard().length];
+
+        //Up
+		for (int i = this.getPosition().getRow() - 1; i >= 0; i--) {
+			ChessPiece piece = (ChessPiece) this.getChessBoard().getBoard()[i][this.getChessPosition().getColumn()];
+			if (piece == null) {
+				possibleMoves[i][this.getPosition().getColumn()] = true;
+			}
+			else if (piece.getColor() != this.getColor()) {
+				possibleMoves[i][this.getPosition().getColumn()] = true;
+				break;
+			}
+			else {
+				break;
+			}
+		}
+		
+		//Right
+		for (int i = this.getPosition().getColumn() + 1; i < this.getChessBoard().getBoard().length; i++) {
+			ChessPiece piece = (ChessPiece) this.getChessBoard().getBoard()[this.getChessPosition().getRow()][i];
+			if (piece == null) {
+				possibleMoves[this.getPosition().getRow()][i] = true;
+			}
+			else if (piece.getColor() != this.getColor()) {
+				possibleMoves[this.getPosition().getRow()][i] = true;
+				break;
+			}
+			else {
+				break;
+			}
+		}
+		
+		//Down
+		for (int i = this.getPosition().getRow() + 1; i < this.getChessBoard().getBoard().length; i++) {
+			ChessPiece piece = (ChessPiece) this.getChessBoard().getBoard()[i][this.getChessPosition().getColumn()];
+			if (piece == null) {
+				possibleMoves[i][this.getPosition().getColumn()] = true;
+			}
+			else if (piece.getColor() != this.getColor()) {
+				possibleMoves[i][this.getPosition().getColumn()] = true;
+				break;
+			}
+			else {
+				break;
+			}
+		}
+		
+		//Left
+		for (int i = this.getPosition().getColumn() - 1; i >= 0; i--) {
+			ChessPiece piece = (ChessPiece) this.getChessBoard().getBoard()[this.getChessPosition().getRow()][i];
+			if (piece == null) {
+				possibleMoves[this.getPosition().getRow()][i] = true;
+			}
+			else if (piece.getColor() != this.getColor()) {
+				possibleMoves[this.getPosition().getRow()][i] = true;
+				break;
+			}
+			else {
+				break;
+			}
+		}
+
+        return possibleMoves;
     }
 }

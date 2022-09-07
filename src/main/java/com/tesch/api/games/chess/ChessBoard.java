@@ -96,7 +96,11 @@ public class ChessBoard extends Board {
     }
 
     public boolean positionExists(Position position) {
-        if (position.getColumn() < this.getBoard().length && position.getRow() < this.getBoard().length) {
+        if (position.getColumn() < this.getBoard().length 
+            && position.getRow() < this.getBoard().length
+            && position.getColumn() >= 0
+            && position.getRow() >= 0
+        ) {
             return true;
         }
         return false;
