@@ -6,6 +6,7 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import com.tesch.api.games.Position;
 import com.tesch.api.games.chess.ChessBoard;
 import com.tesch.api.games.chess.ChessPiece;
 import com.tesch.api.games.chess.enums.Color;
@@ -29,8 +30,19 @@ public class King extends ChessPiece {
 
     @Override
     public boolean[][] possibleMoves() {
-        // TODO Auto-generated method stub
-        return null;
+        boolean[][] possibleMoves = new boolean[this.getChessBoard().getBoard().length][this.getChessBoard().getBoard().length];
+		
+		// Normal moves
+		for (int i = -1; i <= 1; i++) {
+			for (int j = -1; j <= 1; j++) {
+				if (this.getChessBoard().positionExists(new Position((this.getChessPosition().getRow() + i), (this.getChessPosition().getColumn() + j)))) {
+                    ChessPiece target = (ChessPiece) this.getChessBoard().getBoard()[this.getChessPosition().getRow() + i][this.getChessPosition().getColumn() + j];
+					possibleMoves[this.getChessPosition().getRow() + i][this.getChessPosition().getColumn() + j] = target == null || target.getColor() != this.getColor();
+				}
+			}
+		}
+
+        return possibleMoves;
     }
 
     
