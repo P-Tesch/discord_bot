@@ -29,8 +29,24 @@ public class Queen extends ChessPiece {
 
     @Override
     public boolean[][] possibleMoves() {
-        // TODO Auto-generated method stub
-        return null;
+        boolean[][] possibleMoves = new boolean[this.getChessBoard().getBoard().length][this.getChessBoard().getBoard().length];
+
+        ChessPiece rook = new Rook(this.getColor(), this.getChessBoard());
+        ChessPiece bishop = new Bishop(this.getColor(), this.getChessBoard());
+
+        rook.setChessPosition(this.getChessPosition());
+        bishop.setChessPosition(this.getChessPosition());
+
+        boolean[][] rookPossibleMoves = rook.possibleMoves();
+        boolean[][] bishopPossibleMoves = bishop.possibleMoves();
+
+        for (int i = 0; i < possibleMoves.length; i++) {
+            for (int j = 0; j < possibleMoves.length; j++) {
+                possibleMoves[i][j] = rookPossibleMoves[i][j] || bishopPossibleMoves[i][j];
+            }
+        }
+
+        return possibleMoves;
     }
 
     
