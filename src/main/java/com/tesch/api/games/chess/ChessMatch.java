@@ -64,6 +64,11 @@ public class ChessMatch {
         this.nextPlayer();
     }
 
+    public void cancelMove(User player) {
+        if (!player.equals(this.players.get(this.currentPlayer))) throw new ChessException("You are not the current player");
+        this.selectedPiece = null;
+    }
+
     private void nextPlayer() {
         this.currentPlayer = this.currentPlayer == Color.WHITE ? Color.BLACK : Color.WHITE;
     }

@@ -48,12 +48,17 @@ public class ChessManager {
         try {
             ChessMatch match = this.matches.stream().filter(x -> Arrays.asList(x.getPlayers()).contains(event.getAuthor())).toList().get(0);
             String message = event.getMessage().getContentRaw();
-            ChessPosition position = new ChessPosition(Integer.parseInt(String.valueOf(message.charAt(1))), message.charAt(0));
-            if (match.getSelectedPiece() == null) {
-                match.selectPiece(position, event.getAuthor());
+            if (message.equals("cancel")) {
+                match.cancelMove(event.getAuthor());
             }
             else {
-                match.moveSelectedPiece(position, event.getAuthor());
+                ChessPosition position = new ChessPosition(Integer.parseInt(String.valueOf(message.charAt(1))), message.charAt(0));
+                if (match.getSelectedPiece() == null) {
+                    match.selectPiece(position, event.getAuthor());
+                }
+                else {
+                    match.moveSelectedPiece(position, event.getAuthor());
+                }
             }
             this.printBoard(event.getChannel().asTextChannel(), match);
         }
