@@ -106,6 +106,10 @@ public class ChessBoard extends Board {
         return false;
     }
 
+    public ChessPiece getPieceAt(Position position) {
+        return (ChessPiece) this.getBoard()[position.getRow()][position.getColumn()];
+    }
+
     private void buildBoard() {
         // Pawns
         for (int i = 1; i <= 6; i += 5) {

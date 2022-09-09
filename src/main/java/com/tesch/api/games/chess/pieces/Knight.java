@@ -31,54 +31,21 @@ public class Knight extends ChessPiece {
     @Override
     public boolean[][] possibleMoves() {
         boolean[][] possibleMoves = new boolean[this.getChessBoard().getBoard().length][this.getChessBoard().getBoard().length];
-		
-		//Up - Left
-		if (this.getChessBoard().positionExists(new Position(this.getPosition().getRow() - 2, this.getPosition().getColumn() - 1))) {
-            ChessPiece target = (ChessPiece) this.getChessBoard().getBoard()[this.getChessPosition().getRow() - 2][this.getChessPosition().getColumn() - 1];
-			possibleMoves[this.getPosition().getRow() - 2][this.getPosition().getColumn() - 1] = target == null || target.getColor() != this.getColor();
-		}
-		
-		//Up - Right
-        if (this.getChessBoard().positionExists(new Position(this.getPosition().getRow() - 2, this.getPosition().getColumn() + 1))) {
-            ChessPiece target = (ChessPiece) this.getChessBoard().getBoard()[this.getChessPosition().getRow() - 2][this.getChessPosition().getColumn() + 1];
-			possibleMoves[this.getPosition().getRow() - 2][this.getPosition().getColumn() + 1] = target == null || target.getColor() != this.getColor();
-		}
-		
-		//Right - Up
-        if (this.getChessBoard().positionExists(new Position(this.getPosition().getRow() - 1, this.getPosition().getColumn() + 2))) {
-            ChessPiece target = (ChessPiece) this.getChessBoard().getBoard()[this.getChessPosition().getRow() - 1][this.getChessPosition().getColumn() + 2];
-			possibleMoves[this.getPosition().getRow() - 1][this.getPosition().getColumn() + 2] = target == null || target.getColor() != this.getColor();
-		}
-		
-		//Right - Down
-        if (this.getChessBoard().positionExists(new Position(this.getPosition().getRow() + 1, this.getPosition().getColumn() + 2))) {
-            ChessPiece target = (ChessPiece) this.getChessBoard().getBoard()[this.getChessPosition().getRow() + 1][this.getChessPosition().getColumn() + 2];
-			possibleMoves[this.getPosition().getRow() + 1][this.getPosition().getColumn() + 2] = target == null || target.getColor() != this.getColor();
-		}
-		
-		//Down - Right
-        if (this.getChessBoard().positionExists(new Position(this.getPosition().getRow() + 2, this.getPosition().getColumn() + 1))) {
-            ChessPiece target = (ChessPiece) this.getChessBoard().getBoard()[this.getChessPosition().getRow() + 2][this.getChessPosition().getColumn() + 1];
-			possibleMoves[this.getPosition().getRow() + 2][this.getPosition().getColumn() + 1] = target == null || target.getColor() != this.getColor();
-		}
-		
-		//Down - Left
-        if (this.getChessBoard().positionExists(new Position(this.getPosition().getRow() + 2, this.getPosition().getColumn() - 1))) {
-            ChessPiece target = (ChessPiece) this.getChessBoard().getBoard()[this.getChessPosition().getRow() + 2][this.getChessPosition().getColumn() - 1];
-			possibleMoves[this.getPosition().getRow() + 2][this.getPosition().getColumn() - 1] = target == null || target.getColor() != this.getColor();
-		}
-		
-		//Left - Down
-        if (this.getChessBoard().positionExists(new Position(this.getPosition().getRow() + 1, this.getPosition().getColumn() - 2))) {
-            ChessPiece target = (ChessPiece) this.getChessBoard().getBoard()[this.getChessPosition().getRow() + 1][this.getChessPosition().getColumn() - 2];
-			possibleMoves[this.getPosition().getRow() + 1][this.getPosition().getColumn() - 2] = target == null || target.getColor() != this.getColor();
-		}
-		
-		//Left - Up
-        if (this.getChessBoard().positionExists(new Position(this.getPosition().getRow() -1, this.getPosition().getColumn() - 2))) {
-            ChessPiece target = (ChessPiece) this.getChessBoard().getBoard()[this.getChessPosition().getRow() - 1][this.getChessPosition().getColumn() - 2];
-			possibleMoves[this.getPosition().getRow() - 1][this.getPosition().getColumn() - 2] = target == null || target.getColor() != this.getColor();
-		}
+
+        for (int i = -2; i <= 2; i += 4) {
+            for (int j = -1; j <= 1; j += 2) {
+                Position targetPosition = new Position(this.getPosition().getRow() + i, this.getPosition().getColumn() + j);
+                if (this.getChessBoard().positionExists(targetPosition)) {
+                    possibleMoves[targetPosition.getRow()][targetPosition.getColumn()] = this.canMove(targetPosition);
+                }
+
+                targetPosition.setRow(this.getPosition().getRow() + j);
+                targetPosition.setColumn(this.getPosition().getColumn() + i);
+                if (this.getChessBoard().positionExists(targetPosition)) {
+                    possibleMoves[targetPosition.getRow()][targetPosition.getColumn()] = this.canMove(targetPosition);
+                }
+            }
+        }
 				
 		return possibleMoves;
     }

@@ -6,6 +6,7 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import com.tesch.api.games.Position;
 import com.tesch.api.games.chess.ChessBoard;
 import com.tesch.api.games.chess.ChessPiece;
 import com.tesch.api.games.chess.enums.Color;
@@ -33,62 +34,38 @@ public class Rook extends ChessPiece {
 
         //Up
 		for (int i = this.getPosition().getRow() - 1; i >= 0; i--) {
-			ChessPiece piece = (ChessPiece) this.getChessBoard().getBoard()[i][this.getChessPosition().getColumn()];
-			if (piece == null) {
-				possibleMoves[i][this.getPosition().getColumn()] = true;
-			}
-			else if (piece.getColor() != this.getColor()) {
-				possibleMoves[i][this.getPosition().getColumn()] = true;
-				break;
-			}
-			else {
-				break;
-			}
+			Position targetPosition = new Position(i, this.getPosition().getColumn());
+
+			if (!this.canMove(targetPosition)) break;
+			possibleMoves[targetPosition.getRow()][targetPosition.getColumn()] = true;
+			if (this.isThereOpponentPiece(targetPosition)) break;
 		}
 		
 		//Right
 		for (int i = this.getPosition().getColumn() + 1; i < this.getChessBoard().getBoard().length; i++) {
-			ChessPiece piece = (ChessPiece) this.getChessBoard().getBoard()[this.getChessPosition().getRow()][i];
-			if (piece == null) {
-				possibleMoves[this.getPosition().getRow()][i] = true;
-			}
-			else if (piece.getColor() != this.getColor()) {
-				possibleMoves[this.getPosition().getRow()][i] = true;
-				break;
-			}
-			else {
-				break;
-			}
+			Position targetPosition = new Position(this.getPosition().getRow(), i);
+
+			if (!this.canMove(targetPosition)) break;
+			possibleMoves[targetPosition.getRow()][targetPosition.getColumn()] = true;
+			if (this.isThereOpponentPiece(targetPosition)) break;
 		}
 		
 		//Down
 		for (int i = this.getPosition().getRow() + 1; i < this.getChessBoard().getBoard().length; i++) {
-			ChessPiece piece = (ChessPiece) this.getChessBoard().getBoard()[i][this.getChessPosition().getColumn()];
-			if (piece == null) {
-				possibleMoves[i][this.getPosition().getColumn()] = true;
-			}
-			else if (piece.getColor() != this.getColor()) {
-				possibleMoves[i][this.getPosition().getColumn()] = true;
-				break;
-			}
-			else {
-				break;
-			}
+			Position targetPosition = new Position(i, this.getPosition().getColumn());
+
+			if (!this.canMove(targetPosition)) break;
+			possibleMoves[targetPosition.getRow()][targetPosition.getColumn()] = true;
+			if (this.isThereOpponentPiece(targetPosition)) break;
 		}
 		
 		//Left
 		for (int i = this.getPosition().getColumn() - 1; i >= 0; i--) {
-			ChessPiece piece = (ChessPiece) this.getChessBoard().getBoard()[this.getChessPosition().getRow()][i];
-			if (piece == null) {
-				possibleMoves[this.getPosition().getRow()][i] = true;
-			}
-			else if (piece.getColor() != this.getColor()) {
-				possibleMoves[this.getPosition().getRow()][i] = true;
-				break;
-			}
-			else {
-				break;
-			}
+			Position targetPosition = new Position(this.getPosition().getRow(), i);
+			
+			if (!this.canMove(targetPosition)) break;
+			possibleMoves[targetPosition.getRow()][targetPosition.getColumn()] = true;
+			if (this.isThereOpponentPiece(targetPosition)) break;
 		}
 
         return possibleMoves;

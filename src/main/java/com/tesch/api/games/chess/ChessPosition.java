@@ -45,13 +45,13 @@ public class ChessPosition extends Position {
     @Override
     public void setColumn(Integer column){
         super.setColumn(column);
-        this.setChessColumn((char) ('a' + this.getColumn()));
+        this.chessColumn = ((char) ('a' + this.getColumn()));
     }
 
     @Override
     public void setRow(Integer row) {
         super.setRow(row);
-        this.setChessRow(8 - this.getRow());
+        this.chessRow = (8 - this.getRow());
     }
 
     @Override

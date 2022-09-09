@@ -35,10 +35,10 @@ public class King extends ChessPiece {
 		// Normal moves
 		for (int i = -1; i <= 1; i++) {
 			for (int j = -1; j <= 1; j++) {
-				if (this.getChessBoard().positionExists(new Position((this.getChessPosition().getRow() + i), (this.getChessPosition().getColumn() + j)))) {
-                    ChessPiece target = (ChessPiece) this.getChessBoard().getBoard()[this.getChessPosition().getRow() + i][this.getChessPosition().getColumn() + j];
-					possibleMoves[this.getChessPosition().getRow() + i][this.getChessPosition().getColumn() + j] = target == null || target.getColor() != this.getColor();
-				}
+                Position targePosition = new Position(this.getPosition().getRow() + i, this.getPosition().getColumn() + j);
+                if (this.getChessBoard().positionExists(targePosition)) {
+                    possibleMoves[targePosition.getRow()][targePosition.getColumn()] = this.canMove(targePosition);
+                }
 			}
 		}
 
