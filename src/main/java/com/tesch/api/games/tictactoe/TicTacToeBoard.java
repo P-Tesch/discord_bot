@@ -19,13 +19,14 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 public class TicTacToeBoard extends Board {
 
     private List<String> winLine;
+    private boolean finished;
+    private Teams win;
     
     public TicTacToeBoard(User[] players) {
         super(3, players);
         this.winLine = new ArrayList<>();
     }
 
-    @Override
     protected void makeMove(Position position, User player) {
         if (this.getBoard()[position.getRow()][position.getColumn()] != null) {
             throw new TicTacToeException("The selected place is not empty");
@@ -37,6 +38,18 @@ public class TicTacToeBoard extends Board {
         this.checkWin();
         if (this.getWin() != null) this.setFinished(true);
         this.nextPlayer();
+    }
+
+    public boolean getFinished() {
+        return this.finished;
+    }
+
+    public Teams getWin() {
+        return this.win;
+    }
+
+    public void setFinished(boolean finished) {
+        this.finished = finished;
     }
 
     protected Message getBoardAsMessage() {
@@ -70,7 +83,7 @@ public class TicTacToeBoard extends Board {
         return message.build();
     }
 
-    protected Teams checkWinImpl() {
+    protected void checkWin() {
         Piece[] column;
 		Piece[] diagonal1 = new Piece[this.getBoard().length];
 		Piece[] diagonal2 = new Piece[this.getBoard().length];
@@ -81,7 +94,7 @@ public class TicTacToeBoard extends Board {
                 for (int l = 0; l < this.getBoard().length; l++) {
                     this.winLine.add(i + " " + l);
                 }
-				return this.getCurrentPlayer();
+				this.win = this.getCurrentPlayer();
             }
 			
 			// Columns
@@ -92,7 +105,7 @@ public class TicTacToeBoard extends Board {
                     for (int l = 0; l < this.getBoard().length; l++) {
                         this.winLine.add(l + " " + i);
                     }
-					return this.getCurrentPlayer();
+					this.win = this.getCurrentPlayer();
 				}
 			}
 			
@@ -102,7 +115,7 @@ public class TicTacToeBoard extends Board {
                 for (int l = 0; l < this.getBoard().length; l++) {
                     this.winLine.add(l + " " + l);
                 }
-				return this.getCurrentPlayer();
+				this.win = this.getCurrentPlayer();
 			}
 			
 			diagonal2[i] = this.getBoard()[this.getBoard().length - 1 - i][i];
@@ -110,9 +123,9 @@ public class TicTacToeBoard extends Board {
                 for (int l = 0; l < this.getBoard().length; l++) {
                     this.winLine.add(this.getBoard().length - 1 - l + " " + l);
                 }
-				return this.getCurrentPlayer();
+				this.win = this.getCurrentPlayer();
 			}
 		}
-		return null;
+		this.win = null;
     }
 }

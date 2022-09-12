@@ -5,14 +5,18 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 
 import com.tesch.api.games.Board;
 import com.tesch.api.games.Position;
-import com.tesch.api.games.Teams;
 import com.tesch.api.games.chess.enums.Color;
+import com.tesch.api.games.chess.exceptions.ChessException;
 import com.tesch.api.games.chess.pieces.Bishop;
 import com.tesch.api.games.chess.pieces.King;
 import com.tesch.api.games.chess.pieces.Knight;
@@ -27,20 +31,32 @@ import net.dv8tion.jda.api.entities.User;
 public class ChessBoard extends Board {
 
     private ChessMatch match;
+    private List<ChessPiece> piecesOnBoard;
+    private Map<Integer, ChessMove> moveHistory;
 
     protected ChessBoard(Integer boardSize, User[] players, ChessMatch match) {
         super(boardSize, players);
+        this.piecesOnBoard = new ArrayList<>();
+        this.moveHistory = new HashMap<>();
         this.buildBoard();
         this.match = match;
+    }
+
+    public List<ChessPiece> getPiecesOnBoard() {
+        return this.piecesOnBoard;
+    }
+
+    public Integer getTurn() {
+        return this.match.getTurn();
     }
 
     @Override
     protected Message getBoardAsMessage() {
         MessageBuilder message = new MessageBuilder();
         this.getPlayers().keySet().forEach(x -> message.mentionUsers(x.getIdLong()));
-        if (this.getWin() != null) {
+        if (this.match.getWinner() != null) {
             message.setContent("Winner: ");
-            message.append(this.getPlayers().entrySet().stream().filter(x -> x.getValue() == this.getWin()).toList().get(0).getKey().getAsMention());
+            message.append(this.getPlayers().entrySet().stream().filter(x -> x.getValue() == this.match.getWinner().getTeam()).toList().get(0).getKey().getAsMention());
         }
         else {
             message.setContent("Player: ");
@@ -83,18 +99,6 @@ public class ChessBoard extends Board {
         return null;
     }
 
-    @Override
-    protected void makeMove(Position position, User player) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    protected Teams checkWinImpl() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
     public boolean positionExists(Position position) {
         if (position.getColumn() < this.getBoard().length 
             && position.getRow() < this.getBoard().length
@@ -110,45 +114,55 @@ public class ChessBoard extends Board {
         return (ChessPiece) this.getBoard()[position.getRow()][position.getColumn()];
     }
 
-    private void buildBoard() {
-        // Pawns
-        for (int i = 1; i <= 6; i += 5) {
-            for (int j = 0; j < 8; j++) {
-                Pawn pawn = new Pawn(i == 1 ? Color.BLACK : Color.WHITE, this);
-                pawn.setChessPosition(new ChessPosition(new Position(i, j)));
-                this.getBoard()[i][j] = pawn;
-            }
-        }
+    public void makeMove(Position from, Position to) {
+        if (!(this.positionExists(from) || this.positionExists(to))) throw new ChessException("Position does not exist");
 
-        // Other Pieces
+        ChessPiece removedPiece = this.removePiece(to);
+        this.placePiece(this.removePiece(from), to);
+        this.moveHistory.put(this.match.getTurn(), new ChessMove(removedPiece, from, to));
+    }
+
+    public void undoMove(Integer moveKey) {
+        ChessMove move = this.moveHistory.get(moveKey);
+        this.placePiece(this.removePiece(move.getTo()), move.getFrom());
+        if (move.getCapturePiece() != null) {
+            this.placePiece(move.getCapturePiece(), move.getTo());
+        }
+        this.moveHistory.remove(moveKey);
+    }
+
+    protected void placePiece(ChessPiece piece, Position position) {
+        piece.setPosition(position);
+        this.getBoard()[position.getRow()][position.getColumn()] = piece;
+        if (!this.piecesOnBoard.contains(piece)) {
+            this.piecesOnBoard.add(piece);
+        }
+    }
+
+    protected ChessPiece removePiece(Position position) {
+        ChessPiece removed = (ChessPiece) this.getBoard()[position.getRow()][position.getColumn()];
+        this.getBoard()[position.getRow()][position.getColumn()] = null;
+        this.piecesOnBoard.remove(removed);
+        return removed;
+    }
+
+    private void buildBoard() {
+        this.placePiece(new King(Color.WHITE, this), new Position(2, 4));
         for (int i = 0; i <= 7; i += 7) {
             Color color = i == 0 ? Color.BLACK : Color.WHITE;
-            Rook rook1 = new Rook(color, this);
-            Rook rook2 = new Rook(color, this);
-            Knight knight1 = new Knight(color, this);
-            Knight knight2 = new Knight(color, this);
-            Bishop bishop1 = new Bishop(color, this);
-            Bishop bishop2 = new Bishop(color, this);
-            Queen queen = new Queen(color, this);
-            King king = new King(color, this);
 
-            rook1.setChessPosition(new ChessPosition(new Position(i, 0)));
-            rook2.setChessPosition(new ChessPosition(new Position(i, 7)));
-            knight1.setChessPosition(new ChessPosition(new Position(i, 1)));
-            knight2.setChessPosition(new ChessPosition(new Position(i, 6)));
-            bishop1.setChessPosition(new ChessPosition(new Position(i, 2)));
-            bishop2.setChessPosition(new ChessPosition(new Position(i, 5)));
-            queen.setChessPosition(new ChessPosition(new Position(i, 3)));
-            king.setChessPosition(new ChessPosition(new Position(i, 4)));
+            this.placePiece(new Rook(color, this), new Position(i, 0));
+            this.placePiece(new Rook(color, this), new Position(i, 7));
+            this.placePiece(new Knight(color, this), new Position(i, 1));
+            this.placePiece(new Knight(color, this), new Position(i, 6));
+            this.placePiece(new Bishop(color, this), new Position(i, 2));
+            this.placePiece(new Bishop(color, this), new Position(i, 5));
+            this.placePiece(new Queen(color, this), new Position(i, 3));
+            this.placePiece(new King(color, this), new Position(i, 4));
 
-            this.getBoard()[i][0] = rook1;
-            this.getBoard()[i][7] = rook2;
-            this.getBoard()[i][1] = knight1;
-            this.getBoard()[i][6] = knight2;
-            this.getBoard()[i][2] = bishop1;
-            this.getBoard()[i][5] = bishop2;
-            this.getBoard()[i][3] = queen;
-            this.getBoard()[i][4] = king;
+            for (int j = 0; j < this.getBoard().length; j++) {
+                this.placePiece(new Pawn(color, this), new Position(color == Color.BLACK ? i + 1 : i - 1, j));
+            }
         }
     }
     

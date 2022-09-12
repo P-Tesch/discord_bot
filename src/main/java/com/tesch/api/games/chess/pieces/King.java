@@ -28,6 +28,40 @@ public class King extends ChessPiece {
         return null;
     }
 
+    public boolean isInCheck() {
+        for (ChessPiece piece : this.getChessBoard().getPiecesOnBoard().stream().filter(x -> x.getColor() != this.getColor() && !(x instanceof King)).toList()) {
+            if (piece.possibleMoves()[this.getPosition().getRow()][this.getPosition().getColumn()] 
+                && !(piece instanceof Pawn 
+                && this.getPosition().getColumn() == piece.getPosition().getColumn())
+            ) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isInCheck(Position futurePosition) {
+        this.getChessBoard().makeMove(this.getPosition(), futurePosition);
+        for (ChessPiece piece : this.getChessBoard().getPiecesOnBoard().stream().filter(x -> x.getColor() != this.getColor()).toList()) {
+            if (!(piece instanceof King)
+                && piece.possibleMoves()[this.getPosition().getRow()][this.getPosition().getColumn()] 
+                && !(piece instanceof Pawn
+                && this.getPosition().getColumn() == piece.getPosition().getColumn())
+            ) {
+                this.getChessBoard().undoMove(this.getChessBoard().getTurn());
+                return true;
+            }
+            if (piece instanceof King && 
+                ((King) piece).possibleMovesIgnoreCheck()[this.getPosition().getRow()][this.getPosition().getColumn()]
+            ) {
+                this.getChessBoard().undoMove(this.getChessBoard().getTurn());
+                return true;
+            }
+        }
+        this.getChessBoard().undoMove(this.getChessBoard().getTurn());
+        return false;
+    }
+
     @Override
     public boolean[][] possibleMoves() {
         boolean[][] possibleMoves = new boolean[this.getChessBoard().getBoard().length][this.getChessBoard().getBoard().length];
@@ -35,16 +69,33 @@ public class King extends ChessPiece {
 		// Normal moves
 		for (int i = -1; i <= 1; i++) {
 			for (int j = -1; j <= 1; j++) {
-                Position targePosition = new Position(this.getPosition().getRow() + i, this.getPosition().getColumn() + j);
-                if (this.getChessBoard().positionExists(targePosition)) {
-                    possibleMoves[targePosition.getRow()][targePosition.getColumn()] = this.canMove(targePosition);
+                if (!(i == 0 && j == 0)) {
+                    Position targetPosition = new Position(this.getPosition().getRow() + i, this.getPosition().getColumn() + j);
+                    if (this.getChessBoard().positionExists(targetPosition)) {
+                        if (!this.isInCheck(targetPosition)) {
+                            possibleMoves[targetPosition.getRow()][targetPosition.getColumn()] = this.canMove(targetPosition);
+                        }
+                    }
                 }
 			}
 		}
+        return possibleMoves;
+    } 
 
+    protected boolean[][] possibleMovesIgnoreCheck() {
+        boolean[][] possibleMoves = new boolean[this.getChessBoard().getBoard().length][this.getChessBoard().getBoard().length];
+		
+		// Normal moves
+		for (int i = -1; i <= 1; i++) {
+			for (int j = -1; j <= 1; j++) {
+                if (!(i == 0 && j == 0)) {
+                    Position targetPosition = new Position(this.getPosition().getRow() + i, this.getPosition().getColumn() + j);
+                    if (this.getChessBoard().positionExists(targetPosition)) {
+                        possibleMoves[targetPosition.getRow()][targetPosition.getColumn()] = this.canMove(targetPosition);
+                    }
+                }
+			}
+		}
         return possibleMoves;
     }
-
-    
-    
 }

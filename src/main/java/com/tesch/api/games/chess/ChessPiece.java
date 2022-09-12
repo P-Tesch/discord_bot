@@ -65,9 +65,8 @@ public abstract class ChessPiece extends Piece {
     public void MakeMove(Position position) {
         if (!this.getChessBoard().positionExists(position)) throw new ChessException("Position does not exist");
         if (!this.possibleMoves()[position.getRow()][position.getColumn()]) throw new ChessException("Move not possible");
-        this.getChessBoard().getBoard()[this.getPosition().getRow()][this.getPosition().getColumn()] = null;
-        this.setPosition(position);
-        this.getChessBoard().getBoard()[this.getPosition().getRow()][this.getPosition().getColumn()] = this;
+
+        this.getChessBoard().makeMove(this.getPosition(), position);
         if (this instanceof Pawn) {
             ((Pawn) this).setFirstMove(false);
         }

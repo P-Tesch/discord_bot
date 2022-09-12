@@ -15,6 +15,8 @@ public class ChessMatch {
     private ChessBoard chessBoard;
     private ChessPiece selectedPiece;
     private Color currentPlayer;
+    private Color winner;
+    private Integer turn;
     
     public ChessMatch(User[] players) {
         this.players = new HashMap<>();
@@ -23,6 +25,8 @@ public class ChessMatch {
         this.chessBoard = new ChessBoard(8, this.getPlayers(), this);
         this.selectedPiece = null;
         this.currentPlayer = Color.WHITE;
+        this.winner = null;
+        this.turn = 0;
     }
 
     public User[] getPlayers() {
@@ -44,6 +48,14 @@ public class ChessMatch {
         return this.players.get(this.currentPlayer).getAsMention();
     }
 
+    public Color getWinner() {
+        return this.winner;
+    }
+
+    public Integer getTurn() {
+        return this.turn;
+    }
+
     public void selectPiece(ChessPosition chessPosition, User player) {
         if (!player.equals(this.players.get(this.currentPlayer))) throw new ChessException("You are not the current player");
 
@@ -62,6 +74,7 @@ public class ChessMatch {
         this.selectedPiece.MakeMove(chessPosition);
         this.selectedPiece = null;
         this.nextPlayer();
+        this.turn++;
     }
 
     public void cancelMove(User player) {
