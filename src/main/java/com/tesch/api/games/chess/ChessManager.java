@@ -71,6 +71,10 @@ public class ChessManager {
         return this.matches.stream().filter(x -> Arrays.asList(x.getPlayers()).contains(user)).toList().size() > 0 ? true : false;
     }
 
+    public void endMatch(ChessMatch match) {
+        matches.remove(match);
+    }
+
     private User[] instantiatePlayers(MessageReceivedEvent event) {
         User[] players = new User[2];
         players[0] = event.getAuthor();
@@ -107,7 +111,7 @@ public class ChessManager {
             playersInMatchMentions.forEach(stringBuilder::append);
             throw new GameException(stringBuilder.toString());
         }
-        return new ChessMatch(players);
+        return new ChessMatch(players, this);
     }
 
     private void printBoard(TextChannel channel, ChessMatch match) {

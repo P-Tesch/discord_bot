@@ -146,8 +146,38 @@ public class ChessBoard extends Board {
         return removed;
     }
 
+    protected boolean isCheckMate(Color color) {
+        King king = (King) this.getKing(color);
+        if (king.isInCheck()) {
+            for (ChessPiece piece : this.getPiecesOnBoard().stream().filter(x -> x.getColor() == king.getColor()).toList()) {
+                boolean[][] possibleMoves = piece.possibleMoves();
+                for (int i = 0; i < possibleMoves.length; i++) {
+                    for (int j = 0; j < possibleMoves[i].length; j++) {
+                        if (possibleMoves[i][j]) {
+                            this.makeMove(piece.getPosition(), new Position(i, j));
+                            if (!king.isInCheck()) {
+                                System.out.println(piece.getChessPosition() + "\n\n" + new ChessPosition(new Position(i, j)));
+                                this.undoMove(this.getTurn());
+                                return false;
+                            }
+                            this.undoMove(this.getTurn());
+                        }
+                    }
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
+    protected ChessPiece getKing(Color color) {
+        return this.piecesOnBoard.stream().filter(piece -> piece.getColor() == color && piece instanceof King).findFirst().get();
+    }
+
     private void buildBoard() {
         this.placePiece(new King(Color.WHITE, this), new Position(2, 4));
+        this.placePiece(new Rook(Color.BLACK, this), new Position(5, 0));
+        this.placePiece(new Rook(Color.BLACK, this), new Position(5, 1));
         for (int i = 0; i <= 7; i += 7) {
             Color color = i == 0 ? Color.BLACK : Color.WHITE;
 

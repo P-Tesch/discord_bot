@@ -6,6 +6,7 @@ import com.tesch.api.games.Piece;
 import com.tesch.api.games.Position;
 import com.tesch.api.games.chess.enums.Color;
 import com.tesch.api.games.chess.exceptions.ChessException;
+import com.tesch.api.games.chess.pieces.King;
 import com.tesch.api.games.chess.pieces.Pawn;
 
 public abstract class ChessPiece extends Piece {
@@ -67,6 +68,10 @@ public abstract class ChessPiece extends Piece {
         if (!this.possibleMoves()[position.getRow()][position.getColumn()]) throw new ChessException("Move not possible");
 
         this.getChessBoard().makeMove(this.getPosition(), position);
+        if (((King) this.getChessBoard().getKing(this.getColor())).isInCheck()) {
+            this.getChessBoard().undoMove(this.getChessBoard().getTurn());
+            throw new ChessException("Your king is in check");
+        }
         if (this instanceof Pawn) {
             ((Pawn) this).setFirstMove(false);
         }

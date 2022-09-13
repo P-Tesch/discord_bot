@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.entities.User;
 
 public class ChessMatch {
     
+    private ChessManager manager;
     private Map<Color, User> players;
     private ChessBoard chessBoard;
     private ChessPiece selectedPiece;
@@ -18,7 +19,8 @@ public class ChessMatch {
     private Color winner;
     private Integer turn;
     
-    public ChessMatch(User[] players) {
+    public ChessMatch(User[] players, ChessManager manager) {
+        this.manager = manager;
         this.players = new HashMap<>();
         this.players.put(Color.WHITE, players[0]);
         this.players.put(Color.BLACK, players[1]);
@@ -73,8 +75,14 @@ public class ChessMatch {
 
         this.selectedPiece.MakeMove(chessPosition);
         this.selectedPiece = null;
-        this.nextPlayer();
-        this.turn++;
+        if (this.chessBoard.isCheckMate(this.currentPlayer == Color.BLACK ? Color.WHITE : Color.BLACK)) {
+            this.winner = this.currentPlayer;
+            this.manager.endMatch(this);
+        }
+        else {
+            this.nextPlayer();
+            this.turn++;
+        }
     }
 
     public void cancelMove(User player) {
