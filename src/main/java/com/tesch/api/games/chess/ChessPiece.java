@@ -73,12 +73,11 @@ public abstract class ChessPiece extends Piece {
         if (!this.possibleMoves()[position.getRow()][position.getColumn()]) throw new ChessException("Move not possible");
 
         if (this instanceof King) { 
-            System.out.println(position.getColumn() + " " + this.getPosition().getColumn());
             if (position.getColumn() - 2 == this.getPosition().getColumn()) {
                 ((ChessPiece) this.getChessBoard().getBoard()[this.getPosition().getRow()][this.getPosition().getColumn() + 3]).makeMove(new Position(this.getPosition().getRow(), this.getPosition().getColumn() + 1));
             } 
             else if (position.getColumn() + 2 == this.getPosition().getColumn()) {
-                ((ChessPiece) this.getChessBoard().getBoard()[this.getPosition().getRow()][this.getPosition().getColumn() - 4]).makeMove(new Position(this.getPosition().getRow(), this.getPosition().getColumn() - 3));
+                ((ChessPiece) this.getChessBoard().getBoard()[this.getPosition().getRow()][this.getPosition().getColumn() - 4]).makeMove(new Position(this.getPosition().getRow(), this.getPosition().getColumn() - 1));
             }
         }
 
