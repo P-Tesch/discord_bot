@@ -13,15 +13,8 @@ import com.tesch.api.games.chess.enums.Color;
 
 public class Pawn extends ChessPiece {
 
-    private boolean firstMove;
-
     public Pawn(Color color, ChessBoard chessBoard) {
         super(color, chessBoard);
-        this.firstMove = true;
-    }
-
-    public void setFirstMove(boolean firstMove) {
-        this.firstMove = firstMove;
     }
     
     public BufferedImage getAsImage() {
@@ -52,7 +45,7 @@ public class Pawn extends ChessPiece {
         }
 
         targetPosition.setRow(secondRow);
-        if (this.firstMove && this.getChessBoard().positionExists(targetPosition)) {
+        if (this.isFirstMove() && this.getChessBoard().positionExists(targetPosition)) {
             possibleMoves[targetPosition.getRow()][targetPosition.getColumn()] = this.canMove(targetPosition) && !this.isThereOpponentPiece(targetPosition);
         }
 

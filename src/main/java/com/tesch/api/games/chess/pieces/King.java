@@ -65,6 +65,19 @@ public class King extends ChessPiece {
     @Override
     public boolean[][] possibleMoves() {
         boolean[][] possibleMoves = new boolean[this.getChessBoard().getBoard().length][this.getChessBoard().getBoard().length];
+
+        // King side castle
+        ChessPiece kingSideRook = (ChessPiece) this.getChessBoard().getBoard()[this.getPosition().getRow()][this.getPosition().getColumn() + 3];
+        if (this.isFirstMove() 
+            && kingSideRook instanceof Rook 
+            && kingSideRook.isFirstMove()
+            && this.getChessBoard().getBoard()[this.getPosition().getRow()][this.getPosition().getColumn() + 1] == null
+            && this.getChessBoard().getBoard()[this.getPosition().getRow()][this.getPosition().getColumn() + 2] == null
+            && !this.isInCheck(new Position(this.getPosition().getRow(), this.getPosition().getColumn() + 1))
+            && !this.isInCheck(new Position(this.getPosition().getRow(), this.getPosition().getColumn() + 2))
+        ) {
+            possibleMoves[this.getPosition().getRow()][this.getPosition().getColumn() + 2] = true;
+        }
 		
 		// Normal moves
 		for (int i = -1; i <= 1; i++) {

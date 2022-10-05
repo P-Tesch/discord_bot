@@ -73,7 +73,7 @@ public class ChessMatch {
         if (!this.chessBoard.positionExists(new Position(chessPosition.getRow(), chessPosition.getColumn()))) throw new ChessException("Position doesn't exist");
         if (!this.selectedPiece.possibleMoves()[chessPosition.getRow()][chessPosition.getColumn()]) throw new ChessException("Move not possible");
 
-        this.selectedPiece.MakeMove(chessPosition);
+        this.selectedPiece.makeMove(chessPosition);
         this.selectedPiece = null;
         if (this.chessBoard.isCheckMate(this.currentPlayer == Color.BLACK ? Color.WHITE : Color.BLACK)) {
             this.winner = this.currentPlayer;

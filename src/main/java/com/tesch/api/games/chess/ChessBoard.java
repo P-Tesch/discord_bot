@@ -175,9 +175,6 @@ public class ChessBoard extends Board {
     }
 
     private void buildBoard() {
-        this.placePiece(new King(Color.WHITE, this), new Position(2, 4));
-        this.placePiece(new Rook(Color.BLACK, this), new Position(5, 0));
-        this.placePiece(new Rook(Color.BLACK, this), new Position(5, 1));
         for (int i = 0; i <= 7; i += 7) {
             Color color = i == 0 ? Color.BLACK : Color.WHITE;
 
