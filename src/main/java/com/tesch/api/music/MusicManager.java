@@ -121,7 +121,9 @@ public class MusicManager {
             playlist.add(this.audioPlayer.getPlayingTrack().getInfo().title);
             this.queue.getPlaylist().stream().map(x -> x.getInfo().title).forEach(playlist::add);
             for (int i = 0; i < 7; i++) {
-                queueString.append(i + ". " + playlist.get(i) + "\n");
+                if (i < playlist.size()) {
+                    queueString.append((i == 0 ? "Playing" : i) + ". " + playlist.get(i) + "\n");
+                }
             }
             event.getChannel().sendMessage("```\nPage 1:\n" + queueString + "\n```").setActionRow(Button.primary("queue previous", "⬅️"), Button.primary("queue next", "➡️")).queue();
         }
