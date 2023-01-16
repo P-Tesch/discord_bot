@@ -6,8 +6,15 @@ import java.util.Map;
 import com.tesch.api.games.Position;
 import com.tesch.api.games.chess.enums.Color;
 import com.tesch.api.games.chess.exceptions.ChessException;
+import com.tesch.api.games.chess.pieces.Bishop;
+import com.tesch.api.games.chess.pieces.Knight;
+import com.tesch.api.games.chess.pieces.Queen;
+import com.tesch.api.games.chess.pieces.Rook;
 
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 public class ChessMatch {
     
@@ -18,8 +25,10 @@ public class ChessMatch {
     private Color currentPlayer;
     private Color winner;
     private Integer turn;
+    private TextChannel channel;
+    private ChessPiece toPromote;
     
-    public ChessMatch(User[] players, ChessManager manager) {
+    public ChessMatch(User[] players, ChessManager manager, TextChannel channel) {
         this.manager = manager;
         this.players = new HashMap<>();
         this.players.put(Color.WHITE, players[0]);
@@ -29,6 +38,8 @@ public class ChessMatch {
         this.currentPlayer = Color.WHITE;
         this.winner = null;
         this.turn = 0;
+        this.channel = channel;
+        this.toPromote = null;
     }
 
     public User[] getPlayers() {
@@ -58,6 +69,10 @@ public class ChessMatch {
         return this.turn;
     }
 
+    public boolean isPromoting() {
+        return this.toPromote != null;
+    }
+
     public void selectPiece(ChessPosition chessPosition, User player) {
         if (!player.equals(this.players.get(this.currentPlayer))) throw new ChessException("You are not the current player");
 
@@ -80,14 +95,50 @@ public class ChessMatch {
             this.manager.endMatch(this);
         }
         else {
-            this.nextPlayer();
-            this.turn++;
+            if (!this.isPromoting()) {
+                this.nextPlayer();
+                this.turn++;
+            }
         }
     }
 
     public void cancelMove(User player) {
         if (!player.equals(this.players.get(this.currentPlayer))) throw new ChessException("You are not the current player");
         this.selectedPiece = null;
+    }
+
+    protected void promotionSelect(ChessPiece toPromote) {
+        this.toPromote = toPromote;
+        this.channel.sendMessage("Select promotion").setActionRow(
+            Button.primary("chess_queen", "♕"),
+            Button.primary("chess_rook", "♖"),
+            Button.primary("chess_bishop", "♗"),
+            Button.primary("chess_knight", "♘")
+            )
+        .queue();
+    }
+
+    protected void onChessButton(ButtonInteractionEvent event) {
+        if (event.getUser() == this.players.get(this.currentPlayer)) {
+            switch(event.getButton().getId()) {
+                case("chess_queen"):
+                    this.chessBoard.promote(this.toPromote, new Queen(this.currentPlayer, this.chessBoard));
+                    break;
+                case("chess_rook"):
+                    this.chessBoard.promote(this.toPromote, new Rook(this.currentPlayer, this.chessBoard));
+                    break;
+                case("chess_bishop"):
+                    this.chessBoard.promote(this.toPromote, new Bishop(this.currentPlayer, this.chessBoard));
+                    break;
+                case("chess_knight"):
+                    this.chessBoard.promote(this.toPromote, new Knight(this.currentPlayer, this.chessBoard));
+                    break;
+            }
+            this.toPromote = null;
+            this.nextPlayer();
+            this.turn++;
+            event.getMessage().delete().queue();
+        }
     }
 
     private void nextPlayer() {

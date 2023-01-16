@@ -50,6 +50,10 @@ public class ChessBoard extends Board {
         return this.match.getTurn();
     }
 
+    protected ChessMatch getMatch() {
+        return this.match;
+    }
+
     @Override
     protected Message getBoardAsMessage() {
         MessageBuilder message = new MessageBuilder();
@@ -146,6 +150,12 @@ public class ChessBoard extends Board {
         return removed;
     }
 
+    protected void promote(ChessPiece toPromote, ChessPiece selectedPromotion) {
+        this.removePiece(toPromote.getPosition());
+        selectedPromotion.setPosition(toPromote.getPosition());
+        this.placePiece(selectedPromotion, selectedPromotion.getPosition());
+    }
+
     protected boolean isCheckMate(Color color) {
         King king = (King) this.getKing(color);
         if (king.isInCheck()) {
@@ -190,6 +200,9 @@ public class ChessBoard extends Board {
             for (int j = 0; j < this.getBoard().length; j++) {
                 this.placePiece(new Pawn(color, this), new Position(color == Color.BLACK ? i + 1 : i - 1, j));
             }
+
+            this.removePiece(new Position(1, 7));
+            this.placePiece(new Pawn(Color.WHITE, this), new Position(1, 7));
         }
     }
     

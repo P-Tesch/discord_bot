@@ -1,5 +1,7 @@
 package com.tesch.api;
 
+import javax.annotation.Nonnull;
+
 import org.jetbrains.annotations.NotNull;
 
 import com.tesch.api.games.RNGManager;
@@ -156,6 +158,9 @@ public class EventListeners extends ListenerAdapter {
     public void onButtonInteraction(ButtonInteractionEvent event) {
         if (event.getButton().getId().startsWith("queue")) {
             this.musicManager.onQueueButton(event);
+        }
+        if (event.getButton().getId().startsWith("chess")) {
+            this.chessManager.onChessButton(event);
         }
         if (this.musicleManager.isInGame()) {
             this.musicleManager.onButtonInteraction(event);

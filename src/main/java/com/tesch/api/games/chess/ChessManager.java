@@ -10,6 +10,7 @@ import com.tesch.api.utils.DiscordUtils;
 
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class ChessManager {
@@ -33,7 +34,7 @@ public class ChessManager {
 
         try {
             players = this.instantiatePlayers(event);
-            match = this.createMatch(players);
+            match = this.createMatch(players, event.getChannel().asTextChannel());
             this.matches.add(match);
         }
         catch (GameException e) {
@@ -60,11 +61,21 @@ public class ChessManager {
                     match.moveSelectedPiece(position, event.getAuthor());
                 }
             }
+
+            if (match.isPromoting()) return;
             this.printBoard(event.getChannel().asTextChannel(), match);
         }
         catch (ChessException e) {
             event.getChannel().sendMessage(e.getMessage()).queue();
         }
+    }
+
+    public void onChessButton(ButtonInteractionEvent event) {
+        ChessMatch targetMatch = this.matches.stream().filter(match -> Arrays.asList(match.getPlayers()).contains(event.getUser())).toList().get(0);
+        if (targetMatch != null) {
+            targetMatch.onChessButton(event);
+        }
+        this.printBoard(event.getChannel().asTextChannel(), targetMatch);
     }
 
     public boolean userIsInMatch(User user) {
@@ -88,7 +99,7 @@ public class ChessManager {
         return players;
     }
 
-    private ChessMatch createMatch(User[] players) {
+    private ChessMatch createMatch(User[] players, TextChannel channel) {
         List<ChessMatch> matchesWithPlayers = this.matches.stream().filter(x -> {
             for (int i = 0; i < x.getPlayers().length; i++) {
                 if (Arrays.asList(x.getPlayers()).contains(players[i])) {
@@ -111,7 +122,7 @@ public class ChessManager {
             playersInMatchMentions.forEach(stringBuilder::append);
             throw new GameException(stringBuilder.toString());
         }
-        return new ChessMatch(players, this);
+        return new ChessMatch(players, this, channel);
     }
 
     private void printBoard(TextChannel channel, ChessMatch match) {
