@@ -204,9 +204,6 @@ public class ChessBoard extends Board {
             for (int j = 0; j < this.getBoard().length; j++) {
                 this.placePiece(new Pawn(color, this), new Position(color == Color.BLACK ? i + 1 : i - 1, j));
             }
-
-            this.placePiece(new Pawn(Color.BLACK, this), new Position(4, 4));
         }
     }
-    
 }
