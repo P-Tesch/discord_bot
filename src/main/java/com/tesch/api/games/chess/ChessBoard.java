@@ -50,6 +50,10 @@ public class ChessBoard extends Board {
         return this.match.getTurn();
     }
 
+    public Map<Integer, ChessMove> getMoveHistory() {
+        return this.moveHistory;
+    }
+
     protected ChessMatch getMatch() {
         return this.match;
     }
@@ -201,8 +205,7 @@ public class ChessBoard extends Board {
                 this.placePiece(new Pawn(color, this), new Position(color == Color.BLACK ? i + 1 : i - 1, j));
             }
 
-            this.removePiece(new Position(1, 7));
-            this.placePiece(new Pawn(Color.WHITE, this), new Position(1, 7));
+            this.placePiece(new Pawn(Color.BLACK, this), new Position(4, 4));
         }
     }
     
