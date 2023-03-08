@@ -1,0 +1,9 @@
+/.git
+/.gradle
+/.vscode
+/bin
+
+.gitignore
+fly.toml
+Procfile
+README.MD
