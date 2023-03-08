@@ -20,7 +20,7 @@ public class Main {
     public static void main(String[] args) throws LoginException, InterruptedException, IOException, FileNotFoundException {
 
         JDA jda = JDABuilder
-        .createDefault("MTAyOTUxOTIzMTQ3NTI2NTUzNg.GCSn1F.w183K6s36y23eUgFeGOvLeYm-NrXC1DHfSXqiQ")
+        .createDefault(System.getenv("DISCORD_TOKEN"))
         .enableIntents(getIntents())
         .setActivity(Activity.listening("Boate Azul"))
         .build();
