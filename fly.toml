@@ -1,0 +1,8 @@
+# fly.toml file generated for jorje-bot on 2023-03-07T09:57:08-03:00
+
+app = "jorje-bot"
+kill_signal = "SIGINT"
+kill_timeout = 5
+
+[processes]
+  worker = "java $JAVA_OPTS -jar build/libs/*.jar"
