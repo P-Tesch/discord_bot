@@ -19,6 +19,13 @@ public class Main {
 
     public static void main(String[] args) throws LoginException, InterruptedException, IOException, FileNotFoundException {
 
+        // https://github.com/DV8FromTheWorld/JDA/issues/1858 -> Bloco necessário para rodar no fly.io
+        final int cores = Runtime.getRuntime().availableProcessors();
+        if (cores <= 1) {
+            System.out.println("Available Cores \"" + cores + "\", setting Parallelism Flag");
+            System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", "1");
+        }
+
         JDA jda = JDABuilder
         .createDefault(System.getenv("DISCORD_TOKEN"))
         .enableIntents(getIntents())
