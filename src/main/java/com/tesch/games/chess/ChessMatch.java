@@ -79,6 +79,7 @@ public class ChessMatch {
 
         ChessPiece piece = (ChessPiece) this.getChessBoard().getBoard()[chessPosition.getRow()][chessPosition.getColumn()];
 
+        if (piece == null) throw new ChessException("There is no piece in position " + chessPosition);
         if (piece.getColor() != this.currentPlayer) throw new ChessException("This piece is not yours");
         
         this.selectedPiece = piece;

@@ -56,6 +56,6 @@ public class ChessPosition extends Position {
 
     @Override
     public String toString() {
-        return "ChessPosition: " + this.chessRow + " " + this.chessColumn + "\nPosition: " + this.getRow() + " " + this.getColumn();
+        return "" + this.chessColumn + this.chessRow;
     }
 }
