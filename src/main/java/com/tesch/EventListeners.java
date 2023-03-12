@@ -89,11 +89,10 @@ public class EventListeners extends ListenerAdapter {
                     e.printStackTrace();
                 }
                 break;
-        }
-
-        if (manager.getChessManager().userIsInMatch(event.getAuthor())) {
-            manager.getChessManager().onMoveCommand(event);
-            return;
+            default:
+                if (manager.getChessManager().userIsInMatch(event.getAuthor())) {
+                    manager.getChessManager().onMoveCommand(event);
+                }
         }
     }
 
