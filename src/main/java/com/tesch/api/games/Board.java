@@ -36,5 +36,5 @@ public abstract class Board {
         this.currentPlayer = Teams.getOther(this.currentPlayer);
     }
 
-    protected abstract Message getBoardAsMessage();
+    public abstract Message getBoardAsMessage();
 }

@@ -6,6 +6,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.tesch.api.managers.MusicleManager;
+import com.tesch.api.utils.DiscordUtils;
+
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -31,19 +34,19 @@ public class MusicleLobby {
         players.add(event.getAuthor());
         event.getMessage().getMentions().getUsers().forEach(players::add);
         if (this.players.size() < 2) {
-            this.manager.getDiscordUtils().sendMessage("Musicle lobby min players is 2");
+            DiscordUtils.sendMessage("Musicle lobby min players is 2", event.getChannel().asTextChannel());
             this.manager.stop();
             return;
         }
         if (this.players.size() + 1 > 9) {
-            this.manager.getDiscordUtils().sendMessage("Musicle lobby max players is 9");
+            DiscordUtils.sendMessage("Musicle lobby max players is 9", event.getChannel().asTextChannel());
             this.manager.stop();
             return;
         }
         players.forEach(player -> this.manager.setupPlayerScore(player));
     }
 
-    protected void onButtonInteraction(ButtonInteractionEvent event) {
+    public void onButtonInteraction(ButtonInteractionEvent event) {
         if (!this.players.contains(event.getUser())) {
             return;
         }

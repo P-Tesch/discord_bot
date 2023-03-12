@@ -10,6 +10,7 @@ import com.tesch.api.games.chess.pieces.Bishop;
 import com.tesch.api.games.chess.pieces.Knight;
 import com.tesch.api.games.chess.pieces.Queen;
 import com.tesch.api.games.chess.pieces.Rook;
+import com.tesch.api.managers.ChessManager;
 
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
@@ -107,7 +108,7 @@ public class ChessMatch {
         this.selectedPiece = null;
     }
 
-    protected void promotionSelect(ChessPiece toPromote) {
+    public void promotionSelect(ChessPiece toPromote) {
         this.toPromote = toPromote;
         this.channel.sendMessage("Select promotion").setActionRow(
             Button.primary("chess_queen", "♕"),
@@ -118,7 +119,7 @@ public class ChessMatch {
         .queue();
     }
 
-    protected void onChessButton(ButtonInteractionEvent event) {
+    public void onChessButton(ButtonInteractionEvent event) {
         if (event.getUser() == this.players.get(this.currentPlayer)) {
             switch(event.getButton().getId()) {
                 case("chess_queen"):

@@ -59,7 +59,7 @@ public class ChessBoard extends Board {
     }
 
     @Override
-    protected Message getBoardAsMessage() {
+    public Message getBoardAsMessage() {
         MessageBuilder message = new MessageBuilder();
         this.getPlayers().keySet().forEach(x -> message.mentionUsers(x.getIdLong()));
         if (this.match.getWinner() != null) {
@@ -74,7 +74,7 @@ public class ChessBoard extends Board {
         return message.build();
     }
 
-    protected byte[] getBoardAsByteArray(boolean[][] possibleMoves) {
+    public byte[] getBoardAsByteArray(boolean[][] possibleMoves) {
         try {
             BufferedImage boardImage = ImageIO.read(new File("src/main/resources/games/chess/board.png"));
             Graphics2D graphics = boardImage.createGraphics();

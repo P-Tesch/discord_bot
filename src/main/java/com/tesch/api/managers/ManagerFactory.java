@@ -1,18 +1,18 @@
-package com.tesch.api;
+package com.tesch.api.managers;
 
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeSearchProvider;
-import com.tesch.api.games.RNGManager;
-import com.tesch.api.games.chess.ChessManager;
-import com.tesch.api.games.musicle.MusicleManager;
-import com.tesch.api.games.tictactoe.TicTacToeManager;
-import com.tesch.api.music.MusicManager;
 import com.tesch.api.music.MusicQueue;
 
+import net.dv8tion.jda.api.entities.Guild;
+
 public class ManagerFactory {
-    
-    public ManagerFactory() {
+
+    private Guild guild;
+
+    public ManagerFactory(Guild guild) {
+        this.guild = guild;
     }
 
     public DefaultAudioPlayerManager buildAudioPlayerManager() {
@@ -22,7 +22,7 @@ public class ManagerFactory {
     }
 
     public MusicManager buildMusicManager() {
-        return new MusicManager(this.buildAudioPlayerManager(), new MusicQueue(), new YoutubeSearchProvider());
+        return new MusicManager(this.buildAudioPlayerManager(), new MusicQueue(), new YoutubeSearchProvider(), guild);
     }
 
     public MusicleManager buildMusicleManager() {

@@ -1,103 +1,93 @@
 package com.tesch.api;
 
-import javax.annotation.Nonnull;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.jetbrains.annotations.NotNull;
-
-import com.tesch.api.games.RNGManager;
-import com.tesch.api.games.chess.ChessManager;
-import com.tesch.api.games.musicle.MusicleManager;
-import com.tesch.api.games.tictactoe.TicTacToeManager;
-import com.tesch.api.music.MusicManager;
+import com.tesch.api.managers.ManagerManager;
 import com.tesch.api.utils.TaskScheduler;
 
 import net.dv8tion.jda.api.entities.AudioChannel;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.events.guild.GenericGuildEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.events.message.GenericMessageEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 public class EventListeners extends ListenerAdapter {
 
-    private MusicManager musicManager;
-    private MusicleManager musicleManager;
-    private RNGManager rngManager;
-    private HelpManager helpManager;
-    private TicTacToeManager ticTacToeManager;
     private TaskScheduler taskScheduler;
-    private ChessManager chessManager;
+    private Map<Long, ManagerManager> managers;
 
-    public EventListeners(ManagerFactory managerFactory) {
-        this.musicManager = managerFactory.buildMusicManager();
-        this.musicleManager = managerFactory.buildMusicleManager(this.musicManager);
-        this.rngManager = managerFactory.buildRngManager();
-        this.helpManager = managerFactory.buildHelpManager();
-        this.ticTacToeManager = managerFactory.buildTicTacToeManager();
-        this.chessManager = managerFactory.buildChessManager();
+    public EventListeners() {
+        this.managers = new HashMap<>();
         this.taskScheduler = new TaskScheduler();
     }
     
     @Override
-    public void onMessageReceived(@NotNull MessageReceivedEvent event) {
+    public void onMessageReceived(MessageReceivedEvent event) {
         if (event.getAuthor().isBot()) return;
+
+        ManagerManager manager = this.RegisterGuildAndGetManager(event);
 
         String message = event.getMessage().getContentRaw();
 
         if (message.startsWith("play")) {
-            musicManager.onPlayCommand(event);
+            manager.getMusicManager().onPlayCommand(event);
             return;
         }
 
         if (message.startsWith("volume")) {
-            musicManager.onVolumeCommand(event);
+            manager.getMusicManager().onVolumeCommand(event);
             return;
         }
 
         if (message.startsWith("pause")) {
-            musicManager.onPauseCommand();
+            manager.getMusicManager().onPauseCommand(event);
             return;
         }
 
         if (message.startsWith("disconnect")) {
-            musicManager.onDisconnectCommand();
+            manager.getMusicManager().onDisconnectCommand(event);
             return;
         }
 
         if (message.startsWith("skip")) {
-            musicManager.onSkipCommand();
+            manager.getMusicManager().onSkipCommand(event);
             return;
         }
 
         if (message.startsWith("queue")) {
-            musicManager.onQueueCommand(event);
+            manager.getMusicManager().onQueueCommand(event);
             return;
         }
 
         if (message.startsWith("clear")) {
-            musicManager.onClearCommand();
+            manager.getMusicManager().onClearCommand(event);
             return;
         }
 
         if (message.startsWith("loop")) {
-            musicManager.onLoopCommand();
+            manager.getMusicManager().onLoopCommand(event);
             return;
         }
 
         if (message.startsWith("shuffle")) {
-            musicManager.onShuffleCommand();
+            manager.getMusicManager().onShuffleCommand(event);
             return;
         }
 
         if (message.startsWith("jumpto")) {
-            musicManager.onJumpToCommand(event);
+            manager.getMusicManager().onJumpToCommand(event);
             return;
         }
 
         if (message.startsWith("musicle")) {
             try {
-                musicleManager.onMusicleCommand(event);
+                manager.getMusicleManager().onMusicleCommand(event);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -105,32 +95,32 @@ public class EventListeners extends ListenerAdapter {
         }
 
         if (message.startsWith("coinflip")) {
-            rngManager.coinFlip(event);
+            manager.getRngManager().coinFlip(event);
             return;
         }
 
         if (message.startsWith("roll")) {
-            rngManager.diceRoll(event);
+            manager.getRngManager().diceRoll(event);
             return;
         }
 
         if (message.startsWith("help")) {
-            helpManager.onHelpCommand(event);
+            manager.getHelpManager().onHelpCommand(event);
             return;
         }
 
         if (message.startsWith("tictactoe")) {
-            ticTacToeManager.onTicTacToeCommand(event);
+            manager.getTicTacToeManager().onTicTacToeCommand(event);
             return;
         }
 
         if (message.startsWith("chess")) {
-            chessManager.onChessCommand(event);
+            manager.getChessManager().onChessCommand(event);
             return;
         }
 
-        if (this.chessManager.userIsInMatch(event.getAuthor())) {
-            this.chessManager.onMoveCommand(event);
+        if (manager.getChessManager().userIsInMatch(event.getAuthor())) {
+            manager.getChessManager().onMoveCommand(event);
             return;
         }
     }
@@ -143,11 +133,13 @@ public class EventListeners extends ListenerAdapter {
 
     @Override
     public void onGuildVoiceLeave(GuildVoiceLeaveEvent event) {
+        ManagerManager manager = this.RegisterGuildAndGetManager(event);
+
         Runnable scheduleLeave = () -> {
             AudioChannel channel = event.getGuild().getAudioManager().getConnectedChannel();
             if (channel == event.getChannelLeft()) {
                 if (channel.getMembers().size() == 1) {
-                    this.musicManager.onDisconnectCommand();
+                    manager.getMusicManager().silentDisconnect();
                 }
             }
         };
@@ -156,17 +148,49 @@ public class EventListeners extends ListenerAdapter {
 
     @Override
     public void onButtonInteraction(ButtonInteractionEvent event) {
+        ManagerManager manager = this.RegisterGuildAndGetManager(event);
+
         if (event.getButton().getId().startsWith("queue")) {
-            this.musicManager.onQueueButton(event);
+            manager.getMusicManager().onQueueButton(event);
         }
         if (event.getButton().getId().startsWith("chess")) {
-            this.chessManager.onChessButton(event);
+            manager.getChessManager().onChessButton(event);
         }
-        if (this.musicleManager.isInGame()) {
-            this.musicleManager.onButtonInteraction(event);
+        if (manager.getMusicleManager().isInGame()) {
+            manager.getMusicleManager().onButtonInteraction(event);
         }
-        if (this.ticTacToeManager.isInGame()) {
-            this.ticTacToeManager.onButtonInteraction(event);
+        if (manager.getTicTacToeManager().isInGame()) {
+            manager.getTicTacToeManager().onButtonInteraction(event);
         }
+    }
+
+    private ManagerManager RegisterGuildAndGetManager(GenericGuildEvent event) {
+        Guild guild = event.getGuild();
+        Long guildId = guild.getIdLong();
+        if (this.managers.get(guildId) == null) {
+            this.managers.put(guildId, new ManagerManager(guild));
+        }
+
+        return this.managers.get(guildId);
+    }
+
+    private ManagerManager RegisterGuildAndGetManager(GenericMessageEvent event) {
+        Guild guild = event.getGuild();
+        Long guildId = guild.getIdLong();
+        if (this.managers.get(guildId) == null) {
+            this.managers.put(guildId, new ManagerManager(guild));
+        }
+
+        return this.managers.get(guildId);
+    }
+
+    private ManagerManager RegisterGuildAndGetManager(GenericInteractionCreateEvent event) {
+        Guild guild = event.getGuild();
+        Long guildId = guild.getIdLong();
+        if (this.managers.get(guildId) == null) {
+            this.managers.put(guildId, new ManagerManager(guild));
+        }
+
+        return this.managers.get(guildId);
     }
 }

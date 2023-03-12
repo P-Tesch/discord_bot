@@ -27,7 +27,7 @@ public class TicTacToeBoard extends Board {
         this.winLine = new ArrayList<>();
     }
 
-    protected void makeMove(Position position, User player) {
+    public void makeMove(Position position, User player) {
         if (this.getBoard()[position.getRow()][position.getColumn()] != null) {
             throw new TicTacToeException("The selected place is not empty");
         }
@@ -52,7 +52,7 @@ public class TicTacToeBoard extends Board {
         this.finished = finished;
     }
 
-    protected Message getBoardAsMessage() {
+    public Message getBoardAsMessage() {
         List<Button> buttons = new ArrayList<>();
         for (int i = 0; i < this.getBoard().length; i++) {
             for (int j = 0; j < this.getBoard().length; j++) {

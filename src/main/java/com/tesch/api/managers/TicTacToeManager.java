@@ -1,9 +1,11 @@
-package com.tesch.api.games.tictactoe;
+package com.tesch.api.managers;
 
 import com.tesch.api.games.Position;
+import com.tesch.api.games.tictactoe.TicTacToeBoard;
 import com.tesch.api.games.tictactoe.exceptions.TicTacToeException;
 import com.tesch.api.utils.DiscordUtils;
 
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -11,13 +13,11 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 public class TicTacToeManager {
 
     private User[] players;
-    private DiscordUtils discordUtils;
     private TicTacToeBoard board;
     private boolean inGame;
     
     public TicTacToeManager() {
         this.players = new User[2];
-        this.discordUtils = new DiscordUtils();
         this.inGame = false;
     }
 
@@ -26,11 +26,11 @@ public class TicTacToeManager {
     }
 
     public void onTicTacToeCommand(MessageReceivedEvent event) {
-        this.discordUtils.buildFromMessageEvent(event);
+        TextChannel text = event.getChannel().asTextChannel();
 
         if (!this.instantiatePlayers(event)) return;
         if (this.inGame) {
-            this.discordUtils.sendMessage("There is already a game running");
+            DiscordUtils.sendMessage("There is already a game running", text);
             return;
         }
 
@@ -57,14 +57,15 @@ public class TicTacToeManager {
     }
 
     private boolean instantiatePlayers(MessageReceivedEvent event) {
+        TextChannel text = event.getChannel().asTextChannel();
         this.players[0] = event.getAuthor();
         this.players[1] = event.getMessage().getMentions().getUsers().get(0);
         if (this.players[0] == null || this.players[1] == null) {
-            this.discordUtils.sendMessage("TicTacToe must have two players");
+            DiscordUtils.sendMessage("TicTacToe must have two players", text);
             return false;
         }
         if (this.players[0] == this.players[1]) {
-            this.discordUtils.sendMessage("You can't play with yourself");
+            DiscordUtils.sendMessage("You can't play with yourself", text);
             return false;
         }
         return true;

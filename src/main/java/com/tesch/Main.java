@@ -1,7 +1,6 @@
 package com.tesch;
 
 import com.tesch.api.EventListeners;
-import com.tesch.api.ManagerFactory;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -19,7 +18,7 @@ public class Main {
 
     public static void main(String[] args) throws LoginException, InterruptedException, IOException, FileNotFoundException {
 
-        // https://github.com/DV8FromTheWorld/JDA/issues/1858 -> Bloco necessário para rodar no fly.io
+        // https://github.com/DV8FromTheWorld/JDA/issues/1858 -> needed for fly.io single core
         final int cores = Runtime.getRuntime().availableProcessors();
         if (cores <= 1) {
             System.out.println("Available Cores \"" + cores + "\", setting Parallelism Flag");
@@ -30,10 +29,11 @@ public class Main {
         .createDefault(System.getenv("DISCORD_TOKEN"))
         .enableIntents(getIntents())
         .setActivity(Activity.listening("Boate Azul"))
-        .build();
+        .addEventListeners(new EventListeners())
+        .build()
+        .awaitReady();
 
-        jda.addEventListener(new EventListeners(new ManagerFactory()));
-        jda.awaitReady();
+        System.out.println("Logged as: " + jda.getSelfUser().getAsTag());
     }
 
     private static List<GatewayIntent> getIntents() {

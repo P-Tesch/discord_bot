@@ -1,4 +1,4 @@
-package com.tesch.api.music;
+package com.tesch.api.managers;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -12,26 +12,30 @@ import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioTrack;
 import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeSearchProvider;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.BasicAudioPlaylist;
+import com.tesch.api.music.MusicPlayerSendHandler;
+import com.tesch.api.music.MusicQueue;
+import com.tesch.api.music.MusicResultHandler;
 import com.tesch.api.utils.DiscordUtils;
 
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
-public class MusicManager {
+public class MusicManager extends GenericManager {
 
     private AudioPlayer audioPlayer;
     private AudioPlayerManager playerManager;
     private MusicQueue queue;
     private YoutubeSearchProvider youtubeSearch;
-    private DiscordUtils discordUtils;
     private boolean musicleMode;
     
-    public MusicManager(AudioPlayerManager playerManager, MusicQueue queue, YoutubeSearchProvider youtubeSearch) {
+    public MusicManager(AudioPlayerManager playerManager, MusicQueue queue, YoutubeSearchProvider youtubeSearch, Guild guild) {
+        super(guild);
         this.playerManager = playerManager;
         this.queue = queue;
         this.youtubeSearch = youtubeSearch;
-        this.discordUtils = new DiscordUtils();
 
         this.audioPlayer = this.playerManager.createPlayer();
 
@@ -52,67 +56,72 @@ public class MusicManager {
         return this.queue;
     }
 
-    public DiscordUtils getDiscordUtils() {
-        return this.discordUtils;
-    }
-
     public void setMusicleMode(boolean mode) {
         this.musicleMode = mode;
     }
 
     public void onPlayCommand(MessageReceivedEvent event) {
         String message = event.getMessage().getContentRaw().replace("play ", "");
+        TextChannel text = event.getChannel().asTextChannel();
 
-        discordUtils.buildFromMessageEvent(event);
         if (this.musicleMode) {
-            discordUtils.sendMessage("Wait for musicle finish");
+            DiscordUtils.sendMessage("Wait for musicle finish", text);
             return;
         }
-        discordUtils.connectToVoice(new MusicPlayerSendHandler(audioPlayer));
+        DiscordUtils.connectToVoice(new MusicPlayerSendHandler(audioPlayer), event.getGuild(), event.getMember().getVoiceState().getChannel());
 
         if (this.isUrl(message)) {
-            this.playFromUrl(message);
+            this.playFromUrl(message, text);
         }
         else {
-            this.playFromSearch(message);
+            this.playFromSearch(message, text);
         }
     }
 
     public void onVolumeCommand(MessageReceivedEvent event) {
         String[] volume = event.getMessage().getContentRaw().split(" ");
+        TextChannel text = event.getChannel().asTextChannel();
         if (volume.length == 1) {
-            this.discordUtils.sendMessage("Current volume: " + this.audioPlayer.getVolume());
+            DiscordUtils.sendMessage("Current volume: " + this.audioPlayer.getVolume(), text);
         }
         else {
             this.audioPlayer.setVolume(Integer.parseInt(volume[1]));
-            this.discordUtils.sendMessage("Volume set to: " + this.audioPlayer.getVolume());
+            DiscordUtils.sendMessage("Volume set to: " + this.audioPlayer.getVolume(), text);
         }
     }
 
-    public void onPauseCommand() {
+    public void onPauseCommand(MessageReceivedEvent event) {
+        TextChannel text = event.getChannel().asTextChannel();
         if (this.musicleMode) {
-            discordUtils.sendMessage("Wait for musicle finish");
+            DiscordUtils.sendMessage("Wait for musicle finish", text);
             return;
         }
         this.audioPlayer.setPaused(this.audioPlayer.isPaused() ? false : true);
     }
 
-    public void onDisconnectCommand() {
-        this.discordUtils.disconnectFromVoice();
-        this.onClearCommand();
+    public void onDisconnectCommand(MessageReceivedEvent event) {
+        DiscordUtils.disconnectFromVoice(this.getGuild());
+        this.onClearCommand(event);
     }
 
-    public void onSkipCommand() {
+    public void silentDisconnect() {
+        DiscordUtils.disconnectFromVoice(this.getGuild());
+        this.silentClear();
+    }
+
+    public void onSkipCommand(MessageReceivedEvent event) {
+        TextChannel text = event.getChannel().asTextChannel();
         if (this.musicleMode) {
-            discordUtils.sendMessage("Wait for musicle finish");
+            DiscordUtils.sendMessage("Wait for musicle finish", text);
             return;
         }
         this.queue.playNextTrack(true);
     }
 
     public void onQueueCommand(MessageReceivedEvent event) {
+        TextChannel text = event.getChannel().asTextChannel();
         if (this.musicleMode) {
-            discordUtils.sendMessage("Wait for musicle finish");
+            DiscordUtils.sendMessage("Wait for musicle finish", text);
             return;
         }
         try {
@@ -128,7 +137,7 @@ public class MusicManager {
             event.getChannel().sendMessage("```\nPage 1:\n" + queueString + "\n```").setActionRow(Button.primary("queue previous", "⬅️"), Button.primary("queue next", "➡️")).queue();
         }
         catch (NullPointerException e) {
-            this.discordUtils.sendMessage("Queue empty");
+            DiscordUtils.sendMessage("Queue empty", text);
         }
     }
 
@@ -159,38 +168,45 @@ public class MusicManager {
         }
     }
 
-    public void onClearCommand() {
+    public void onClearCommand(MessageReceivedEvent event) {
+        TextChannel text = event.getChannel().asTextChannel();
         if (this.musicleMode) {
-            discordUtils.sendMessage("Wait for musicle finish");
+            DiscordUtils.sendMessage("Wait for musicle finish", text);
             return;
         }
         if (this.audioPlayer.getPlayingTrack() != null) {
-            this.discordUtils.sendMessage("Cleared queue");
+            DiscordUtils.sendMessage("Cleared queue", text);
         }
         this.queue.clearPlaylist();
     }
 
-    public void onLoopCommand() {
+    private void silentClear() {
+        this.queue.clearPlaylist();
+    }
+
+    public void onLoopCommand(MessageReceivedEvent event) {
+        TextChannel text = event.getChannel().asTextChannel();
         if (this.musicleMode) {
-            discordUtils.sendMessage("Wait for musicle finish");
+            DiscordUtils.sendMessage("Wait for musicle finish", text);
             return;
         }
         this.queue.setLoop(!this.queue.getLoop());
-        this.discordUtils.sendMessage("Loop set to " + this.queue.getLoop());
+        DiscordUtils.sendMessage("Loop set to " + this.queue.getLoop(), text);
     }
 
-    public void onShuffleCommand() {
+    public void onShuffleCommand(MessageReceivedEvent event) {
+        TextChannel text = event.getChannel().asTextChannel();
         if (this.musicleMode) {
-            discordUtils.sendMessage("Wait for musicle finish");
+            DiscordUtils.sendMessage("Wait for musicle finish", text);
             return;
         }
         this.queue.shufflePlaylist();
-        this.discordUtils.sendMessage("Queue Suffled");
+        DiscordUtils.sendMessage("Queue Suffled", text);
     }
 
     public void onJumpToCommand(MessageReceivedEvent event) {
         for (int i = 0; i < Integer.parseInt(event.getMessage().getContentRaw().split(" ")[1]); i++) {
-            this.onSkipCommand();
+            this.onSkipCommand(event);
         }
     }
 
@@ -204,13 +220,13 @@ public class MusicManager {
         }
     }
 
-    private void playFromUrl(String url) {
-        MusicResultHandler resultHandler = new MusicResultHandler(this.discordUtils.getText(), queue);
+    private void playFromUrl(String url, TextChannel text) {
+        MusicResultHandler resultHandler = new MusicResultHandler(text, queue);
         playerManager.loadItem(url, resultHandler);
     }
 
-    private void playFromSearch(String search) {
-        MusicResultHandler resultHandler = new MusicResultHandler(this.discordUtils.getText(), queue);
+    private void playFromSearch(String search, TextChannel text) {
+        MusicResultHandler resultHandler = new MusicResultHandler(text, queue);
 
         BasicAudioPlaylist songs = (BasicAudioPlaylist) youtubeSearch.loadSearchResult(search, info -> new YoutubeAudioTrack(info, new YoutubeAudioSourceManager()));
         AudioTrack song = songs.getTracks().get(0);

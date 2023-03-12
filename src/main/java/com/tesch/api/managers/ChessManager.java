@@ -1,9 +1,11 @@
-package com.tesch.api.games.chess;
+package com.tesch.api.managers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.tesch.api.games.chess.ChessMatch;
+import com.tesch.api.games.chess.ChessPosition;
 import com.tesch.api.games.chess.exceptions.ChessException;
 import com.tesch.api.games.exceptions.GameException;
 import com.tesch.api.utils.DiscordUtils;
@@ -15,11 +17,9 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class ChessManager {
 
-    private DiscordUtils discordUtils;
     private List<ChessMatch> matches;
     
     public ChessManager() {
-        this.discordUtils = new DiscordUtils();
         this.matches = new ArrayList<>();
     }
 
@@ -28,7 +28,6 @@ public class ChessManager {
     }
 
     public void onChessCommand(MessageReceivedEvent event) {
-        this.discordUtils.buildFromMessageEvent(event);
         User[] players;
         ChessMatch match;
 
@@ -38,7 +37,7 @@ public class ChessManager {
             this.matches.add(match);
         }
         catch (GameException e) {
-            this.discordUtils.sendMessage(e.getMessage());
+            DiscordUtils.sendMessage(e.getMessage(), event.getChannel().asTextChannel());
             return;
         }
 

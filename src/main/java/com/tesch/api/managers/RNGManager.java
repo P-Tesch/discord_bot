@@ -1,4 +1,4 @@
-package com.tesch.api.games;
+package com.tesch.api.managers;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,23 +6,21 @@ import java.util.List;
 import com.tesch.api.utils.DiscordUtils;
 import com.tesch.api.utils.MiscUtils;
 
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class RNGManager {
-
-    private DiscordUtils discordUtils;
     
     public RNGManager() {
-        this.discordUtils = new DiscordUtils();
     }
 
     public void coinFlip(MessageReceivedEvent event) {
-        this.discordUtils.buildFromMessageEvent(event);
-        this.discordUtils.sendMessage(MiscUtils.randomInt(0, 100) < 50 ? "https://imgur.com/QiQ63s7" : "https://imgur.com/UbuR3zg");
+        TextChannel text = event.getChannel().asTextChannel();
+        DiscordUtils.sendMessage(MiscUtils.randomInt(0, 100) < 50 ? "https://imgur.com/QiQ63s7" : "https://imgur.com/UbuR3zg", text);
     }
 
     public void diceRoll(MessageReceivedEvent event) {
-        this.discordUtils.buildFromMessageEvent(event);
+        TextChannel text = event.getChannel().asTextChannel();
         String[] rollInfo = event.getMessage().getContentRaw().replace("roll ", "").split("d");
         List<Integer> rolls = new ArrayList<>();
 
@@ -47,6 +45,6 @@ public class RNGManager {
             stringBuilder.append(rolls.get(0));
         }
 
-        discordUtils.sendMessage(stringBuilder.toString());
+        DiscordUtils.sendMessage(stringBuilder.toString(), text);
     }
 }
