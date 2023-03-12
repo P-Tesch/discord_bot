@@ -34,89 +34,61 @@ public class EventListeners extends ListenerAdapter {
         ManagerManager manager = this.RegisterGuildAndGetManager(event);
 
         String message = event.getMessage().getContentRaw();
+        String command = message.split(" ")[0];
 
-        if (message.startsWith("play")) {
-            manager.getMusicManager().onPlayCommand(event);
-            return;
-        }
-
-        if (message.startsWith("volume")) {
-            manager.getMusicManager().onVolumeCommand(event);
-            return;
-        }
-
-        if (message.startsWith("pause")) {
-            manager.getMusicManager().onPauseCommand(event);
-            return;
-        }
-
-        if (message.startsWith("disconnect")) {
-            manager.getMusicManager().onDisconnectCommand(event);
-            return;
-        }
-
-        if (message.startsWith("skip")) {
-            manager.getMusicManager().onSkipCommand(event);
-            return;
-        }
-
-        if (message.startsWith("queue")) {
-            manager.getMusicManager().onQueueCommand(event);
-            return;
-        }
-
-        if (message.startsWith("clear")) {
-            manager.getMusicManager().onClearCommand(event);
-            return;
-        }
-
-        if (message.startsWith("loop")) {
-            manager.getMusicManager().onLoopCommand(event);
-            return;
-        }
-
-        if (message.startsWith("shuffle")) {
-            manager.getMusicManager().onShuffleCommand(event);
-            return;
-        }
-
-        if (message.startsWith("jumpto")) {
-            manager.getMusicManager().onJumpToCommand(event);
-            return;
-        }
-
-        if (message.startsWith("musicle")) {
-            try {
-                manager.getMusicleManager().onMusicleCommand(event);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            return;
-        }
-
-        if (message.startsWith("coinflip")) {
-            manager.getRngManager().coinFlip(event);
-            return;
-        }
-
-        if (message.startsWith("roll")) {
-            manager.getRngManager().diceRoll(event);
-            return;
-        }
-
-        if (message.startsWith("help")) {
-            manager.getHelpManager().onHelpCommand(event);
-            return;
-        }
-
-        if (message.startsWith("tictactoe")) {
-            manager.getTicTacToeManager().onTicTacToeCommand(event);
-            return;
-        }
-
-        if (message.startsWith("chess")) {
-            manager.getChessManager().onChessCommand(event);
-            return;
+        switch (command) {
+            case "play":
+                manager.getMusicManager().onPlayCommand(event);
+                break;
+            case "volume":
+                manager.getMusicManager().onVolumeCommand(event);
+                break;
+            case "pause":
+                manager.getMusicManager().onPauseCommand(event);
+                break;
+            case "disconnect":
+                manager.getMusicManager().onDisconnectCommand(event);
+                break;
+            case "skip": 
+                manager.getMusicManager().onSkipCommand(event);
+                break;
+            case "queue":
+                manager.getMusicManager().onQueueCommand(event);
+                break;
+            case "clear":
+                manager.getMusicManager().onClearCommand(event);
+                break;
+            case "loop":
+                manager.getMusicManager().onLoopCommand(event);
+                break;
+            case "shuffle":
+                manager.getMusicManager().onShuffleCommand(event);
+                break;
+            case "jumpto":
+                manager.getMusicManager().onJumpToCommand(event);
+                break;
+            case "coinflip":
+                manager.getRngManager().coinFlip(event);
+                break;
+            case "roll":
+                manager.getRngManager().diceRoll(event);
+                break;
+            case "help":
+                manager.getHelpManager().onHelpCommand(event);
+                break;
+            case "tictactoe":
+                manager.getTicTacToeManager().onTicTacToeCommand(event);
+                break;
+            case "chess":
+                manager.getChessManager().onChessCommand(event);
+                break;
+            case "musicle":
+                try {
+                    manager.getMusicleManager().onMusicleCommand(event);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                break;
         }
 
         if (manager.getChessManager().userIsInMatch(event.getAuthor())) {
