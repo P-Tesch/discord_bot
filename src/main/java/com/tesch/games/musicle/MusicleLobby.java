@@ -56,7 +56,7 @@ public class MusicleLobby {
         if (this.selections.keySet().contains(event.getUser())) {
             return;
         }
-        this.selections.putIfAbsent(event.getUser(), Integer.parseInt(event.getButton().getId()));
+        this.selections.putIfAbsent(event.getUser(), Integer.parseInt(event.getButton().getId().split("_")[1]));
     
         if (this.selections.keySet().containsAll(this.players)) {
             this.stop(event);

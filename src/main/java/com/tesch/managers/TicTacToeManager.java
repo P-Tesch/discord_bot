@@ -42,7 +42,7 @@ public class TicTacToeManager {
 
     public void onButtonInteraction(ButtonInteractionEvent event) {
         try {
-            this.board.makeMove(new Position(event.getButton().getId()), event.getUser());
+            this.board.makeMove(new Position(event.getButton().getId().split("_")[1]), event.getUser());
             event.editMessage(this.board.getBoardAsMessage()).queue();
             if (this.board.getFinished() == true) {
                 this.clear();

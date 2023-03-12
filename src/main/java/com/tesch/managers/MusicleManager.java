@@ -173,11 +173,11 @@ public class MusicleManager {
         }
 
         event.getChannel().sendMessage(this.stringBuilder).setActionRow(
-            Button.primary("1", Emoji.fromUnicode("1️⃣")),
-            Button.primary("2", Emoji.fromUnicode("2️⃣")),
-            Button.primary("3", Emoji.fromUnicode("3️⃣")),
-            Button.primary("4", Emoji.fromUnicode("4️⃣")),
-            Button.primary("5", Emoji.fromUnicode("5️⃣"))
+            Button.primary("musicle_1", Emoji.fromUnicode("1️⃣")),
+            Button.primary("musicle_2", Emoji.fromUnicode("2️⃣")),
+            Button.primary("musicle_3", Emoji.fromUnicode("3️⃣")),
+            Button.primary("musicle_4", Emoji.fromUnicode("4️⃣")),
+            Button.primary("musicle_5", Emoji.fromUnicode("5️⃣"))
             )
         .queue();
         this.timeLimit();
@@ -206,7 +206,7 @@ public class MusicleManager {
         this.answers = new String[5];
         List<String> possibleAnswersList = new ArrayList<>(possibleAnswers);
         for (int i = 0; i < 5; i++) {
-            this.answers[i] = possibleAnswersList.remove((int) MiscUtils.randomInt(0, possibleAnswersList.size()));
+            this.answers[i] = possibleAnswersList.remove((int) MiscUtils.randomInt(0, possibleAnswersList.size() - 1));
         }
 
         this.answerIndex = MiscUtils.randomInt(0, answers.length - 1);
@@ -227,7 +227,7 @@ public class MusicleManager {
             event.editMessage("Time's up").queue(msg -> event.getMessage().editMessageEmbeds().setActionRows().queue());
         }
         if (event.getUser() == this.player) {
-            int selected = Integer.parseInt(event.getButton().getId());
+            int selected = Integer.parseInt(event.getButton().getId().split("_")[1]);
             StringBuilder builder = new StringBuilder();
             if (selected == this.answerIndex + 1) {
                 this.answers[this.answerIndex] = this.answers[this.answerIndex] + " ✅";

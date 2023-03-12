@@ -121,17 +121,19 @@ public class EventListeners extends ListenerAdapter {
     public void onButtonInteraction(ButtonInteractionEvent event) {
         ManagerManager manager = this.RegisterGuildAndGetManager(event);
 
-        if (event.getButton().getId().startsWith("queue")) {
-            manager.getMusicManager().onQueueButton(event);
-        }
-        if (event.getButton().getId().startsWith("chess")) {
-            manager.getChessManager().onChessButton(event);
-        }
-        if (manager.getMusicleManager().isInGame()) {
-            manager.getMusicleManager().onButtonInteraction(event);
-        }
-        if (manager.getTicTacToeManager().isInGame()) {
-            manager.getTicTacToeManager().onButtonInteraction(event);
+        switch(event.getButton().getId().split("_")[0]) {
+            case "queue":
+                manager.getMusicManager().onQueueButton(event);
+                break;
+            case "chess":
+                manager.getChessManager().onChessButton(event);
+                break;
+            case "musicle":
+                manager.getMusicleManager().onButtonInteraction(event);
+                break;
+            case "tictactoe":
+                manager.getTicTacToeManager().onButtonInteraction(event);
+                break;
         }
     }
 

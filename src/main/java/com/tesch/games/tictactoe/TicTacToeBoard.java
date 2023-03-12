@@ -57,10 +57,10 @@ public class TicTacToeBoard extends Board {
         for (int i = 0; i < this.getBoard().length; i++) {
             for (int j = 0; j < this.getBoard().length; j++) {
                 if (winLine.contains(i + " " + j)) {
-                    buttons.add(Button.success(i + " " + j, this.getBoard()[i][j] != null ? this.getBoard()[i][j].toString() : " "));
+                    buttons.add(Button.success("tictactoe_" + i + " " + j, this.getBoard()[i][j] != null ? this.getBoard()[i][j].toString() : "‎")); 
                 }
                 else {
-                    buttons.add(Button.primary(i + " " + j, this.getBoard()[i][j] != null ? this.getBoard()[i][j].toString() : " "));
+                    buttons.add(Button.primary("tictactoe_" + i + " " + j, this.getBoard()[i][j] != null ? this.getBoard()[i][j].toString() : "‎"));
                 }
             }
         }
@@ -76,9 +76,9 @@ public class TicTacToeBoard extends Board {
         }
         
         message.setActionRows(
-            ActionRow.of(buttons.stream().filter(x -> Integer.parseInt(x.getId().split(" ")[0]) == 0).toList()),
-            ActionRow.of(buttons.stream().filter(x -> Integer.parseInt(x.getId().split(" ")[0]) == 1).toList()),
-            ActionRow.of(buttons.stream().filter(x -> Integer.parseInt(x.getId().split(" ")[0]) == 2).toList())
+            ActionRow.of(buttons.stream().filter(x -> Integer.parseInt(x.getId().split("_")[1].split(" ")[0]) == 0).toList()),
+            ActionRow.of(buttons.stream().filter(x -> Integer.parseInt(x.getId().split("_")[1].split(" ")[0]) == 1).toList()),
+            ActionRow.of(buttons.stream().filter(x -> Integer.parseInt(x.getId().split("_")[1].split(" ")[0]) == 2).toList())
         );
         return message.build();
     }
