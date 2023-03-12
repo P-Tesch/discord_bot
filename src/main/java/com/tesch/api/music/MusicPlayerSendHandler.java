@@ -9,6 +9,8 @@ import net.dv8tion.jda.api.audio.AudioSendHandler;
 
 public class MusicPlayerSendHandler implements AudioSendHandler {
     
+  // https://github.com/sedmelluq/lavaplayer -> JDA integration
+
     private final AudioPlayer audioPlayer;
     private AudioFrame lastFrame;
   
