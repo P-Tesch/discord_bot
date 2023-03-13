@@ -10,16 +10,18 @@ public class ManagerManager extends GenericManager {
     private HelpManager helpManager;
     private TicTacToeManager ticTacToeManager;
     private ChessManager chessManager;
+    private PlayerChannelManager playerChannelManager;
     
     public ManagerManager(Guild guild) {
         super(guild);
         ManagerFactory managerFactory = new ManagerFactory(guild);
         this.musicManager = managerFactory.buildMusicManager();
-        this.musicleManager = managerFactory.buildMusicleManager();
+        this.musicleManager = managerFactory.buildMusicleManager(this.musicManager);
         this.rngManager = managerFactory.buildRngManager();
         this.helpManager = managerFactory.buildHelpManager();
         this.ticTacToeManager = managerFactory.buildTicTacToeManager();
         this.chessManager = managerFactory.buildChessManager();
+        this.playerChannelManager = managerFactory.buildPlayerChannelManager(this.musicManager);
     }
 
     public MusicManager getMusicManager() {
@@ -44,5 +46,9 @@ public class ManagerManager extends GenericManager {
 
     public ChessManager getChessManager() {
         return chessManager;
+    }
+
+    public PlayerChannelManager getPlayerChannelManager() {
+        return playerChannelManager;
     }
 }

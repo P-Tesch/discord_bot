@@ -5,6 +5,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
@@ -56,6 +57,14 @@ public class MusicManager extends GenericManager {
         return this.queue;
     }
 
+    public YoutubeSearchProvider getYoutubeSearchProvider() {
+        return this.youtubeSearch;
+    }
+
+    public boolean getMusicleMode() {
+        return this.musicleMode;
+    }
+
     public void setMusicleMode(boolean mode) {
         this.musicleMode = mode;
     }
@@ -71,10 +80,10 @@ public class MusicManager extends GenericManager {
         DiscordUtils.connectToVoice(new MusicPlayerSendHandler(audioPlayer), event.getGuild(), event.getMember().getVoiceState().getChannel());
 
         if (this.isUrl(message)) {
-            this.playFromUrl(message, text);
+            this.playFromUrl(message, new MusicResultHandler(text, queue));
         }
         else {
-            this.playFromSearch(message, text);
+            this.playFromSearch(message, new MusicResultHandler(text, queue));
         }
     }
 
@@ -210,7 +219,7 @@ public class MusicManager extends GenericManager {
         }
     }
 
-    private boolean isUrl(String test) {
+    protected boolean isUrl(String test) {
         try {
             new URL(test);
             return true;
@@ -220,14 +229,11 @@ public class MusicManager extends GenericManager {
         }
     }
 
-    private void playFromUrl(String url, TextChannel text) {
-        MusicResultHandler resultHandler = new MusicResultHandler(text, queue);
+    protected void playFromUrl(String url, AudioLoadResultHandler resultHandler) {
         playerManager.loadItem(url, resultHandler);
     }
 
-    private void playFromSearch(String search, TextChannel text) {
-        MusicResultHandler resultHandler = new MusicResultHandler(text, queue);
-
+    protected void playFromSearch(String search, AudioLoadResultHandler resultHandler) {
         BasicAudioPlaylist songs = (BasicAudioPlaylist) youtubeSearch.loadSearchResult(search, info -> new YoutubeAudioTrack(info, new YoutubeAudioSourceManager()));
         AudioTrack song = songs.getTracks().get(0);
         

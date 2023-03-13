@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.tesch.managers.ManagerManager;
+import com.tesch.managers.PlayerChannelManager;
 import com.tesch.utils.TaskScheduler;
 
 import net.dv8tion.jda.api.entities.AudioChannel;
@@ -35,6 +36,11 @@ public class EventListeners extends ListenerAdapter {
 
         String message = event.getMessage().getContentRaw();
         String command = message.split(" ")[0];
+
+        if (event.getChannel().getName().equalsIgnoreCase(PlayerChannelManager.CHANNEL_NAME)) {
+            manager.getPlayerChannelManager().onPlayCommand(event);
+            return;
+        }
 
         switch (command) {
             case "play":

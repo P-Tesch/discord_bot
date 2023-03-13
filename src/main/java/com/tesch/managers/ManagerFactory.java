@@ -48,4 +48,8 @@ public class ManagerFactory {
     public ChessManager buildChessManager() {
         return new ChessManager();
     }
+
+    public PlayerChannelManager buildPlayerChannelManager(MusicManager musicManager) {
+        return new PlayerChannelManager(musicManager);
+    }
 }
