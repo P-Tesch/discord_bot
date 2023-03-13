@@ -19,6 +19,7 @@ import com.tesch.music.MusicQueue;
 import com.tesch.music.MusicResultHandler;
 import com.tesch.utils.DiscordUtils;
 
+import net.dv8tion.jda.api.entities.AudioChannel;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -74,17 +75,26 @@ public class MusicManager extends GenericManager {
         String message = event.getMessage().getContentRaw().replace("play ", "");
         TextChannel text = event.getChannel().asTextChannel();
 
-        if (this.musicleMode) {
-            DiscordUtils.sendMessage("Wait for musicle finish", text);
-            return;
+        try {
+            this.play(event.getMember().getVoiceState().getChannel(), message, new MusicResultHandler(text, queue));
         }
-        DiscordUtils.connectToVoice(new MusicPlayerSendHandler(audioPlayer), event.getGuild(), event.getMember().getVoiceState().getChannel());
+        catch (MusicleException e) {
+            DiscordUtils.sendMessage(e.getMessage(), text);
+        }
+    }
+
+    protected void play(AudioChannel channel, String message, AudioLoadResultHandler resultHandler) {
+        if (this.musicleMode) {
+            throw new MusicleException("wait for musicle to finish");
+        }
+
+        DiscordUtils.connectToVoice(new MusicPlayerSendHandler(audioPlayer), this.getGuild(), channel);
 
         if (this.isUrl(message)) {
-            this.playFromUrl(message, new MusicResultHandler(text, queue));
+            this.playFromUrl(message, resultHandler);
         }
         else {
-            this.playFromSearch(message, new MusicResultHandler(text, queue));
+            this.playFromSearch(message, resultHandler);
         }
     }
 

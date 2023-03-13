@@ -2,7 +2,6 @@ package com.tesch.managers;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.concurrent.TimeUnit;
 import java.awt.Color;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
@@ -10,9 +9,7 @@ import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeSearchProvider;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.tesch.exceptions.MusicleException;
 import com.tesch.music.MusicPlayerChannelResultHandler;
-import com.tesch.music.MusicPlayerSendHandler;
 import com.tesch.music.MusicQueue;
-import com.tesch.utils.DiscordUtils;
 import com.tesch.utils.TaskScheduler;
 
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -64,7 +61,7 @@ public class PlayerChannelManager extends MusicManager {
         messageBuilder.setEmbeds(embed);
 
         this.embedMessage = text.sendMessage(messageBuilder.build()).complete();
-        this.updatePlayer(null);
+        this.updatePlayer();
     }
 
     private Collection<ActionRow> buildButtons() {
@@ -98,7 +95,8 @@ public class PlayerChannelManager extends MusicManager {
         this.embedBuilder.setImage(thumbURL);
     }
 
-    public void updatePlayer(AudioTrack playing) {
+    public void updatePlayer() {
+        AudioTrack playing = this.getAudioPlayer().getPlayingTrack();
         updatePlayerImage(playing);
 
         MessageBuilder messageBuilder = new MessageBuilder();
@@ -107,17 +105,23 @@ public class PlayerChannelManager extends MusicManager {
         embedMessage.editMessage(messageBuilder.build()).queue(); 
     }
 
-    private void setFooter(String footer) {
-        this.embedBuilder.setFooter(footer);
-
-        MessageBuilder messageBuilder = new MessageBuilder();
-        messageBuilder.setEmbeds(this.embedBuilder.build());
-        embedMessage.editMessage(messageBuilder.build()).queue();
+    public void updatePlayer(String footer, Integer footerTime) {
+        if (footerTime == null) {
+            this.setFooter(footer);
+        }
+        else {
+            this.setFooter(footer, footerTime);
+        }
+        this.updatePlayer();
     }
 
-    private void setFooter(String footer, Integer time) {
+    public void setFooter(String footer) {
+        this.embedBuilder.setFooter(footer);
+    }
+
+    public void setFooter(String footer, Integer time) {
         this.setFooter(footer);
-        scheduler.schedule(() -> this.setFooter(""), time);
+        scheduler.schedule(() -> this.updatePlayer(null, null), time);
     }
     
     @Override
@@ -125,18 +129,11 @@ public class PlayerChannelManager extends MusicManager {
         String message = event.getMessage().getContentRaw();
         event.getMessage().delete().queue();
 
-        if (this.getMusicleMode()) {
-            Message waitMusicle = DiscordUtils.sendMessage("Wait for musicle finish", text);
-            waitMusicle.delete().queueAfter(5, TimeUnit.SECONDS);
-            return;
+        try {
+            this.play(event.getMember().getVoiceState().getChannel(), message, new MusicPlayerChannelResultHandler(text, this.getQueue(), this.scheduler, this));
         }
-        DiscordUtils.connectToVoice(new MusicPlayerSendHandler(this.getAudioPlayer()), this.getGuild(), event.getMember().getVoiceState().getChannel());
-
-        if (this.isUrl(message)) {
-            this.playFromUrl(message, new MusicPlayerChannelResultHandler(text, this.getQueue(), this.scheduler));
-        }
-        else {
-            this.playFromSearch(message, new MusicPlayerChannelResultHandler(text, this.getQueue(), this.scheduler));
+        catch (MusicleException e) {
+            this.setFooter(e.getMessage(), 5);
         }
     }
 
@@ -153,7 +150,7 @@ public class PlayerChannelManager extends MusicManager {
     private void onPauseCommand() {
         try {
             this.pause();
-            this.updatePlayer(null);
+            this.updatePlayer();
         }
         catch (MusicleException e) {
             this.setFooter(e.getMessage(), 5);

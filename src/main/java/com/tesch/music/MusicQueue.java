@@ -81,7 +81,7 @@ public class MusicQueue extends AudioEventAdapter{
         if (player.startTrack(playlist.peek().makeClone(), !skip)) {
             AudioTrack toPlay = playlist.poll();
             if (playerChannelManager != null) {
-                playerChannelManager.updatePlayer(toPlay);
+                playerChannelManager.updatePlayer(null, null);
             }
             if (loop) {
                 playlist.offer(toPlay);

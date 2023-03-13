@@ -1,11 +1,10 @@
 package com.tesch.music;
 
-import java.util.concurrent.TimeUnit;
-
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import com.tesch.managers.PlayerChannelManager;
 import com.tesch.utils.DiscordUtils;
 import com.tesch.utils.TaskScheduler;
 
@@ -17,11 +16,13 @@ public class MusicPlayerChannelResultHandler implements AudioLoadResultHandler {
     private TextChannel textChannel;
     private MusicQueue queue;
     private TaskScheduler scheduler;
+    private PlayerChannelManager manager;
 
-    public MusicPlayerChannelResultHandler(TextChannel textChannel, MusicQueue queue, TaskScheduler scheduler) {
+    public MusicPlayerChannelResultHandler(TextChannel textChannel, MusicQueue queue, TaskScheduler scheduler, PlayerChannelManager manager) {
         this.textChannel = textChannel;
         this.queue = queue;
         this.scheduler = scheduler;
+        this.manager = manager;
     }
 
     @Override
@@ -46,7 +47,7 @@ public class MusicPlayerChannelResultHandler implements AudioLoadResultHandler {
     @Override
     public void trackLoaded(AudioTrack track) {
         queue.addToPlaylist(track);
-        DiscordUtils.sendMessage("Track loaded " + track.getInfo().title, msg -> msg.delete().queueAfter(5, TimeUnit.SECONDS) ,textChannel);
+        this.manager.updatePlayer("Track loaded " + track.getInfo().title, 5);
     }
     
 }
