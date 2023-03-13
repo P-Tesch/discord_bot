@@ -139,9 +139,18 @@ public class MusicManager extends GenericManager {
 
     public void onSkipCommand(MessageReceivedEvent event) {
         TextChannel text = event.getChannel().asTextChannel();
+        
+        try {
+            this.skip();
+        }
+        catch (MusicleException e) {
+            DiscordUtils.sendMessage(e.getMessage(), text);
+        }
+    }
+
+    protected void skip() {
         if (this.musicleMode) {
-            DiscordUtils.sendMessage("Wait for musicle finish", text);
-            return;
+            throw new MusicleException("wait for musicle to finish");
         }
         this.queue.playNextTrack(true);
     }

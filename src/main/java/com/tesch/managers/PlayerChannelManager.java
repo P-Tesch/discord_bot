@@ -93,6 +93,7 @@ public class PlayerChannelManager extends MusicManager {
         String videoId = playing.getInfo().uri.split("=")[1];
         String thumbURL = "http://img.youtube.com/vi/" + videoId + "/0.jpg";
         this.embedBuilder.setImage(thumbURL);
+        this.embedBuilder.setDescription(playing.getInfo().title);
     }
 
     public void updatePlayer() {
@@ -144,6 +145,9 @@ public class PlayerChannelManager extends MusicManager {
             case "playPause":
                 this.onPauseCommand();
                 break;
+            case "next":
+                this.onSkipCommand();
+                break;
         }
     }
 
@@ -153,7 +157,17 @@ public class PlayerChannelManager extends MusicManager {
             this.updatePlayer();
         }
         catch (MusicleException e) {
-            this.setFooter(e.getMessage(), 5);
+            this.updatePlayer(e.getMessage(), 5);
+        }
+    }
+
+    private void onSkipCommand() {
+        try {
+            this.skip();
+            this.updatePlayer();
+        }
+        catch (MusicleException e) {
+            this.updatePlayer(e.getMessage(), 5);
         }
     }
 }
