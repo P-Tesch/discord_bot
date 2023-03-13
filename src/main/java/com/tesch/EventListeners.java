@@ -140,6 +140,9 @@ public class EventListeners extends ListenerAdapter {
             case "tictactoe":
                 manager.getTicTacToeManager().onButtonInteraction(event);
                 break;
+            case "playerchannel":
+                manager.getPlayerChannelManager().onButtonInteraction(event);
+                break;
         }
     }
 

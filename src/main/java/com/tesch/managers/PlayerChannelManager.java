@@ -1,11 +1,14 @@
 package com.tesch.managers;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 import java.awt.Color;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeSearchProvider;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import com.tesch.exceptions.MusicleException;
 import com.tesch.music.MusicPlayerChannelResultHandler;
 import com.tesch.music.MusicPlayerSendHandler;
 import com.tesch.music.MusicQueue;
@@ -19,7 +22,10 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.MessageHistory;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 public class PlayerChannelManager extends MusicManager {
 
@@ -43,7 +49,7 @@ public class PlayerChannelManager extends MusicManager {
     private void genericConstructor() {
         this.scheduler = new TaskScheduler();
         this.text = this.getGuild().getTextChannelsByName(CHANNEL_NAME, true).get(0);
-        this.text.deleteMessages(MessageHistory.getHistoryFromBeginning(this.text).complete().getRetrievedHistory()).queue();
+        MessageHistory.getHistoryFromBeginning(this.text).complete().getRetrievedHistory().forEach(msg -> msg.delete().queue());
         this.getQueue().setPlayerChannelManager(this);
         this.buildPlayer();
     }
@@ -52,27 +58,66 @@ public class PlayerChannelManager extends MusicManager {
         this.embedBuilder = new EmbedBuilder();
         embedBuilder.setTitle("Music Player");
         embedBuilder.setColor(new Color(255, 51, 153));
-        embedBuilder.setImage("https://i.ytimg.com/vi/p3orUcVWn6Q/maxresdefault.jpg");
         MessageEmbed embed = embedBuilder.build();
 
         MessageBuilder messageBuilder = new MessageBuilder();
         messageBuilder.setEmbeds(embed);
 
         this.embedMessage = text.sendMessage(messageBuilder.build()).complete();
+        this.updatePlayer(null);
+    }
+
+    private Collection<ActionRow> buildButtons() {
+        return Arrays.asList(
+            ActionRow.of(Arrays.asList(
+                !this.getAudioPlayer().isPaused() ? 
+                    Button.success("playerchannel_playPause", "⏸️") : 
+                    Button.danger("playerchannel_playPause", "▶️"),
+                Button.secondary("playerchannel_stop", "⏹️"),
+                Button.secondary("playerchannel_previous", "⏮️"),
+                Button.secondary("playerchannel_next", "⏭️"),
+                Button.primary("playerchannel_queue", "🔼")
+            )),
+            ActionRow.of(Arrays.asList(
+                Button.danger("playerchannel_shuffle", "🔀"),
+                !this.getQueue().getLoop() ?
+                    Button.danger("playerchannel_loop", "🔁") :
+                    Button.success("playerchannel_loop", "🔁")
+            ))
+        );
     }
 
     private void updatePlayerImage(AudioTrack playing) {
+        if (playing == null) {
+            embedBuilder.setImage("https://i.ytimg.com/vi/p3orUcVWn6Q/maxresdefault.jpg");
+            return;
+        }
+
         String videoId = playing.getInfo().uri.split("=")[1];
         String thumbURL = "http://img.youtube.com/vi/" + videoId + "/0.jpg";
         this.embedBuilder.setImage(thumbURL);
+    }
+
+    public void updatePlayer(AudioTrack playing) {
+        updatePlayerImage(playing);
+
+        MessageBuilder messageBuilder = new MessageBuilder();
+        messageBuilder.setEmbeds(this.embedBuilder.build());
+        messageBuilder.setActionRows(this.buildButtons());
+        embedMessage.editMessage(messageBuilder.build()).queue(); 
+    }
+
+    private void setFooter(String footer) {
+        this.embedBuilder.setFooter(footer);
 
         MessageBuilder messageBuilder = new MessageBuilder();
         messageBuilder.setEmbeds(this.embedBuilder.build());
         embedMessage.editMessage(messageBuilder.build()).queue();
     }
 
-    public void updatePlayer(AudioTrack playing) {
-        updatePlayerImage(playing);
+    private void setFooter(String footer, Integer time) {
+        this.setFooter(footer);
+        scheduler.schedule(() -> this.setFooter(""), time);
     }
     
     @Override
@@ -92,6 +137,26 @@ public class PlayerChannelManager extends MusicManager {
         }
         else {
             this.playFromSearch(message, new MusicPlayerChannelResultHandler(text, this.getQueue(), this.scheduler));
+        }
+    }
+
+    public void onButtonInteraction(ButtonInteractionEvent event) {
+        String command = event.getButton().getId().split("_")[1];
+        event.deferEdit().queue();
+        switch (command) {
+            case "playPause":
+                this.onPauseCommand();
+                break;
+        }
+    }
+
+    private void onPauseCommand() {
+        try {
+            this.pause();
+            this.updatePlayer(null);
+        }
+        catch (MusicleException e) {
+            this.setFooter(e.getMessage(), 5);
         }
     }
 }

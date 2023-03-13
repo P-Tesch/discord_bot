@@ -13,6 +13,7 @@ import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioTrack;
 import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeSearchProvider;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.BasicAudioPlaylist;
+import com.tesch.exceptions.MusicleException;
 import com.tesch.music.MusicPlayerSendHandler;
 import com.tesch.music.MusicQueue;
 import com.tesch.music.MusicResultHandler;
@@ -101,9 +102,17 @@ public class MusicManager extends GenericManager {
 
     public void onPauseCommand(MessageReceivedEvent event) {
         TextChannel text = event.getChannel().asTextChannel();
+        try {
+            this.pause();
+        }
+        catch (MusicleException e) {
+            DiscordUtils.sendMessage(e.getMessage(), text);
+        }
+    }
+
+    protected void pause() {
         if (this.musicleMode) {
-            DiscordUtils.sendMessage("Wait for musicle finish", text);
-            return;
+            throw new MusicleException("Wait for musicle to finish");
         }
         this.audioPlayer.setPaused(this.audioPlayer.isPaused() ? false : true);
     }
