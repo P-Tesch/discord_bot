@@ -248,12 +248,20 @@ public class MusicManager extends GenericManager {
 
     public void onShuffleCommand(MessageReceivedEvent event) {
         TextChannel text = event.getChannel().asTextChannel();
+        try {
+            this.shuffle();
+            DiscordUtils.sendMessage("Queue shuffled", text);
+        }
+        catch (MusicleException e) {
+            DiscordUtils.sendMessage(e.getMessage(), text);
+        }
+    }
+
+    protected void shuffle() {
         if (this.musicleMode) {
-            DiscordUtils.sendMessage("Wait for musicle finish", text);
-            return;
+            throw new MusicleException("Wait for musicle to finish");
         }
         this.queue.shufflePlaylist();
-        DiscordUtils.sendMessage("Queue Suffled", text);
     }
 
     public void onJumpToCommand(MessageReceivedEvent event) {

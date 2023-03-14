@@ -76,7 +76,9 @@ public class PlayerChannelManager extends MusicManager {
                 Button.primary("playerchannel_queue", "🔼")
             )),
             ActionRow.of(Arrays.asList(
-                Button.danger("playerchannel_shuffle", "🔀"),
+                !this.getQueue().isShuffled() ?
+                    Button.danger("playerchannel_shuffle", "🔀") :
+                    Button.success("playerchannel_shuffle", "🔀"),
                 !this.getQueue().getLoop() ?
                     Button.danger("playerchannel_loop", "🔁") :
                     Button.success("playerchannel_loop", "🔁")
@@ -131,7 +133,7 @@ public class PlayerChannelManager extends MusicManager {
         event.getMessage().delete().queue();
 
         try {
-            this.play(event.getMember().getVoiceState().getChannel(), message, new MusicPlayerChannelResultHandler(text, this.getQueue(), this.scheduler, this));
+            this.play(event.getMember().getVoiceState().getChannel(), message, new MusicPlayerChannelResultHandler(this.getQueue(), this));
         }
         catch (MusicleException e) {
             this.setFooter(e.getMessage(), 5);
@@ -153,6 +155,9 @@ public class PlayerChannelManager extends MusicManager {
                 break;
             case "loop":
                 this.onLoopCommand();
+                break;
+            case "shuffle":
+                this.onShuffleCommand();
                 break;
         }
     }
@@ -199,6 +204,16 @@ public class PlayerChannelManager extends MusicManager {
             this.updatePlayer();
         }
         catch (MusicleException e) {
+            this.updatePlayer(e.getMessage(), 5);
+        }
+    }
+
+    private void onShuffleCommand() {
+        try {
+            this.shuffle();
+            this.updatePlayer();
+        }
+        catch(MusicleException e) {
             this.updatePlayer(e.getMessage(), 5);
         }
     }

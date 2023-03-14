@@ -20,9 +20,11 @@ public class MusicQueue extends AudioEventAdapter{
     private AudioPlayer player;
     private boolean loop;
     private PlayerChannelManager playerChannelManager;
+    private Queue<AudioTrack> unshuffledPlaylist;
 
     public MusicQueue() {
-        playlist = new LinkedBlockingQueue<>();
+        this.playlist = new LinkedBlockingQueue<>();
+        this.unshuffledPlaylist = new LinkedBlockingQueue<>();
         this.loop = false;
     }
 
@@ -49,10 +51,22 @@ public class MusicQueue extends AudioEventAdapter{
         this.playerChannelManager = playerChannelManager;
     }
 
+    public boolean isShuffled() {
+        return !this.unshuffledPlaylist.isEmpty();
+    }
+
     public void shufflePlaylist() {
-        List<AudioTrack> shuffledPlaylist = new ArrayList<>();
-        playlist.stream().forEach(track -> shuffledPlaylist.add(MiscUtils.randomInt(0, shuffledPlaylist.size()), track));
-        this.playlist = new LinkedBlockingQueue<>(shuffledPlaylist);
+        if (this.unshuffledPlaylist.isEmpty()) {
+            List<AudioTrack> shuffledPlaylist = new ArrayList<>();
+            this.unshuffledPlaylist.addAll(this.playlist);
+            playlist.stream().forEach(track -> shuffledPlaylist.add(MiscUtils.randomInt(0, shuffledPlaylist.size()), track));
+            this.playlist = new LinkedBlockingQueue<>(shuffledPlaylist);
+        }
+        else {
+            this.playlist.clear();
+            this.playlist.addAll(this.unshuffledPlaylist);
+            this.unshuffledPlaylist.clear();
+        }
     }
 
     public void clearPlaylist() {
@@ -85,6 +99,9 @@ public class MusicQueue extends AudioEventAdapter{
             }
             if (loop) {
                 playlist.offer(toPlay);
+            }
+            else {
+                this.unshuffledPlaylist.remove(toPlay);
             }
         }
     }
