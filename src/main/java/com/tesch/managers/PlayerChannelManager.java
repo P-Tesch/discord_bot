@@ -151,6 +151,9 @@ public class PlayerChannelManager extends MusicManager {
             case "stop":
                 this.onStopCommand();
                 break;
+            case "loop":
+                this.onLoopCommand();
+                break;
         }
     }
 
@@ -184,6 +187,16 @@ public class PlayerChannelManager extends MusicManager {
                 this.clear();
                 this.updatePlayer();
             }
+        }
+        catch (MusicleException e) {
+            this.updatePlayer(e.getMessage(), 5);
+        }
+    }
+
+    private void onLoopCommand() {
+        try {
+            this.loop();
+            this.updatePlayer();
         }
         catch (MusicleException e) {
             this.updatePlayer(e.getMessage(), 5);

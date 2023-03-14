@@ -230,12 +230,20 @@ public class MusicManager extends GenericManager {
 
     public void onLoopCommand(MessageReceivedEvent event) {
         TextChannel text = event.getChannel().asTextChannel();
+        try {
+            this.loop();
+            DiscordUtils.sendMessage("Loop set to " + this.queue.getLoop(), text);
+        }
+        catch (MusicleException e) {
+            DiscordUtils.sendMessage(e.getMessage(), text);
+        }
+    }
+
+    protected void loop() {
         if (this.musicleMode) {
-            DiscordUtils.sendMessage("Wait for musicle finish", text);
-            return;
+            throw new MusicleException("Wait for musicle to finish");
         }
         this.queue.setLoop(!this.queue.getLoop());
-        DiscordUtils.sendMessage("Loop set to " + this.queue.getLoop(), text);
     }
 
     public void onShuffleCommand(MessageReceivedEvent event) {
