@@ -128,13 +128,12 @@ public class MusicManager extends GenericManager {
     }
 
     public void onDisconnectCommand(MessageReceivedEvent event) {
-        DiscordUtils.disconnectFromVoice(this.getGuild());
+        this.disconnect();
         this.onClearCommand(event);
     }
 
-    public void silentDisconnect() {
+    protected void disconnect() {
         DiscordUtils.disconnectFromVoice(this.getGuild());
-        this.silentClear();
     }
 
     public void onSkipCommand(MessageReceivedEvent event) {
@@ -207,17 +206,25 @@ public class MusicManager extends GenericManager {
 
     public void onClearCommand(MessageReceivedEvent event) {
         TextChannel text = event.getChannel().asTextChannel();
-        if (this.musicleMode) {
-            DiscordUtils.sendMessage("Wait for musicle finish", text);
-            return;
-        }
-        if (this.audioPlayer.getPlayingTrack() != null) {
+        
+        try {
+            this.clear();
             DiscordUtils.sendMessage("Cleared queue", text);
         }
-        this.queue.clearPlaylist();
+        catch (MusicleException e) {
+            DiscordUtils.sendMessage(e.getMessage(), text);
+        }
     }
 
-    private void silentClear() {
+    public void forceClearDisconnect() {
+        this.queue.clearPlaylist();
+        this.disconnect();
+    }
+
+    protected void clear() {
+        if (this.musicleMode) {
+            throw new MusicleException("Wait for musicle to finish");
+        }
         this.queue.clearPlaylist();
     }
 

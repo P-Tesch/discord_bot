@@ -116,7 +116,7 @@ public class EventListeners extends ListenerAdapter {
             AudioChannel channel = event.getGuild().getAudioManager().getConnectedChannel();
             if (channel == event.getChannelLeft()) {
                 if (channel.getMembers().size() == 1) {
-                    manager.getMusicManager().silentDisconnect();
+                    manager.getMusicManager().forceClearDisconnect();
                 }
             }
         };

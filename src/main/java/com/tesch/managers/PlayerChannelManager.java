@@ -148,6 +148,9 @@ public class PlayerChannelManager extends MusicManager {
             case "next":
                 this.onSkipCommand();
                 break;
+            case "stop":
+                this.onStopCommand();
+                break;
         }
     }
 
@@ -165,6 +168,22 @@ public class PlayerChannelManager extends MusicManager {
         try {
             this.skip();
             this.updatePlayer();
+        }
+        catch (MusicleException e) {
+            this.updatePlayer(e.getMessage(), 5);
+        }
+    }
+
+    private void onStopCommand() {
+        try {
+            if (this.getQueue().getPlaylist().isEmpty()) {
+                this.disconnect();
+                this.updatePlayer();
+            }
+            else {
+                this.clear();
+                this.updatePlayer();
+            }
         }
         catch (MusicleException e) {
             this.updatePlayer(e.getMessage(), 5);
