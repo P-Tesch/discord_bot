@@ -32,6 +32,8 @@ public class PlayerChannelManager extends MusicManager {
     private TextChannel text;
     private Message embedMessage;
     private EmbedBuilder embedBuilder;
+    private boolean queueMode;
+    private Integer queuePage;
 
     public PlayerChannelManager(MusicManager musicManager) {
         super(musicManager.getPlayerManager(), musicManager.getQueue(), musicManager.getYoutubeSearchProvider(), musicManager.getGuild());
@@ -44,6 +46,7 @@ public class PlayerChannelManager extends MusicManager {
     }
 
     private void genericConstructor() {
+        this.queueMode = false;
         this.scheduler = new TaskScheduler();
         this.text = this.getGuild().getTextChannelsByName(CHANNEL_NAME, true).get(0);
         MessageHistory.getHistoryFromBeginning(this.text).complete().getRetrievedHistory().forEach(msg -> msg.delete().queue());
@@ -75,20 +78,32 @@ public class PlayerChannelManager extends MusicManager {
                 Button.secondary("playerchannel_next", "⏭️"),
                 Button.primary("playerchannel_queue", "🔼")
             )),
-            ActionRow.of(Arrays.asList(
-                !this.getQueue().isShuffled() ?
-                    Button.danger("playerchannel_shuffle", "🔀") :
-                    Button.success("playerchannel_shuffle", "🔀"),
-                !this.getQueue().getLoop() ?
-                    Button.danger("playerchannel_loop", "🔁") :
-                    Button.success("playerchannel_loop", "🔁")
-            ))
+            !this.queueMode ?
+                ActionRow.of(Arrays.asList(
+                    !this.getQueue().isShuffled() ?
+                        Button.danger("playerchannel_shuffle", "🔀") :
+                        Button.success("playerchannel_shuffle", "🔀"),
+                    !this.getQueue().getLoop() ?
+                        Button.danger("playerchannel_loop", "🔁") :
+                        Button.success("playerchannel_loop", "🔁")
+                )) :
+                ActionRow.of(Arrays.asList(
+                    !this.getQueue().isShuffled() ?
+                        Button.danger("playerchannel_shuffle", "🔀") :
+                        Button.success("playerchannel_shuffle", "🔀"),
+                    !this.getQueue().getLoop() ?
+                        Button.danger("playerchannel_loop", "🔁") :
+                        Button.success("playerchannel_loop", "🔁"),
+                    Button.secondary("playerchannel_queuePrevious", "⏪"),
+                    Button.secondary("playerchannel_queueNext", "⏩")
+                ))
         );
     }
 
     private void updatePlayerImage(AudioTrack playing) {
         if (playing == null) {
             embedBuilder.setImage("https://i.ytimg.com/vi/p3orUcVWn6Q/maxresdefault.jpg");
+            this.embedBuilder.setDescription("");
             return;
         }
 
@@ -99,6 +114,10 @@ public class PlayerChannelManager extends MusicManager {
     }
 
     public void updatePlayer() {
+        if (this.queueMode) {
+            this.updatePlayerAsQueue(this.queuePage);
+            return;
+        }
         AudioTrack playing = this.getAudioPlayer().getPlayingTrack();
         updatePlayerImage(playing);
 
@@ -116,6 +135,22 @@ public class PlayerChannelManager extends MusicManager {
             this.setFooter(footer, footerTime);
         }
         this.updatePlayer();
+    }
+
+    private void updatePlayerAsQueue(Integer page) {
+        String queueString = this.queue(page);
+        if (queueString == null) {
+            this.queueMode = false;
+            this.updatePlayer();
+            return;
+        }
+        this.embedBuilder.setImage(null);
+        this.embedBuilder.setDescription(queueString);
+
+        MessageBuilder messageBuilder = new MessageBuilder();
+        messageBuilder.setEmbeds(this.embedBuilder.build());
+        messageBuilder.setActionRows(this.buildButtons());
+        embedMessage.editMessage(messageBuilder.build()).queue(); 
     }
 
     public void setFooter(String footer) {
@@ -158,6 +193,15 @@ public class PlayerChannelManager extends MusicManager {
                 break;
             case "shuffle":
                 this.onShuffleCommand();
+                break;
+            case "queue":
+                this.onQueueCommand();
+                break;
+            case "queueNext":
+                this.onQueueNextCommand();
+                break;
+            case "queuePrevious":
+                this.onQueuePreviousCommand();
                 break;
         }
     }
@@ -216,5 +260,21 @@ public class PlayerChannelManager extends MusicManager {
         catch(MusicleException e) {
             this.updatePlayer(e.getMessage(), 5);
         }
+    }
+
+    private void onQueueNextCommand() {
+        this.queuePage++;
+        this.updatePlayer();
+    }
+
+    private void onQueuePreviousCommand() {
+        this.queuePage--;
+        this.updatePlayer();
+    }
+
+    private void onQueueCommand() {
+        this.queueMode = !this.queueMode;
+        this.queuePage = 1;
+        this.updatePlayer();
     }
 }

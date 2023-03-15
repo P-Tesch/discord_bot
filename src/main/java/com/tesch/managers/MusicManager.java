@@ -76,7 +76,7 @@ public class MusicManager extends GenericManager {
         TextChannel text = event.getChannel().asTextChannel();
 
         try {
-            this.play(event.getMember().getVoiceState().getChannel(), message, new MusicResultHandler(text, queue));
+            this.play(event.getMember().getVoiceState().getChannel(), message, new MusicResultHandler(text, this.queue));
         }
         catch (MusicleException e) {
             DiscordUtils.sendMessage(e.getMessage(), text);
@@ -156,39 +156,40 @@ public class MusicManager extends GenericManager {
 
     public void onQueueCommand(MessageReceivedEvent event) {
         TextChannel text = event.getChannel().asTextChannel();
-        if (this.musicleMode) {
-            DiscordUtils.sendMessage("Wait for musicle finish", text);
-            return;
-        }
         try {
-            List<String> playlist = new ArrayList<>();
-            StringBuilder queueString = new StringBuilder();
-            playlist.add(this.audioPlayer.getPlayingTrack().getInfo().title);
-            this.queue.getPlaylist().stream().map(x -> x.getInfo().title).forEach(playlist::add);
-            for (int i = 0; i < 7; i++) {
-                if (i < playlist.size()) {
-                    queueString.append((i == 0 ? "Playing" : i) + ". " + playlist.get(i) + "\n");
-                }
-            }
-            event.getChannel().sendMessage("```\nPage 1:\n" + queueString + "\n```").setActionRow(Button.primary("queue previous", "⬅️"), Button.primary("queue next", "➡️")).queue();
+            event.getChannel().sendMessage("```\nPage 1:\n" + this.queue(1) + "\n```").setActionRow(Button.primary("queue previous", "⬅️"), Button.primary("queue next", "➡️")).queue();
+        }
+        catch (MusicleException e) {
+            DiscordUtils.sendMessage(e.getMessage(), text);
         }
         catch (NullPointerException e) {
             DiscordUtils.sendMessage("Queue empty", text);
         }
     }
 
-    public void onQueueButton(ButtonInteractionEvent event) {
+    protected String queue(Integer page) throws NullPointerException {
+        if (this.musicleMode) {
+            throw new MusicleException("Wait for musicle to finish");
+        }
+
         try {
+            if (this.queue.getPlaylist().isEmpty()) {
+                return null;
+            }
             List<String> playlist = new ArrayList<>();
             playlist.add(this.audioPlayer.getPlayingTrack().getInfo().title);
             this.queue.getPlaylist().stream().map(x -> x.getInfo().title).forEach(playlist::add);
 
-            Integer page = Integer.parseInt(event.getMessage().getContentRaw().split("\n")[1].split(" ")[1].replace(":", ""));
-            page = event.getButton().getId().equals("queue next") ? page + 1 : page - 1;
-
             int lastPage = playlist.size() % 7 == 0 ? playlist.size() / 7 : playlist.size() / 7 + 1;
-            if (page == 0) page = lastPage;
-            if (page > lastPage) page = 1;
+            while (page < 0) {
+                page += lastPage;
+            }
+            while (page > lastPage) { 
+                page -= lastPage;
+            }
+            if (page == 0) {
+                page = lastPage;
+            }
 
             StringBuilder queueString = new StringBuilder();
 
@@ -197,11 +198,18 @@ public class MusicManager extends GenericManager {
                     queueString.append(i + ". " + playlist.get(i) + "\n");
                 }
             }
-            event.editMessage("```\nPage " + page + ":\n" + queueString + "\n```").queue();
+            return "\nPage " + page + ":\n" + queueString.toString() + "\n";
         }
         catch (IllegalStateException e) {
             e.getMessage();
+            return null;
         }
+    }
+
+    public void onQueueButton(ButtonInteractionEvent event) {
+        Integer page = Integer.parseInt(event.getMessage().getContentRaw().split("\n")[1].split(" ")[1].replace(":", ""));
+        page = event.getButton().getId().equals("queue next") ? page + 1 : page - 1;
+        event.editMessage("```" + this.queue(page) + "```").queue();
     }
 
     public void onClearCommand(MessageReceivedEvent event) {
