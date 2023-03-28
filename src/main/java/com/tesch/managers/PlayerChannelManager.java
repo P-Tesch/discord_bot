@@ -185,6 +185,9 @@ public class PlayerChannelManager extends MusicManager {
             case "next":
                 this.onSkipCommand();
                 break;
+            case "previous":
+                this.OnPreviousCommand();;
+                break;
             case "stop":
                 this.onStopCommand();
                 break;
@@ -276,5 +279,9 @@ public class PlayerChannelManager extends MusicManager {
         this.queueMode = !this.queueMode;
         this.queuePage = 1;
         this.updatePlayer();
+    }
+
+    private void OnPreviousCommand() {
+        this.getQueue().playPreviousTrack();
     }
 }

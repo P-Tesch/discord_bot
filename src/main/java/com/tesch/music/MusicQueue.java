@@ -1,8 +1,11 @@
 package com.tesch.music;
 
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.List;
 import java.util.Queue;
+import java.util.Stack;
+import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.Collectors;
 
@@ -16,15 +19,17 @@ import com.tesch.utils.MiscUtils;
 
 public class MusicQueue extends AudioEventAdapter{
 
-    private Queue<AudioTrack> playlist;
+    private Deque<AudioTrack> playlist;
     private AudioPlayer player;
     private boolean loop;
     private PlayerChannelManager playerChannelManager;
     private Queue<AudioTrack> unshuffledPlaylist;
+    private Stack<AudioTrack> playedPlaylist;
 
     public MusicQueue() {
-        this.playlist = new LinkedBlockingQueue<>();
+        this.playlist = new LinkedBlockingDeque<>();
         this.unshuffledPlaylist = new LinkedBlockingQueue<>();
+        this.playedPlaylist = new Stack<>();
         this.loop = false;
     }
 
@@ -60,7 +65,7 @@ public class MusicQueue extends AudioEventAdapter{
             List<AudioTrack> shuffledPlaylist = new ArrayList<>();
             this.unshuffledPlaylist.addAll(this.playlist);
             playlist.stream().forEach(track -> shuffledPlaylist.add(MiscUtils.randomInt(0, shuffledPlaylist.size()), track));
-            this.playlist = new LinkedBlockingQueue<>(shuffledPlaylist);
+            this.playlist = new LinkedBlockingDeque<>(shuffledPlaylist);
         }
         else {
             this.playlist.clear();
@@ -90,6 +95,7 @@ public class MusicQueue extends AudioEventAdapter{
             if (skip) {
                 player.stopTrack();
             }
+            this.playerChannelManager.updatePlayer();
             return;
         }
         if (player.startTrack(playlist.peek().makeClone(), !skip)) {
@@ -106,8 +112,31 @@ public class MusicQueue extends AudioEventAdapter{
         }
     }
 
+    public void playPreviousTrack() {
+        if (this.playedPlaylist.isEmpty()) {
+            return;
+        }
+        this.playlist.addFirst(this.player.getPlayingTrack());
+        AudioTrack toPlay = this.playedPlaylist.pop();
+        if (player.startTrack(toPlay.makeClone(), false)) {
+            if (this.playerChannelManager != null) {
+                this.playerChannelManager.updatePlayer(null, null);
+            }
+            if (loop) {
+                this.playlist.remove(toPlay);
+            }
+        }
+    }
+
+    public void clearPlayedPlaylist() {
+        this.playedPlaylist.clear();
+    }
+
     @Override
     public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
+        if (!this.playlist.contains(track)) {
+            this.playedPlaylist.push(track);
+        }
         if (endReason.mayStartNext) {
             this.playNextTrack(false);
         }

@@ -133,6 +133,7 @@ public class MusicManager extends GenericManager {
     }
 
     protected void disconnect() {
+        this.queue.clearPlayedPlaylist();
         DiscordUtils.disconnectFromVoice(this.getGuild());
     }
 
