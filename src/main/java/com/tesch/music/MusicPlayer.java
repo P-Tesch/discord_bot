@@ -100,7 +100,7 @@ public class MusicPlayer {
         this.queue.playNextTrack(true);
     }
 
-    public String queue(Integer page) throws NullPointerException {
+    public String queue(Integer page) {
         if (this.musicleMode) {
             throw new MusicleException("Wait for musicle to finish");
         }

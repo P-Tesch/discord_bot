@@ -70,13 +70,15 @@ public class ChatMusicManager extends MusicManager {
     public void onQueueCommand(MessageReceivedEvent event) {
         TextChannel text = event.getChannel().asTextChannel();
         try {
-            event.getChannel().sendMessage("```\n" + this.getMusicPlayer().queue(1) + "\n```").setActionRow(Button.primary("queue previous", "⬅️"), Button.primary("queue next", "➡️")).queue();
+            String queueString = this.getMusicPlayer().queue(1);
+            if (queueString == null) {
+                DiscordUtils.sendMessage("Queue empty", text);
+                return;
+            }
+            event.getChannel().sendMessage("```\n" + queueString + "\n```").setActionRow(Button.primary("queue previous", "⬅️"), Button.primary("queue next", "➡️")).queue();
         }
         catch (MusicleException e) {
             DiscordUtils.sendMessage(e.getMessage(), text);
-        }
-        catch (NullPointerException e) {
-            DiscordUtils.sendMessage("Queue empty", text);
         }
     }
 
