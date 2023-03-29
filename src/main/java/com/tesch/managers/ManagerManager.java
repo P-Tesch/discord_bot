@@ -1,29 +1,32 @@
 package com.tesch.managers;
 
+import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeSearchProvider;
+import com.tesch.music.MusicPlayer;
+import com.tesch.music.MusicQueue;
+
 import net.dv8tion.jda.api.entities.Guild;
 
 public class ManagerManager extends GenericManager {
 
-    private MusicManager musicManager;
     private MusicleManager musicleManager;
     private RNGManager rngManager;
     private HelpManager helpManager;
     private TicTacToeManager ticTacToeManager;
     private ChessManager chessManager;
+    private PlayerChannelManager playerChannelManager;
+    private ChatMusicManager chatMusicManager;
     
     public ManagerManager(Guild guild) {
         super(guild);
         ManagerFactory managerFactory = new ManagerFactory(guild);
-        this.musicManager = managerFactory.buildMusicManager();
-        this.musicleManager = managerFactory.buildMusicleManager();
         this.rngManager = managerFactory.buildRngManager();
         this.helpManager = managerFactory.buildHelpManager();
         this.ticTacToeManager = managerFactory.buildTicTacToeManager();
         this.chessManager = managerFactory.buildChessManager();
-    }
-
-    public MusicManager getMusicManager() {
-        return musicManager;
+        MusicPlayer musicPlayer = new MusicPlayer(managerFactory.buildAudioPlayerManager(), new MusicQueue(), new YoutubeSearchProvider(), guild);
+        this.musicleManager = managerFactory.buildMusicleManager(musicPlayer);
+        this.playerChannelManager = managerFactory.buildPlayerChannelManager(musicPlayer);
+        this.chatMusicManager = managerFactory.buildChatMusicManager(musicPlayer);
     }
 
     public MusicleManager getMusicleManager() {
@@ -44,5 +47,13 @@ public class ManagerManager extends GenericManager {
 
     public ChessManager getChessManager() {
         return chessManager;
+    }
+
+    public PlayerChannelManager getPlayerChannelManager() {
+        return playerChannelManager;
+    }
+
+    public ChatMusicManager getChatMusicManager() {
+        return chatMusicManager;
     }
 }

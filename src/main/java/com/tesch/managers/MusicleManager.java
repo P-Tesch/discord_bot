@@ -14,6 +14,7 @@ import com.tesch.games.musicle.MusicleLobby;
 import com.tesch.games.musicle.MusicleResultHandler;
 import com.tesch.games.musicle.MusicleScore;
 import com.tesch.games.musicle.enums.MusicGenres;
+import com.tesch.music.MusicPlayer;
 import com.tesch.music.MusicPlayerSendHandler;
 import com.tesch.utils.DiscordUtils;
 import com.tesch.utils.MiscUtils;
@@ -28,7 +29,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 public class MusicleManager {
 
-    private MusicManager musicManager;
+    private MusicPlayer musicPlayer;
     private MusicleLobby lobby;
     private TaskScheduler scheduler;
     private boolean titleMode;
@@ -42,8 +43,8 @@ public class MusicleManager {
     private Map<User, MusicleScore> playerScore;
     private boolean inGame;
 
-    public MusicleManager(MusicManager musicEventHandler) {
-        this.musicManager = musicEventHandler;
+    public MusicleManager(MusicPlayer musicPlayer) {
+        this.musicPlayer = musicPlayer;
         this.lobby = null;
         this.scheduler = new TaskScheduler();
         this.titleMode = false;
@@ -60,8 +61,8 @@ public class MusicleManager {
         return this.scheduler;
     }
 
-    public MusicManager getMusicManager() {
-        return this.musicManager;
+    public MusicPlayer getMusicPlayer() {
+        return this.musicPlayer;
     }
 
     public boolean getStartMode() {
@@ -118,7 +119,7 @@ public class MusicleManager {
             DiscordUtils.sendMessage("Scoreboard:\n" + this.getScoreboard(), text);
             return;
         }
-        if (this.musicManager.getAudioPlayer().getPlayingTrack() != null) {
+        if (this.musicPlayer.getAudioPlayer().getPlayingTrack() != null) {
             DiscordUtils.sendMessage("Something is already playing, clear the queue to play", text);
             return;
         }
@@ -138,12 +139,12 @@ public class MusicleManager {
 
         this.scheduler.cancelAll();
     
-        this.musicManager.setMusicleMode(true);
+        this.musicPlayer.setMusicleMode(true);
         
-        DiscordUtils.connectToVoice(new MusicPlayerSendHandler(this.musicManager.getAudioPlayer()), event.getGuild(), event.getMember().getVoiceState().getChannel());
+        DiscordUtils.connectToVoice(new MusicPlayerSendHandler(this.musicPlayer.getAudioPlayer()), event.getGuild(), event.getMember().getVoiceState().getChannel());
 
-        MusicleResultHandler resultHandler = new MusicleResultHandler(event.getChannel().asTextChannel(), musicManager.getQueue(), this);
-        Future<Void> wait = musicManager.getPlayerManager().loadItem(url, resultHandler);
+        MusicleResultHandler resultHandler = new MusicleResultHandler(event.getChannel().asTextChannel(), musicPlayer.getQueue(), this);
+        Future<Void> wait = musicPlayer.getPlayerManager().loadItem(url, resultHandler);
 
         byte i = 0;
         while (!wait.isDone()) {
@@ -157,7 +158,7 @@ public class MusicleManager {
         }
 
         if (!this.startMode) {
-            AudioTrack track = this.musicManager.getAudioPlayer().getPlayingTrack();
+            AudioTrack track = this.musicPlayer.getAudioPlayer().getPlayingTrack();
             track.setPosition(MiscUtils.randomInt(0, (int) (3 * track.getDuration() / 4))); 
         }
 
@@ -201,7 +202,7 @@ public class MusicleManager {
         else {
             songs.forEach(x -> possibleAnswers.add(x.getInfo().author));
         }
-        this.answerName = this.titleMode ? musicManager.getAudioPlayer().getPlayingTrack().getInfo().title : musicManager.getAudioPlayer().getPlayingTrack().getInfo().author;
+        this.answerName = this.titleMode ? musicPlayer.getAudioPlayer().getPlayingTrack().getInfo().title : musicPlayer.getAudioPlayer().getPlayingTrack().getInfo().author;
         possibleAnswers.remove(this.answerName);
         this.answers = new String[5];
         List<String> possibleAnswersList = new ArrayList<>(possibleAnswers);
@@ -240,7 +241,7 @@ public class MusicleManager {
                 Arrays.asList(this.answers).stream().forEach(x -> builder.append(x + "\n"));
                 this.playerScore.get(this.player).addLoss();
             }
-            builder.append("\nTitle: " + this.musicManager.getAudioPlayer().getPlayingTrack().getInfo().title);
+            builder.append("\nTitle: " + this.musicPlayer.getAudioPlayer().getPlayingTrack().getInfo().title);
             event.editMessage(builder.toString()).queue(msg -> event.getMessage().editMessageEmbeds().setActionRows().queue());
             this.stop();
         }
@@ -253,7 +254,7 @@ public class MusicleManager {
     }
 
     public void stop() {
-        this.musicManager.setMusicleMode(false);
+        this.musicPlayer.setMusicleMode(false);
         this.lobby = null;
         this.stringBuilder = null;
         this.answerIndex = null;
@@ -262,7 +263,7 @@ public class MusicleManager {
         this.answers = null;
         this.lobbyMode = false;
         this.inGame = false;
-        this.musicManager.getQueue().clearPlaylist();
+        this.musicPlayer.getQueue().clearPlaylist();
     }
 
     private void changeTitleMode() {

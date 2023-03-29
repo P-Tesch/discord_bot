@@ -5,6 +5,7 @@ import java.util.function.Consumer;
 import com.tesch.exceptions.BotException;
 import com.tesch.music.MusicPlayerSendHandler;
 
+import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.AudioChannel;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
@@ -27,11 +28,15 @@ public class DiscordUtils {
         guild.getAudioManager().closeAudioConnection();
     }
 
-    public static void sendMessage(String message, TextChannel text) {
+    public static Message sendMessage(String content, TextChannel text) {
+        Message message = new MessageBuilder(content).build();
         text.sendMessage(message).queue();
+        return message;
     }
 
-    public static <T> void sendMessage(String message, Consumer<? super Message> consumer, TextChannel text) {
+    public static <T> Message sendMessage(String content, Consumer<? super Message> consumer, TextChannel text) {
+        Message message = new MessageBuilder(content).build();
         text.sendMessage(message).queue(consumer);
+        return message;
     }
 }
