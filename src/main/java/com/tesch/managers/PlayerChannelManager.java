@@ -4,12 +4,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.awt.Color;
 
-import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
-import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeSearchProvider;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.tesch.exceptions.MusicleException;
+import com.tesch.music.MusicPlayer;
 import com.tesch.music.MusicPlayerChannelResultHandler;
-import com.tesch.music.MusicQueue;
 import com.tesch.utils.TaskScheduler;
 
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -35,13 +33,8 @@ public class PlayerChannelManager extends MusicManager {
     private boolean queueMode;
     private Integer queuePage;
 
-    public PlayerChannelManager(MusicManager musicManager) {
-        super(musicManager.getPlayerManager(), musicManager.getQueue(), musicManager.getYoutubeSearchProvider(), musicManager.getGuild());
-        this.genericConstructor();
-    }
-
-    public PlayerChannelManager(AudioPlayerManager playerManager, MusicQueue queue, YoutubeSearchProvider youtubeSearch, Guild guild) {
-        super(playerManager, queue, youtubeSearch, guild);
+    public PlayerChannelManager(MusicPlayer musicPlayer, Guild guild) {
+        super(musicPlayer, guild);
         this.genericConstructor();
     }
 
@@ -50,7 +43,7 @@ public class PlayerChannelManager extends MusicManager {
         this.scheduler = new TaskScheduler();
         this.text = this.getGuild().getTextChannelsByName(CHANNEL_NAME, true).get(0);
         MessageHistory.getHistoryFromBeginning(this.text).complete().getRetrievedHistory().forEach(msg -> msg.delete().queue());
-        this.getQueue().setPlayerChannelManager(this);
+        this.getMusicPlayer().getQueue().setPlayerChannelManager(this);
         this.buildPlayer();
     }
 
@@ -70,7 +63,7 @@ public class PlayerChannelManager extends MusicManager {
     private Collection<ActionRow> buildButtons() {
         return Arrays.asList(
             ActionRow.of(Arrays.asList(
-                !this.getAudioPlayer().isPaused() ? 
+                !this.getMusicPlayer().getAudioPlayer().isPaused() ? 
                     Button.success("playerchannel_playPause", "⏸️") : 
                     Button.danger("playerchannel_playPause", "▶️"),
                 Button.secondary("playerchannel_stop", "⏹️"),
@@ -80,18 +73,18 @@ public class PlayerChannelManager extends MusicManager {
             )),
             !this.queueMode ?
                 ActionRow.of(Arrays.asList(
-                    !this.getQueue().isShuffled() ?
+                    !this.getMusicPlayer().getQueue().isShuffled() ?
                         Button.danger("playerchannel_shuffle", "🔀") :
                         Button.success("playerchannel_shuffle", "🔀"),
-                    !this.getQueue().getLoop() ?
+                    !this.getMusicPlayer().getQueue().getLoop() ?
                         Button.danger("playerchannel_loop", "🔁") :
                         Button.success("playerchannel_loop", "🔁")
                 )) :
                 ActionRow.of(Arrays.asList(
-                    !this.getQueue().isShuffled() ?
+                    !this.getMusicPlayer().getQueue().isShuffled() ?
                         Button.danger("playerchannel_shuffle", "🔀") :
                         Button.success("playerchannel_shuffle", "🔀"),
-                    !this.getQueue().getLoop() ?
+                    !this.getMusicPlayer().getQueue().getLoop() ?
                         Button.danger("playerchannel_loop", "🔁") :
                         Button.success("playerchannel_loop", "🔁"),
                     Button.secondary("playerchannel_queuePrevious", "⏪"),
@@ -118,7 +111,7 @@ public class PlayerChannelManager extends MusicManager {
             this.updatePlayerAsQueue(this.queuePage);
             return;
         }
-        AudioTrack playing = this.getAudioPlayer().getPlayingTrack();
+        AudioTrack playing = this.getMusicPlayer().getAudioPlayer().getPlayingTrack();
         updatePlayerImage(playing);
 
         MessageBuilder messageBuilder = new MessageBuilder();
@@ -138,7 +131,7 @@ public class PlayerChannelManager extends MusicManager {
     }
 
     private void updatePlayerAsQueue(Integer page) {
-        String queueString = this.queue(page);
+        String queueString = this.getMusicPlayer().queue(page);
         if (queueString == null) {
             this.queueMode = false;
             this.updatePlayer();
@@ -162,13 +155,12 @@ public class PlayerChannelManager extends MusicManager {
         scheduler.schedule(() -> this.updatePlayer(null, null), time);
     }
     
-    @Override
     public void onPlayCommand(MessageReceivedEvent event) {
         String message = event.getMessage().getContentRaw();
         event.getMessage().delete().queue();
 
         try {
-            this.play(event.getMember().getVoiceState().getChannel(), message, new MusicPlayerChannelResultHandler(this.getQueue(), this));
+            this.getMusicPlayer().play(event.getMember().getVoiceState().getChannel(), message, new MusicPlayerChannelResultHandler(this.getMusicPlayer().getQueue(), this));
         }
         catch (MusicleException e) {
             this.setFooter(e.getMessage(), 5);
@@ -211,7 +203,7 @@ public class PlayerChannelManager extends MusicManager {
 
     private void onPauseCommand() {
         try {
-            this.pause();
+            this.getMusicPlayer().pause();
             this.updatePlayer();
         }
         catch (MusicleException e) {
@@ -221,7 +213,7 @@ public class PlayerChannelManager extends MusicManager {
 
     private void onSkipCommand() {
         try {
-            this.skip();
+            this.getMusicPlayer().skip();
             this.updatePlayer();
         }
         catch (MusicleException e) {
@@ -231,12 +223,12 @@ public class PlayerChannelManager extends MusicManager {
 
     private void onStopCommand() {
         try {
-            if (this.getQueue().getPlaylist().isEmpty()) {
-                this.disconnect();
+            if (this.getMusicPlayer().getQueue().getPlaylist().isEmpty()) {
+                this.getMusicPlayer().disconnect();
                 this.updatePlayer();
             }
             else {
-                this.clear();
+                this.getMusicPlayer().clear();
                 this.updatePlayer();
             }
         }
@@ -247,7 +239,7 @@ public class PlayerChannelManager extends MusicManager {
 
     private void onLoopCommand() {
         try {
-            this.loop();
+            this.getMusicPlayer().loop();
             this.updatePlayer();
         }
         catch (MusicleException e) {
@@ -257,7 +249,7 @@ public class PlayerChannelManager extends MusicManager {
 
     private void onShuffleCommand() {
         try {
-            this.shuffle();
+            this.getMusicPlayer().shuffle();
             this.updatePlayer();
         }
         catch(MusicleException e) {
@@ -282,6 +274,6 @@ public class PlayerChannelManager extends MusicManager {
     }
 
     private void OnPreviousCommand() {
-        this.getQueue().playPreviousTrack();
+        this.getMusicPlayer().getQueue().playPreviousTrack();
     }
 }

@@ -8,12 +8,12 @@ import com.tesch.utils.DiscordUtils;
 
 import net.dv8tion.jda.api.entities.TextChannel;
 
-public class MusicResultHandler implements AudioLoadResultHandler {
+public class MusicChatResultHandler implements AudioLoadResultHandler {
 
     private TextChannel textChannel;
     private MusicQueue queue;
 
-    public MusicResultHandler(TextChannel textChannel, MusicQueue queue) {
+    public MusicChatResultHandler(TextChannel textChannel, MusicQueue queue) {
         this.textChannel = textChannel;
         this.queue = queue;
     }

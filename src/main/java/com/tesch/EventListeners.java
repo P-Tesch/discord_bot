@@ -44,34 +44,34 @@ public class EventListeners extends ListenerAdapter {
 
         switch (command) {
             case "play":
-                manager.getMusicManager().onPlayCommand(event);
+                manager.getChatMusicManager().onPlayCommand(event);
                 break;
             case "volume":
-                manager.getMusicManager().onVolumeCommand(event);
+                manager.getChatMusicManager().onVolumeCommand(event);
                 break;
             case "pause":
-                manager.getMusicManager().onPauseCommand(event);
+                manager.getChatMusicManager().onPauseCommand(event);
                 break;
             case "disconnect":
-                manager.getMusicManager().onDisconnectCommand(event);
+                manager.getChatMusicManager().onDisconnectCommand(event);
                 break;
             case "skip": 
-                manager.getMusicManager().onSkipCommand(event);
+                manager.getChatMusicManager().onSkipCommand(event);
                 break;
             case "queue":
-                manager.getMusicManager().onQueueCommand(event);
+                manager.getChatMusicManager().onQueueCommand(event);
                 break;
             case "clear":
-                manager.getMusicManager().onClearCommand(event);
+                manager.getChatMusicManager().onClearCommand(event);
                 break;
             case "loop":
-                manager.getMusicManager().onLoopCommand(event);
+                manager.getChatMusicManager().onLoopCommand(event);
                 break;
             case "shuffle":
-                manager.getMusicManager().onShuffleCommand(event);
+                manager.getChatMusicManager().onShuffleCommand(event);
                 break;
             case "jumpto":
-                manager.getMusicManager().onJumpToCommand(event);
+                manager.getChatMusicManager().onJumpToCommand(event);
                 break;
             case "coinflip":
                 manager.getRngManager().coinFlip(event);
@@ -116,7 +116,7 @@ public class EventListeners extends ListenerAdapter {
             AudioChannel channel = event.getGuild().getAudioManager().getConnectedChannel();
             if (channel == event.getChannelLeft()) {
                 if (channel.getMembers().size() == 1) {
-                    manager.getMusicManager().forceClearDisconnect();
+                    manager.getChatMusicManager().getMusicPlayer().forceClearDisconnect();
                 }
             }
         };
@@ -129,7 +129,7 @@ public class EventListeners extends ListenerAdapter {
 
         switch(event.getButton().getId().split("_")[0]) {
             case "queue":
-                manager.getMusicManager().onQueueButton(event);
+                manager.getChatMusicManager().onQueueButton(event);
                 break;
             case "chess":
                 manager.getChessManager().onChessButton(event);

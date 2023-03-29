@@ -29,7 +29,7 @@ public class MusicleLobby {
     
     public void setup(String url) throws InterruptedException {
         this.manager.getScheduler().cancelAll();
-        this.manager.getMusicManager().setMusicleMode(true);
+        this.manager.getMusicPlayer().setMusicleMode(true);
 
         players.add(event.getAuthor());
         event.getMessage().getMentions().getUsers().forEach(players::add);
@@ -77,7 +77,7 @@ public class MusicleLobby {
             }
         });
         Arrays.asList(this.manager.getAnswers()).forEach(x -> builder.append(x + "\n"));
-        builder.append("\nTitle: " + this.manager.getMusicManager().getAudioPlayer().getPlayingTrack().getInfo().title);
+        builder.append("\nTitle: " + this.manager.getMusicPlayer().getAudioPlayer().getPlayingTrack().getInfo().title);
         event.editMessage(builder.toString()).queue(msg -> event.getMessage().editMessageEmbeds().setActionRows().queue());
         this.manager.stop();
     }
