@@ -150,8 +150,8 @@ public class MusicleManager {
         while (!wait.isDone()) {
             Thread.sleep(500L);
             if (i >= 10) {
-               DiscordUtils.sendMessage("Failed", text);
-               this.stop();
+                DiscordUtils.sendMessage("Failed", text);
+                this.stop();
                 return;
             }
             i++;

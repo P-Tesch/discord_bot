@@ -107,6 +107,9 @@ public class PlayerChannelManager extends MusicManager {
     }
 
     public void updatePlayer() {
+        if (this.getMusicPlayer().getMusicleMode()) {
+            return;
+        }
         if (this.queueMode) {
             this.updatePlayerAsQueue(this.queuePage);
             return;
