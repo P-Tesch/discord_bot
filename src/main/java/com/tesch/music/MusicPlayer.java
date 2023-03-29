@@ -165,6 +165,10 @@ public class MusicPlayer {
         this.queue.shufflePlaylist();
     }
 
+    public void previous() {
+        this.queue.playPreviousTrack();
+    }
+
     public boolean isUrl(String test) {
         try {
             new URL(test);

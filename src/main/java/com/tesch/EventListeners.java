@@ -58,6 +58,9 @@ public class EventListeners extends ListenerAdapter {
             case "skip": 
                 manager.getChatMusicManager().onSkipCommand(event);
                 break;
+            case "previous":
+                manager.getChatMusicManager().onPreviousCommand(event);
+                break;
             case "queue":
                 manager.getChatMusicManager().onQueueCommand(event);
                 break;

@@ -127,4 +127,15 @@ public class ChatMusicManager extends MusicManager {
             this.onSkipCommand(event);
         }
     }
+
+    public void onPreviousCommand(MessageReceivedEvent event) {
+        TextChannel text = event.getChannel().asTextChannel();
+        
+        try {
+            this.getMusicPlayer().previous();
+        }
+        catch (MusicleException e) {
+            DiscordUtils.sendMessage(e.getMessage(), text);
+        }
+    }
 }
