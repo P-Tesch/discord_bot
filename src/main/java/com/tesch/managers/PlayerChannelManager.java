@@ -223,7 +223,7 @@ public class PlayerChannelManager extends MusicManager {
 
     private void onStopCommand() {
         try {
-            if (this.getMusicPlayer().getQueue().getPlaylist().isEmpty()) {
+            if (this.getMusicPlayer().getQueue().getPlaylist().isEmpty() && this.getMusicPlayer().getAudioPlayer().getPlayingTrack() == null) {
                 this.getMusicPlayer().disconnect();
                 this.updatePlayer();
             }
