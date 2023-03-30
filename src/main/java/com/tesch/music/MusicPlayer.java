@@ -16,8 +16,8 @@ import com.sedmelluq.discord.lavaplayer.track.BasicAudioPlaylist;
 import com.tesch.exceptions.MusicleException;
 import com.tesch.utils.DiscordUtils;
 
-import net.dv8tion.jda.api.entities.AudioChannel;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
 
 
 public class MusicPlayer {

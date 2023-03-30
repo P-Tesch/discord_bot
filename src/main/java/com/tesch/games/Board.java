@@ -3,8 +3,8 @@ package com.tesch.games;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
 public abstract class Board {
 
@@ -36,5 +36,5 @@ public abstract class Board {
         this.currentPlayer = Teams.getOther(this.currentPlayer);
     }
 
-    public abstract Message getBoardAsMessage();
+    public abstract MessageCreateData getBoardAsMessageCreateData();
 }

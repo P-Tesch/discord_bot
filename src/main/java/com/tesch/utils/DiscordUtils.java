@@ -5,12 +5,13 @@ import java.util.function.Consumer;
 import com.tesch.exceptions.BotException;
 import com.tesch.music.MusicPlayerSendHandler;
 
-import net.dv8tion.jda.api.MessageBuilder;
-import net.dv8tion.jda.api.entities.AudioChannel;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
 import net.dv8tion.jda.api.managers.AudioManager;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
 public class DiscordUtils {
 
@@ -28,14 +29,14 @@ public class DiscordUtils {
         guild.getAudioManager().closeAudioConnection();
     }
 
-    public static Message sendMessage(String content, TextChannel text) {
-        Message message = new MessageBuilder(content).build();
+    public static MessageCreateData sendMessage(String content, TextChannel text) {
+        MessageCreateData message = new MessageCreateBuilder().addContent(content).build();
         text.sendMessage(message).queue();
         return message;
     }
 
-    public static <T> Message sendMessage(String content, Consumer<? super Message> consumer, TextChannel text) {
-        Message message = new MessageBuilder(content).build();
+    public static <T> MessageCreateData sendMessage(String content, Consumer<? super Message> consumer, TextChannel text) {
+        MessageCreateData message = new MessageCreateBuilder().addContent(content).build();
         text.sendMessage(message).queue(consumer);
         return message;
     }

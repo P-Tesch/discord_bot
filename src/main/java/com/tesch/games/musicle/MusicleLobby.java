@@ -51,7 +51,7 @@ public class MusicleLobby {
             return;
         }
         if (this.players.size() == 0) {
-            event.editMessage("Time's up").queue(msg -> event.getMessage().editMessageEmbeds().setActionRows().queue());
+            event.editMessage("Time's up").queue(msg -> event.getMessage().editMessageEmbeds().setComponents().queue());
         }
         if (this.selections.keySet().contains(event.getUser())) {
             return;
@@ -78,7 +78,7 @@ public class MusicleLobby {
         });
         Arrays.asList(this.manager.getAnswers()).forEach(x -> builder.append(x + "\n"));
         builder.append("\nTitle: " + this.manager.getMusicPlayer().getAudioPlayer().getPlayingTrack().getInfo().title);
-        event.editMessage(builder.toString()).queue(msg -> event.getMessage().editMessageEmbeds().setActionRows().queue());
+        event.editMessage(builder.toString()).queue(msg -> event.getMessage().editMessageEmbeds().setComponents().queue());
         this.manager.stop();
     }
 }

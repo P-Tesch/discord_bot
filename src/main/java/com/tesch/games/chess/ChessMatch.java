@@ -12,8 +12,8 @@ import com.tesch.games.chess.pieces.Queen;
 import com.tesch.games.chess.pieces.Rook;
 import com.tesch.managers.ChessManager;
 
-import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 

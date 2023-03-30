@@ -11,20 +11,21 @@ import com.tesch.music.MusicPlayerChannelResultHandler;
 import com.tesch.utils.TaskScheduler;
 
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.MessageHistory;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
 
 public class PlayerChannelManager extends MusicManager {
 
-    public static final String CHANNEL_NAME = "musica";
+    public static final String CHANNEL_NAME = "musica-test";
 
     private TaskScheduler scheduler;
     private TextChannel text;
@@ -53,7 +54,7 @@ public class PlayerChannelManager extends MusicManager {
         embedBuilder.setColor(new Color(255, 51, 153));
         MessageEmbed embed = embedBuilder.build();
 
-        MessageBuilder messageBuilder = new MessageBuilder();
+        MessageCreateBuilder messageBuilder = new MessageCreateBuilder();
         messageBuilder.setEmbeds(embed);
 
         this.embedMessage = text.sendMessage(messageBuilder.build()).complete();
@@ -117,9 +118,9 @@ public class PlayerChannelManager extends MusicManager {
         AudioTrack playing = this.getMusicPlayer().getAudioPlayer().getPlayingTrack();
         updatePlayerImage(playing);
 
-        MessageBuilder messageBuilder = new MessageBuilder();
+        MessageEditBuilder messageBuilder = new MessageEditBuilder();
         messageBuilder.setEmbeds(this.embedBuilder.build());
-        messageBuilder.setActionRows(this.buildButtons());
+        messageBuilder.setComponents(this.buildButtons());
         embedMessage.editMessage(messageBuilder.build()).queue(); 
     }
 
@@ -143,9 +144,9 @@ public class PlayerChannelManager extends MusicManager {
         this.embedBuilder.setImage(null);
         this.embedBuilder.setDescription(queueString);
 
-        MessageBuilder messageBuilder = new MessageBuilder();
+        MessageEditBuilder messageBuilder = new MessageEditBuilder();
         messageBuilder.setEmbeds(this.embedBuilder.build());
-        messageBuilder.setActionRows(this.buildButtons());
+        messageBuilder.setComponents(this.buildButtons());
         embedMessage.editMessage(messageBuilder.build()).queue(); 
     }
 

@@ -5,10 +5,11 @@ import com.tesch.games.Position;
 import com.tesch.games.tictactoe.TicTacToeBoard;
 import com.tesch.utils.DiscordUtils;
 
-import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.utils.messages.MessageEditData;
 
 public class TicTacToeManager {
 
@@ -37,13 +38,13 @@ public class TicTacToeManager {
         this.board = new TicTacToeBoard(this.players);
 
         this.inGame = true;
-        event.getChannel().sendMessage(this.board.getBoardAsMessage()).queue();
+        event.getChannel().sendMessage(this.board.getBoardAsMessageCreateData()).queue();
     }
 
     public void onButtonInteraction(ButtonInteractionEvent event) {
         try {
             this.board.makeMove(new Position(event.getButton().getId().split("_")[1]), event.getUser());
-            event.editMessage(this.board.getBoardAsMessage()).queue();
+            event.editMessage(MessageEditData.fromCreateData(this.board.getBoardAsMessageCreateData())).queue();
             if (this.board.getFinished() == true) {
                 this.clear();
             }

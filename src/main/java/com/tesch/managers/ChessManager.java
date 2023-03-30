@@ -10,10 +10,11 @@ import com.tesch.games.chess.ChessMatch;
 import com.tesch.games.chess.ChessPosition;
 import com.tesch.utils.DiscordUtils;
 
-import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.utils.FileUpload;
 
 public class ChessManager {
 
@@ -125,6 +126,6 @@ public class ChessManager {
     }
 
     private void printBoard(TextChannel channel, ChessMatch match) {
-        channel.sendFile(match.getChessBoard().getBoardAsByteArray(match.getSelectedPiece() == null ? null : match.getSelectedPiece().possibleMoves()), "board.png").queue(x -> x.editMessage(match.getChessBoard().getBoardAsMessage()).queue());
+        channel.sendFiles(FileUpload.fromData(match.getChessBoard().getBoardAsByteArray(match.getSelectedPiece() == null ? null : match.getSelectedPiece().possibleMoves()), "board.png")).addContent(match.getChessBoard().getBoardAsMessageCreateData().getContent()).queue();
     }
 }

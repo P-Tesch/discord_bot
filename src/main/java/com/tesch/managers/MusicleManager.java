@@ -20,8 +20,8 @@ import com.tesch.utils.DiscordUtils;
 import com.tesch.utils.MiscUtils;
 import com.tesch.utils.TaskScheduler;
 
-import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -225,7 +225,7 @@ public class MusicleManager {
             return;
         }
         if (this.player == null) {
-            event.editMessage("Time's up").queue(msg -> event.getMessage().editMessageEmbeds().setActionRows().queue());
+            event.editMessage("Time's up").queue(msg -> event.getMessage().editMessageEmbeds().setComponents().queue());
         }
         if (event.getUser() == this.player) {
             int selected = Integer.parseInt(event.getButton().getId().split("_")[1]);
@@ -242,7 +242,7 @@ public class MusicleManager {
                 this.playerScore.get(this.player).addLoss();
             }
             builder.append("\nTitle: " + this.musicPlayer.getAudioPlayer().getPlayingTrack().getInfo().title);
-            event.editMessage(builder.toString()).queue(msg -> event.getMessage().editMessageEmbeds().setActionRows().queue());
+            event.editMessage(builder.toString()).queue(msg -> event.getMessage().editMessageEmbeds().setComponents().queue());
             this.stop();
         }
     }

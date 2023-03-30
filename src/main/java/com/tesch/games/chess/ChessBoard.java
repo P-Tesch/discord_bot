@@ -24,9 +24,9 @@ import com.tesch.games.chess.pieces.Pawn;
 import com.tesch.games.chess.pieces.Queen;
 import com.tesch.games.chess.pieces.Rook;
 
-import net.dv8tion.jda.api.MessageBuilder;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
 public class ChessBoard extends Board {
 
@@ -59,16 +59,16 @@ public class ChessBoard extends Board {
     }
 
     @Override
-    public Message getBoardAsMessage() {
-        MessageBuilder message = new MessageBuilder();
+    public MessageCreateData getBoardAsMessageCreateData() {
+        MessageCreateBuilder message = new MessageCreateBuilder();
         this.getPlayers().keySet().forEach(x -> message.mentionUsers(x.getIdLong()));
         if (this.match.getWinner() != null) {
             message.setContent("Winner: ");
-            message.append(this.getPlayers().entrySet().stream().filter(x -> x.getValue() == this.match.getWinner().getTeam()).toList().get(0).getKey().getAsMention());
+            message.addContent(this.getPlayers().entrySet().stream().filter(x -> x.getValue() == this.match.getWinner().getTeam()).toList().get(0).getKey().getAsMention());
         }
         else {
             message.setContent("Player: ");
-            message.append(match.getCurrentPlayerAsMention());
+            message.addContent(match.getCurrentPlayerAsMention());
         }
 
         return message.build();

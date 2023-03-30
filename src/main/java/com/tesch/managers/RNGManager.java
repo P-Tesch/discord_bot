@@ -6,7 +6,7 @@ import java.util.List;
 import com.tesch.utils.DiscordUtils;
 import com.tesch.utils.MiscUtils;
 
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class RNGManager {

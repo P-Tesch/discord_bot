@@ -10,11 +10,11 @@ import com.tesch.games.Piece;
 import com.tesch.games.Position;
 import com.tesch.games.Teams;
 
-import net.dv8tion.jda.api.MessageBuilder;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
 public class TicTacToeBoard extends Board {
 
@@ -52,7 +52,8 @@ public class TicTacToeBoard extends Board {
         this.finished = finished;
     }
 
-    public Message getBoardAsMessage() {
+    @Override
+    public MessageCreateData getBoardAsMessageCreateData() {
         List<Button> buttons = new ArrayList<>();
         for (int i = 0; i < this.getBoard().length; i++) {
             for (int j = 0; j < this.getBoard().length; j++) {
@@ -64,18 +65,18 @@ public class TicTacToeBoard extends Board {
                 }
             }
         }
-        MessageBuilder message = new MessageBuilder();
+        MessageCreateBuilder message = new MessageCreateBuilder();
         this.getPlayers().keySet().forEach(x -> message.mentionUsers(x.getIdLong()));
         if (this.getWin() != null) {
             message.setContent("Winner: ");
-            message.append(this.getPlayers().entrySet().stream().filter(x -> x.getValue() == this.getWin()).toList().get(0).getKey().getAsMention());
+            message.addContent(this.getPlayers().entrySet().stream().filter(x -> x.getValue() == this.getWin()).toList().get(0).getKey().getAsMention());
         }
         else {
             message.setContent("Player: ");
-            message.append(this.getPlayers().entrySet().stream().filter(x -> x.getValue() == this.getCurrentPlayer()).toList().get(0).getKey().getAsMention());
+            message.addContent(this.getPlayers().entrySet().stream().filter(x -> x.getValue() == this.getCurrentPlayer()).toList().get(0).getKey().getAsMention());
         }
         
-        message.setActionRows(
+        message.setComponents(
             ActionRow.of(buttons.stream().filter(x -> Integer.parseInt(x.getId().split("_")[1].split(" ")[0]) == 0).toList()),
             ActionRow.of(buttons.stream().filter(x -> Integer.parseInt(x.getId().split("_")[1].split(" ")[0]) == 1).toList()),
             ActionRow.of(buttons.stream().filter(x -> Integer.parseInt(x.getId().split("_")[1].split(" ")[0]) == 2).toList())
