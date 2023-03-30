@@ -184,7 +184,7 @@ public class MusicPlayer {
     }
 
     public void playFromSearch(String search, AudioLoadResultHandler resultHandler) {
-        BasicAudioPlaylist songs = (BasicAudioPlaylist) youtubeSearch.loadSearchResult(search, info -> new YoutubeAudioTrack(info, new YoutubeAudioSourceManager()));
+        BasicAudioPlaylist songs = (BasicAudioPlaylist) youtubeSearch.loadSearchResult(search, info -> new YoutubeAudioTrack(info, new YoutubeAudioSourceManager(true, System.getenv("BOT_GMAIL"), "BOT_GMAIL_PASSWORD")));
         AudioTrack song = songs.getTracks().get(0);
         
         playerManager.loadItem(song.getInfo().uri, resultHandler);

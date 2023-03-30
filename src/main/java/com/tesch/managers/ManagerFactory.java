@@ -2,6 +2,7 @@ package com.tesch.managers;
 
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
+import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
 import com.tesch.music.MusicPlayer;
 
 import net.dv8tion.jda.api.entities.Guild;
@@ -16,6 +17,7 @@ public class ManagerFactory {
 
     public DefaultAudioPlayerManager buildAudioPlayerManager() {
         DefaultAudioPlayerManager playerManager = new DefaultAudioPlayerManager();
+        playerManager.registerSourceManager(new YoutubeAudioSourceManager(true, System.getenv("BOT_GMAIL"), "BOT_GMAIL_PASSWORD"));
         AudioSourceManagers.registerRemoteSources(playerManager);
         return playerManager;
     }
