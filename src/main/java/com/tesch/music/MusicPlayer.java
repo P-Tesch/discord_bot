@@ -28,12 +28,14 @@ public class MusicPlayer {
     private YoutubeSearchProvider youtubeSearch;
     private boolean musicleMode;
     private Guild guild;
+    private YoutubeAudioSourceManager youtubeSource;
     
     public MusicPlayer(AudioPlayerManager playerManager, MusicQueue queue, YoutubeSearchProvider youtubeSearch, Guild guild) {
         this.guild = guild;
         this.playerManager = playerManager;
         this.queue = queue;
         this.youtubeSearch = youtubeSearch;
+        this.youtubeSource = new YoutubeAudioSourceManager(true, System.getenv("BOT_GMAIL"), System.getenv("BOT_GMAIL_PASSWORD"));
 
         this.audioPlayer = this.playerManager.createPlayer();
 
@@ -184,7 +186,7 @@ public class MusicPlayer {
     }
 
     public void playFromSearch(String search, AudioLoadResultHandler resultHandler) {
-        BasicAudioPlaylist songs = (BasicAudioPlaylist) youtubeSearch.loadSearchResult(search, info -> new YoutubeAudioTrack(info, new YoutubeAudioSourceManager(true, System.getenv("BOT_GMAIL"), "BOT_GMAIL_PASSWORD")));
+        BasicAudioPlaylist songs = (BasicAudioPlaylist) youtubeSearch.loadSearchResult(search, info -> new YoutubeAudioTrack(info, this.youtubeSource));
         AudioTrack song = songs.getTracks().get(0);
         
         playerManager.loadItem(song.getInfo().uri, resultHandler);

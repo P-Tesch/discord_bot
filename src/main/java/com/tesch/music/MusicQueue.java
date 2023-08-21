@@ -14,6 +14,7 @@ import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrackState;
 import com.tesch.managers.PlayerChannelManager;
 import com.tesch.utils.MiscUtils;
 
@@ -39,9 +40,6 @@ public class MusicQueue extends AudioEventAdapter{
 
     public void setLoop(boolean loop) {
         this.loop = loop;
-        if (this.loop) {
-            this.addToPlaylist(player.getPlayingTrack());
-        }
     }
 
     public void setPlayer(AudioPlayer player) {
@@ -91,6 +89,11 @@ public class MusicQueue extends AudioEventAdapter{
     }
     
     public void playNextTrack(Boolean skip) {
+        AudioTrack playingTrack = this.player.getPlayingTrack();
+        if (this.loop && playingTrack != null && (playingTrack.getState() == AudioTrackState.FINISHED || skip)) {
+            this.playlist.offer(playingTrack.makeClone());
+        }
+
         if (this.playlist.isEmpty()) {
             if (skip) {
                 player.stopTrack();
@@ -98,13 +101,11 @@ public class MusicQueue extends AudioEventAdapter{
             this.playerChannelManager.updatePlayer();
             return;
         }
+
         if (player.startTrack(playlist.peek().makeClone(), !skip)) {
             AudioTrack toPlay = playlist.poll();
             if (playerChannelManager != null) {
                 playerChannelManager.updatePlayer(null, null);
-            }
-            if (loop) {
-                playlist.offer(toPlay);
             }
             else {
                 this.unshuffledPlaylist.remove(toPlay);
