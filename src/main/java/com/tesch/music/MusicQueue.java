@@ -14,7 +14,6 @@ import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
-import com.sedmelluq.discord.lavaplayer.track.AudioTrackState;
 import com.tesch.managers.PlayerChannelManager;
 import com.tesch.utils.MiscUtils;
 
@@ -84,14 +83,15 @@ public class MusicQueue extends AudioEventAdapter{
     public void addToPlaylist(AudioTrack track) {
         if (!this.playlist.contains(track)) {
             playlist.offer(track);
-            this.playNextTrack(false);
+            if (this.player.getPlayingTrack() == null) {
+                this.playNextTrack(false);
+            }
         }
     }
     
     public void playNextTrack(Boolean skip) {
-        AudioTrack playingTrack = this.player.getPlayingTrack();
-        if (this.loop && playingTrack != null && (playingTrack.getState() == AudioTrackState.FINISHED || skip)) {
-            this.playlist.offer(playingTrack.makeClone());
+        if (loop && skip && this.player.getPlayingTrack() != null) {
+            this.addToPlaylist(this.player.getPlayingTrack().makeClone());
         }
 
         if (this.playlist.isEmpty()) {
@@ -139,6 +139,9 @@ public class MusicQueue extends AudioEventAdapter{
             this.playedPlaylist.push(track);
         }
         if (endReason.mayStartNext) {
+            if (this.loop) {
+                this.addToPlaylist(track.makeClone());
+            }
             this.playNextTrack(false);
         }
     }
