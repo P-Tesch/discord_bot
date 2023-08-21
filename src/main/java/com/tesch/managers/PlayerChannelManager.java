@@ -25,7 +25,7 @@ import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
 
 public class PlayerChannelManager extends MusicManager {
 
-    public static final String CHANNEL_NAME = "musica-test";
+    public static final String CHANNEL_NAME = "musica";
 
     private TaskScheduler scheduler;
     private TextChannel text;
