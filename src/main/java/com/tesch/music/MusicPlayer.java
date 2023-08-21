@@ -1,10 +1,17 @@
 package com.tesch.music;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
+import org.apache.hc.core5.http.ParseException;
+
+import com.neovisionaries.i18n.CountryCode;
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
@@ -18,6 +25,12 @@ import com.tesch.utils.DiscordUtils;
 
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
+import se.michaelthelin.spotify.SpotifyApi;
+import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
+import se.michaelthelin.spotify.model_objects.specification.Paging;
+import se.michaelthelin.spotify.model_objects.specification.PlaylistTrack;
+import se.michaelthelin.spotify.model_objects.specification.Track;
+import se.michaelthelin.spotify.requests.authorization.client_credentials.ClientCredentialsRequest;
 
 
 public class MusicPlayer {
@@ -29,6 +42,7 @@ public class MusicPlayer {
     private boolean musicleMode;
     private Guild guild;
     private YoutubeAudioSourceManager youtubeSource;
+    private SpotifyApi spotifyApi;
     
     public MusicPlayer(AudioPlayerManager playerManager, MusicQueue queue, YoutubeSearchProvider youtubeSearch, Guild guild) {
         this.guild = guild;
@@ -36,6 +50,12 @@ public class MusicPlayer {
         this.queue = queue;
         this.youtubeSearch = youtubeSearch;
         this.youtubeSource = new YoutubeAudioSourceManager(true, System.getenv("BOT_GMAIL"), System.getenv("BOT_GMAIL_PASSWORD"));
+
+        try {
+            spotifyApi = new SpotifyApi.Builder().setClientId(System.getenv("SPOTIFY_CLIENT_ID")).setClientSecret(System.getenv("SPOTIFY_CLIENT_SECRET")).setRedirectUri(new URI("https://github.com/P-Tesch/discord_bot")).build();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
 
         this.audioPlayer = this.playerManager.createPlayer();
 
@@ -76,7 +96,12 @@ public class MusicPlayer {
         DiscordUtils.connectToVoice(new MusicPlayerSendHandler(audioPlayer), this.guild, channel);
 
         if (this.isUrl(message)) {
-            this.playFromUrl(message, resultHandler);
+            if (this.isSpotify(message)) {
+                this.playFromSpotify(message, resultHandler);
+            }
+            else {
+                this.playFromUrl(message, resultHandler);
+            }
         }
         else {
             this.playFromSearch(message, resultHandler);
@@ -181,6 +206,10 @@ public class MusicPlayer {
         }
     }
 
+    private boolean isSpotify(String test) {
+        return test.contains("open.spotify.com");
+    }
+
     public void playFromUrl(String url, AudioLoadResultHandler resultHandler) {
         playerManager.loadItem(url, resultHandler);
     }
@@ -190,5 +219,42 @@ public class MusicPlayer {
         AudioTrack song = songs.getTracks().get(0);
         
         playerManager.loadItem(song.getInfo().uri, resultHandler);
+    }
+
+    public void playFromSpotify(String search, AudioLoadResultHandler resultHandler) {
+        try {
+            this.updateSpotifyAccessToken();
+            String playlistId = search.replace("https://open.spotify.com/playlist/", "").split("[?]")[0];
+            Integer total = this.spotifyApi.getPlaylist(playlistId).build().execute().getTracks().getTotal();
+            Integer offset = 0;
+            do {
+                Paging<PlaylistTrack> tracks = this.spotifyApi.getPlaylistsItems(playlistId).market(CountryCode.BR).offset(offset).build().execute();
+                total -= tracks.getLimit();
+                offset += tracks.getLimit() + 1;
+                Stream.of(tracks.getItems()).forEach(item -> {
+                    Track track = (Track) item.getTrack();
+                    StringBuffer stringBuffer = new StringBuffer();
+                    stringBuffer.append(track.getName());
+                    stringBuffer.append(" ");
+                    stringBuffer.append(track.getArtists()[0].getName());
+                    stringBuffer.append(" ");
+                    stringBuffer.append(track.getAlbum().getName());
+                    this.queue.addToPlaylist(((BasicAudioPlaylist) youtubeSearch.loadSearchResult(stringBuffer.toString(), info -> new YoutubeAudioTrack(info, this.youtubeSource))).getTracks().get(0));
+                });
+            } while (total > 0);
+        } 
+        catch (ParseException | SpotifyWebApiException | IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void updateSpotifyAccessToken() {
+        try {
+        ClientCredentialsRequest clientCredentialsRequest = this.spotifyApi.clientCredentials().build();
+            this.spotifyApi.setAccessToken(clientCredentialsRequest.execute().getAccessToken());
+        } 
+        catch (ParseException | SpotifyWebApiException | IOException e) {
+            e.printStackTrace();
+        }
     }
 }
