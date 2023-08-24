@@ -3,6 +3,8 @@ package com.tesch.managers;
 import java.util.Arrays;
 import java.util.Collection;
 import java.awt.Color;
+import java.io.IOException;
+import java.net.URL;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.tesch.exceptions.MusicleException;
@@ -15,6 +17,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.MessageHistory;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -97,14 +100,26 @@ public class PlayerChannelManager extends MusicManager {
     private void updatePlayerImage(AudioTrack playing) {
         if (playing == null) {
             embedBuilder.setImage("https://i.ytimg.com/vi/p3orUcVWn6Q/maxresdefault.jpg");
+            this.embedBuilder.setTitle("A mimir");
+            this.embedBuilder.setThumbnail("https://media.tenor.com/NWW1Za3Xeu4AAAAj/neco-arc-neco.gif");
             this.embedBuilder.setDescription("");
             return;
         }
 
         String videoId = playing.getInfo().uri.split("=")[1];
-        String thumbURL = "http://img.youtube.com/vi/" + videoId + "/0.jpg";
+        String thumbURL = "http://img.youtube.com/vi/" + videoId + "/hq720.jpg";
+        try {
+            URL thumbAsURL = new URL(thumbURL);
+            thumbAsURL.getContent().toString();
+        } 
+        catch (IOException e) {
+            thumbURL = "http://img.youtube.com/vi/" + videoId + "/0.jpg";
+        }
+
         this.embedBuilder.setImage(thumbURL);
-        this.embedBuilder.setDescription(playing.getInfo().title);
+        this.embedBuilder.setThumbnail("https://media.tenor.com/Vb3g5JF3MB4AAAAj/neco-arc-taunt.gif");
+        this.embedBuilder.setTitle(playing.getInfo().title, playing.getInfo().uri);
+        this.embedBuilder.setDescription(playing.getInfo().author + "\n\nRequested by: " + ((User)playing.getUserData()).getAsMention());
     }
 
     public void updatePlayer() {
@@ -164,7 +179,7 @@ public class PlayerChannelManager extends MusicManager {
         event.getMessage().delete().queue();
 
         try {
-            this.getMusicPlayer().play(event.getMember().getVoiceState().getChannel(), message, new MusicPlayerChannelResultHandler(this.getMusicPlayer().getQueue(), this));
+            this.getMusicPlayer().play(event.getMember(), message, new MusicPlayerChannelResultHandler(this.getMusicPlayer().getQueue(), this));
         }
         catch (MusicleException e) {
             this.setFooter(e.getMessage(), 5);

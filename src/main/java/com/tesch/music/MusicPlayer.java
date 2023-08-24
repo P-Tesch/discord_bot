@@ -24,6 +24,7 @@ import com.tesch.exceptions.MusicleException;
 import com.tesch.utils.DiscordUtils;
 
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
@@ -88,10 +89,13 @@ public class MusicPlayer {
         this.musicleMode = mode;
     }
 
-    public void play(AudioChannel channel, String message, AudioLoadResultHandler resultHandler) {
+    public void play(Member member, String message, AudioLoadResultHandler resultHandler) {
         if (this.musicleMode) {
             throw new MusicleException("wait for musicle to finish");
         }
+
+        AudioChannel channel = member.getVoiceState().getChannel();
+        ((MusicResultHandler) resultHandler).setLastRequester(member.getUser());
 
         DiscordUtils.connectToVoice(new MusicPlayerSendHandler(audioPlayer), this.guild, channel);
 
@@ -230,7 +234,7 @@ public class MusicPlayer {
             do {
                 Paging<PlaylistTrack> tracks = this.spotifyApi.getPlaylistsItems(playlistId).market(CountryCode.BR).offset(offset).build().execute();
                 total -= tracks.getLimit();
-                offset += tracks.getLimit() + 1;
+                offset += offset == 0 ? tracks.getLimit() + 1 : tracks.getLimit();
                 Stream.of(tracks.getItems()).forEach(item -> {
                     Track track = (Track) item.getTrack();
                     StringBuffer stringBuffer = new StringBuffer();
@@ -239,9 +243,10 @@ public class MusicPlayer {
                     stringBuffer.append(track.getArtists()[0].getName());
                     stringBuffer.append(" ");
                     stringBuffer.append(track.getAlbum().getName());
-                    this.queue.addToPlaylist(((BasicAudioPlaylist) youtubeSearch.loadSearchResult(stringBuffer.toString(), info -> new YoutubeAudioTrack(info, this.youtubeSource))).getTracks().get(0));
-                });
+                    playerManager.loadItem(((BasicAudioPlaylist) youtubeSearch.loadSearchResult(stringBuffer.toString(), info -> new YoutubeAudioTrack(info, this.youtubeSource))).getTracks().get(0).getInfo().uri, resultHandler);
+               });
             } while (total > 0);
+            this.queue.getPlayerChannelManager().setFooter("Loaded playlist from spotify", 5);
         } 
         catch (ParseException | SpotifyWebApiException | IOException e) {
             e.printStackTrace();

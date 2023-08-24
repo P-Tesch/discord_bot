@@ -22,7 +22,7 @@ public class ChatMusicManager extends MusicManager {
         TextChannel text = event.getChannel().asTextChannel();
 
         try {
-            this.getMusicPlayer().play(event.getMember().getVoiceState().getChannel(), message, new MusicChatResultHandler(text, this.getMusicPlayer().getQueue()));
+            this.getMusicPlayer().play(event.getMember(), message, new MusicChatResultHandler(text, this.getMusicPlayer().getQueue()));
         }
         catch (MusicleException e) {
             DiscordUtils.sendMessage(e.getMessage(), text);

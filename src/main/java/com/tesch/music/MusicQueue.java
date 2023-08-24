@@ -53,6 +53,10 @@ public class MusicQueue extends AudioEventAdapter{
         this.playerChannelManager = playerChannelManager;
     }
 
+    public PlayerChannelManager getPlayerChannelManager() {
+        return this.playerChannelManager;
+    }
+
     public boolean isShuffled() {
         return !this.unshuffledPlaylist.isEmpty();
     }
