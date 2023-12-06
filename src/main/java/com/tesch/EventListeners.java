@@ -93,6 +93,7 @@ public class EventListeners extends ListenerAdapter {
                 break;
             case "musicle":
                 manager.getMusicleManager().onMusicleCommand(event);
+                break;
             case "score":
                 manager.getBotuserManager().onScoreCommand(event);
                 break;
