@@ -49,6 +49,7 @@ public class TriviaManager extends QuizManager{
                 return topic;
             }
         }
-        return topics.get((int)(Math.random() * (topics.size() - 1)));
+        
+        return topics.get(Math.toIntExact(Math.round(Math.random() * (topics.size() - 1))));
     }
 }

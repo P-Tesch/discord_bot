@@ -95,8 +95,10 @@ public class EventListeners extends ListenerAdapter {
                 manager.getMusicleManager().onMusicleCommand(event);
             case "score":
                 manager.getBotuserManager().onScoreCommand(event);
+                break;
             case "trivia":
                 manager.getTriviaManager().onTriviaCommand(event);
+                break;
         }
     }
 

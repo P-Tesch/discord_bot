@@ -101,7 +101,7 @@ public class MusicleManager extends QuizManager {
                 return genre;
             }
         }
-        return genres.get((int)(Math.random() * (genres.size() - 1)));
+        return genres.get(Math.toIntExact(Math.round(Math.random() * (genres.size() - 1))));
     }
 
     public void stop() {
