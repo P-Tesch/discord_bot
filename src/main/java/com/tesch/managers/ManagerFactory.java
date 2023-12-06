@@ -4,6 +4,7 @@ import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
 import com.tesch.games.quiz.musicle.MusicleManager;
+import com.tesch.games.quiz.trivia.TriviaManager;
 import com.tesch.music.MusicPlayer;
 
 import net.dv8tion.jda.api.entities.Guild;
@@ -53,5 +54,9 @@ public class ManagerFactory {
 
     public BotuserManager buildBotuserManager() {
         return new BotuserManager();
+    }
+
+    public TriviaManager buildTriviaManager() {
+        return new TriviaManager();
     }
 }

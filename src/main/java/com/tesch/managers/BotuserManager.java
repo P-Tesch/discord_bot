@@ -17,7 +17,9 @@ public class BotuserManager {
         
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Musicle total: " + score.getMusicleTotal() + "\n");
-        stringBuilder.append("Musicle Wins: " + score.getMusicleWin());
+        stringBuilder.append("Musicle Wins: " + score.getMusicleWin() + "\n");
+        stringBuilder.append("Trivia Total: " + score.getTriviaTotal() + "\n");
+        stringBuilder.append("Trivia Wins: " + score.getTriviaWin());
 
         DiscordUtils.sendMessage(stringBuilder.toString(), event.getChannel().asTextChannel());
     }

@@ -14,6 +14,7 @@ import com.tesch.db.entities.Score;
 import com.tesch.exceptions.InternalServerErrorException;
 import com.tesch.exceptions.NotFoundException;
 import com.tesch.games.quiz.musicle.MusicleManager;
+import com.tesch.games.quiz.trivia.TriviaManager;
 import com.tesch.db.entities.Item;
 
 public class GameRequester {
@@ -62,6 +63,12 @@ public class GameRequester {
                 botuser.getScore().setMusicleTotal(botuser.getScore().getMusicleTotal() + 1);
                 if (win) {
                     botuser.getScore().setMusicleWin(botuser.getScore().getMusicleWin() + 1);
+                }
+            }
+            if (gameManager == TriviaManager.class) {
+                botuser.getScore().setTriviaTotal(botuser.getScore().getTriviaTotal() + 1);
+                if (win) {
+                    botuser.getScore().setTriviaWin(botuser.getScore().getTriviaWin() + 1);
                 }
             }
 
