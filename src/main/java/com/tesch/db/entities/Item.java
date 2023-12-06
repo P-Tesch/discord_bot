@@ -2,20 +2,24 @@ package com.tesch.db.entities;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Genre {
+public class Item {
     
-    @JsonProperty("Genre_id")
+    @JsonProperty("Item_id")
     private Long id;
 
     @JsonProperty("Name")
     private String name;
 
-    public Genre() {
+    @JsonProperty("Description")
+    private String description;
+
+    public Item() {
     }
 
-    public Genre(Long id, String name) {
+    public Item(Long id, String name, String description) {
         this.id = id;
         this.name = name;
+        this.description = description;
     }
 
     public Long getId() {
@@ -32,7 +36,15 @@ public class Genre {
 
     public void setName(String name) {
         this.name = name;
-    } 
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
     @Override
     public int hashCode() {
@@ -40,6 +52,7 @@ public class Genre {
         int result = 1;
         result = prime * result + ((id == null) ? 0 : id.hashCode());
         result = prime * result + ((name == null) ? 0 : name.hashCode());
+        result = prime * result + ((description == null) ? 0 : description.hashCode());
         return result;
     }
 
@@ -51,7 +64,7 @@ public class Genre {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        Genre other = (Genre) obj;
+        Item other = (Item) obj;
         if (id == null) {
             if (other.id != null)
                 return false;
@@ -61,6 +74,11 @@ public class Genre {
             if (other.name != null)
                 return false;
         } else if (!name.equals(other.name))
+            return false;
+        if (description == null) {
+            if (other.description != null)
+                return false;
+        } else if (!description.equals(other.description))
             return false;
         return true;
     }

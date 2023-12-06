@@ -2,18 +2,18 @@ package com.tesch.db.entities;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Genre {
+public class Interpreter {
     
-    @JsonProperty("Genre_id")
+    @JsonProperty("Interpreter_id")
     private Long id;
 
     @JsonProperty("Name")
     private String name;
 
-    public Genre() {
+    public Interpreter() {
     }
 
-    public Genre(Long id, String name) {
+    public Interpreter(Long id, String name) {
         this.id = id;
         this.name = name;
     }
@@ -32,7 +32,7 @@ public class Genre {
 
     public void setName(String name) {
         this.name = name;
-    } 
+    }
 
     @Override
     public int hashCode() {
@@ -51,7 +51,7 @@ public class Genre {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        Genre other = (Genre) obj;
+        Interpreter other = (Interpreter) obj;
         if (id == null) {
             if (other.id != null)
                 return false;
@@ -63,7 +63,7 @@ public class Genre {
         } else if (!name.equals(other.name))
             return false;
         return true;
-    }
+    }   
 
     @Override
     public String toString() {

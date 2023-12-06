@@ -3,9 +3,6 @@ package com.tesch;
 import java.util.Arrays;
 import java.util.List;
 
-import com.tesch.db.HTTPHandler;
-import com.tesch.db.MusicleRequester;
-
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
@@ -15,9 +12,6 @@ public class Main {
 
     public static void main(String[] args) {
 
-        MusicleRequester.getAllGenres().forEach(System.out::println);
-
-        /*
         // https://github.com/DV8FromTheWorld/JDA/issues/1858 -> needed for fly.io single core
         final int cores = Runtime.getRuntime().availableProcessors();
         if (cores <= 1) {
@@ -58,6 +52,5 @@ public class Main {
             GatewayIntent.GUILD_WEBHOOKS,
             GatewayIntent.MESSAGE_CONTENT
             );
-            */
     }
 }

@@ -92,16 +92,9 @@ public class EventListeners extends ListenerAdapter {
                 manager.getChessManager().onChessCommand(event);
                 break;
             case "musicle":
-                try {
-                    manager.getMusicleManager().onMusicleCommand(event);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                break;
-            default:
-                if (manager.getChessManager().userIsInMatch(event.getAuthor())) {
-                    manager.getChessManager().onMoveCommand(event);
-                }
+                manager.getMusicleManager().onMusicleCommand(event);
+            case "score":
+                manager.getBotuserManager().onScoreCommand(event);
         }
     }
 
