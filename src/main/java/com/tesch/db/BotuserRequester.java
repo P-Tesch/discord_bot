@@ -17,7 +17,71 @@ import com.tesch.games.quiz.musicle.MusicleManager;
 import com.tesch.games.quiz.trivia.TriviaManager;
 import com.tesch.db.entities.Item;
 
-public class GameRequester {
+public class BotuserRequester {
+
+    public static Botuser getBotuser(Long discordId) {
+         try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            String getResponse = HTTPHandler.executeRequest("GET", "botusers/?discord_id=" + discordId);
+            Botuser botuser = objectMapper.readValue(getResponse, Botuser[].class)[0];
+
+            return botuser;
+
+        } catch (UnexpectedException e) {
+            e.printStackTrace();
+        } catch (NotFoundException e) {
+            e.printStackTrace();
+        } catch (InternalServerErrorException e) {
+            e.printStackTrace();
+        } catch (JsonMappingException e) {
+            e.printStackTrace();
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public static void updateUserCurrency(Long discordId, Integer difference) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            String getResponse = HTTPHandler.executeRequest("GET", "botusers/?discord_id=" + discordId);
+            Botuser botuser = objectMapper.readValue(getResponse, Botuser[].class)[0];
+            if (botuser.getItems().size() == 1 && botuser.getItems().get(0).getId() == null) {
+                botuser.setItems(new ArrayList<>());
+            }
+
+            if (botuser.getCurrency() + difference < 0) {
+                throw new IllegalStateException("User doesn't has enough currency");
+            }
+
+            botuser.setCurrency(botuser.getCurrency() + difference);
+            StringWriter writer = new StringWriter();
+            objectMapper.writeValue(writer, botuser);
+            HTTPHandler.executeRequest("PUT", "botusers/", writer.toString());
+
+        } catch (UnexpectedException e) {
+            e.printStackTrace();
+        } catch (NotFoundException e) {
+            e.printStackTrace();
+        } catch (InternalServerErrorException e) {
+            e.printStackTrace();
+        } catch (JsonMappingException e) {
+            e.printStackTrace();
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void transferCurrency(Long discordIdSender, Long discordIdReceiver, Integer amount) {
+        if (amount <= 0) {
+            throw new IllegalStateException("Invalid amount");
+        }
+        updateUserCurrency(discordIdSender, amount * -1);
+        updateUserCurrency(discordIdReceiver, amount);
+    }
 
     public static void updateUserScore(Long discordId, Boolean win, Class<?> gameManager) {
         try {

@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import com.tesch.db.GameRequester;
+import com.tesch.db.BotuserRequester;
 import com.tesch.games.quiz.musicle.MusicleManager;
 
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -117,7 +117,11 @@ public class QuizLobby {
             stringBuilder.append((char)('A' + i) + ". " + this.answers.get(i));
             for (Entry<User, Integer> entry : this.playersAndSelections.entrySet()) {
                 if (entry.getValue() == i) {
-                    GameRequester.updateUserScore(entry.getKey().getIdLong(), answers.get(entry.getValue()) == answer, this.manager.getClass());
+                    boolean win = answers.get(entry.getValue()) == answer;
+                    BotuserRequester.updateUserScore(entry.getKey().getIdLong(), win, this.manager.getClass());
+                    if (win) {
+                        BotuserRequester.updateUserCurrency(entry.getKey().getIdLong(), 10);
+                    }
                     stringBuilder.append(" " + entry.getKey().getAsMention());
                 }
             }
