@@ -2,10 +2,17 @@ package com.tesch.db.entities;
 
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class EpicStoreGame {
     
+    @JsonProperty("title")
     private String title;
+
+    @JsonProperty("startDate")
     private LocalDate freeStartDate;
+
+    @JsonProperty("endDate")
     private LocalDate freeEndDate;
 
     public EpicStoreGame() {
