@@ -30,9 +30,9 @@ public class Main {
             .build()
             .awaitReady();
 
-            eventListeners.scheduleThursday(jda);
-
             System.out.println("[INFO] Logged as: " + jda.getSelfUser().getAsTag());
+
+            eventListeners.scheduleThursday(jda);
         }
         catch (Exception e) {
             System.out.println(e.getMessage());

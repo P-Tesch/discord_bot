@@ -174,7 +174,7 @@ public class EventListeners extends ListenerAdapter {
         LocalDateTime currentTime = LocalDateTime.now();
         LocalDateTime nextThursday = LocalDateTime.now().withHour(14).withMinute(0).withSecond(0).withNano(0);
         while (currentTime.until(nextThursday, ChronoUnit.SECONDS) <= 0 || nextThursday.getDayOfWeek() != DayOfWeek.THURSDAY) {
-            nextThursday.plusDays(1);
+            nextThursday = nextThursday.plusDays(1);
         }
         this.taskScheduler.scheduleOffList(() -> this.onThursdayAfternoon(jda), currentTime.until(nextThursday, ChronoUnit.SECONDS));
         
