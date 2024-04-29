@@ -14,6 +14,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -53,9 +54,9 @@ public class EpicGamesRequester {
             freeGames.forEach(game -> {
                 StringBuilder string = new StringBuilder();
                 string.append("```lua\n");
-                string.append("\"Jogo:\": " + game.getTitle().replace("'", "`") + "\n");
-                string.append("\"Lugar:\": Epic Games\n");
-                string.append("\"Período:\": Até " + game.getFreeEndDate().format(DateTimeFormatter.ofPattern("dd-LLLL")).replace("-", " de ") + "\n");
+                string.append("\"Jogo\": " + game.getTitle().replace("'", "`") + "\n");
+                string.append("\"Lugar\": Epic Games\n");
+                string.append("\"Período\": Até " + game.getFreeEndDate().format(DateTimeFormatter.ofPattern("dd-LLLL", new Locale("pt", "BR"))).replace("-", " de ") + "\n");
                 string.append("```");
                 messageString.add(string.toString());
             });

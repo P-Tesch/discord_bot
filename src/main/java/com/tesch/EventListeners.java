@@ -172,8 +172,8 @@ public class EventListeners extends ListenerAdapter {
 
     public void scheduleThursday(JDA jda) {
         LocalDateTime currentTime = LocalDateTime.now();
-        LocalDateTime nextThursday = LocalDateTime.now().withHour(14).withMinute(0).withSecond(0).withNano(0);
-        while (currentTime.until(nextThursday, ChronoUnit.SECONDS) <= 0 || nextThursday.getDayOfWeek() != DayOfWeek.THURSDAY) {
+        LocalDateTime nextThursday = LocalDateTime.now().withHour(18).withMinute(0).withSecond(0).withNano(0);
+        while (currentTime.until(nextThursday, ChronoUnit.HOURS) <= 0 || nextThursday.getDayOfWeek() != DayOfWeek.THURSDAY) {
             nextThursday = nextThursday.plusDays(1);
         }
         this.taskScheduler.scheduleOffList(() -> this.onThursdayAfternoon(jda), currentTime.until(nextThursday, ChronoUnit.SECONDS));
