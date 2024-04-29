@@ -11,7 +11,7 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 public class Main {
 
     public static void main(String[] args) {
-
+        
         // https://github.com/DV8FromTheWorld/JDA/issues/1858 -> needed for fly.io single core
         final int cores = Runtime.getRuntime().availableProcessors();
         if (cores <= 1) {
@@ -20,15 +20,19 @@ public class Main {
         }
 
         try {
+            EventListeners eventListeners = new EventListeners();
+
             JDA jda = JDABuilder
             .createDefault(System.getenv("DISCORD_TOKEN"))
             .enableIntents(getIntents())
             .setActivity(Activity.listening("Boate Azul"))
-            .addEventListeners(new EventListeners())
+            .addEventListeners(eventListeners)
             .build()
             .awaitReady();
 
             System.out.println("[INFO] Logged as: " + jda.getSelfUser().getAsTag());
+
+            eventListeners.scheduleThursday(jda);
         }
         catch (Exception e) {
             System.out.println(e.getMessage());

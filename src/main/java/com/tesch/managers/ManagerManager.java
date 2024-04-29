@@ -1,6 +1,8 @@
 package com.tesch.managers;
 
 import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeSearchProvider;
+import com.tesch.games.quiz.musicle.MusicleManager;
+import com.tesch.games.quiz.trivia.TriviaManager;
 import com.tesch.music.MusicPlayer;
 import com.tesch.music.MusicQueue;
 
@@ -15,6 +17,8 @@ public class ManagerManager extends GenericManager {
     private ChessManager chessManager;
     private PlayerChannelManager playerChannelManager;
     private ChatMusicManager chatMusicManager;
+    private BotuserManager botuserManager;
+    private TriviaManager triviaManager;
     
     public ManagerManager(Guild guild) {
         super(guild);
@@ -27,6 +31,8 @@ public class ManagerManager extends GenericManager {
         this.musicleManager = managerFactory.buildMusicleManager(musicPlayer);
         this.playerChannelManager = managerFactory.buildPlayerChannelManager(musicPlayer);
         this.chatMusicManager = managerFactory.buildChatMusicManager(musicPlayer);
+        this.botuserManager = managerFactory.buildBotuserManager();
+        this.triviaManager = managerFactory.buildTriviaManager();
     }
 
     public MusicleManager getMusicleManager() {
@@ -55,5 +61,13 @@ public class ManagerManager extends GenericManager {
 
     public ChatMusicManager getChatMusicManager() {
         return chatMusicManager;
+    }
+
+    public BotuserManager getBotuserManager() {
+        return botuserManager;
+    }
+
+    public TriviaManager getTriviaManager() {
+        return triviaManager;
     }
 }

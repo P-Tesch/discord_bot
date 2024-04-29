@@ -1,12 +1,18 @@
 package com.tesch;
 
+import java.time.DayOfWeek;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.tesch.db.EpicGamesRequester;
 import com.tesch.managers.ManagerManager;
 import com.tesch.managers.PlayerChannelManager;
+import com.tesch.utils.DiscordUtils;
 import com.tesch.utils.TaskScheduler;
 
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
 import net.dv8tion.jda.api.events.guild.GenericGuildEvent;
@@ -92,16 +98,20 @@ public class EventListeners extends ListenerAdapter {
                 manager.getChessManager().onChessCommand(event);
                 break;
             case "musicle":
-                try {
-                    manager.getMusicleManager().onMusicleCommand(event);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                manager.getMusicleManager().onMusicleCommand(event);
                 break;
-            default:
-                if (manager.getChessManager().userIsInMatch(event.getAuthor())) {
-                    manager.getChessManager().onMoveCommand(event);
-                }
+            case "score":
+                manager.getBotuserManager().onScoreCommand(event);
+                break;
+            case "trivia":
+                manager.getTriviaManager().onTriviaCommand(event);
+                break;
+            case "currency":
+                manager.getBotuserManager().onCurrencyCommand(event);
+                break;
+            case "pix":
+                manager.getBotuserManager().onPixCommand(event);
+                break;
         }
     }
 
@@ -149,7 +159,26 @@ public class EventListeners extends ListenerAdapter {
             case "playerchannel":
                 manager.getPlayerChannelManager().onButtonInteraction(event);
                 break;
+            case "trivia":
+                manager.getTriviaManager().onButtonInteraction(event);
+                break;
         }
+    }
+
+    private void onThursdayAfternoon(JDA jda) {
+        EpicGamesRequester.getFreeGames().forEach(message -> DiscordUtils.sendMessage(message, jda.getTextChannelById(568182843360935936L)));
+        this.scheduleThursday(jda);
+    }
+
+    public void scheduleThursday(JDA jda) {
+        LocalDateTime currentTime = LocalDateTime.now();
+        LocalDateTime nextThursday = LocalDateTime.now().withHour(18).withMinute(0).withSecond(0).withNano(0);
+        while (currentTime.until(nextThursday, ChronoUnit.HOURS) <= 0 || nextThursday.getDayOfWeek() != DayOfWeek.THURSDAY) {
+            nextThursday = nextThursday.plusDays(1);
+        }
+        this.taskScheduler.scheduleOffList(() -> this.onThursdayAfternoon(jda), currentTime.until(nextThursday, ChronoUnit.SECONDS));
+        
+        System.out.println("[INFO] Free game task scheduled to " + nextThursday.toString());
     }
 
     private ManagerManager RegisterGuildAndGetManager(GenericGuildEvent event) {

@@ -25,6 +25,10 @@ public class TaskScheduler {
         scheduledTasks.add(this.scheduler.schedule(runnable, time, TimeUnit.SECONDS));
     }
 
+    public void scheduleOffList(Runnable runnable, Long time) {
+        this.scheduler.schedule(runnable, time, TimeUnit.SECONDS);
+    }
+
     public void cancelTask(ScheduledFuture<?> task) {
         task.cancel(true);
     }
