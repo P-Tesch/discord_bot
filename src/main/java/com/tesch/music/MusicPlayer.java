@@ -212,6 +212,9 @@ public class MusicPlayer {
         catch (MalformedURLException e) {
             return false;
         }
+        catch (IllegalArgumentException e) {
+            return false;
+        }
     }
 
     private boolean isSpotify(String test) {

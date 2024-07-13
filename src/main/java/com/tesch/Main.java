@@ -23,7 +23,7 @@ public class Main {
             EventListeners eventListeners = new EventListeners();
 
             JDA jda = JDABuilder
-            .createDefault(System.getenv("DISCORD_TOKEN_TEST"))
+            .createDefault(System.getenv("DISCORD_TOKEN"))
             .enableIntents(getIntents())
             .setActivity(Activity.listening("Boate Azul"))
             .addEventListeners(eventListeners)
