@@ -2,11 +2,11 @@ package com.tesch.managers;
 
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
-import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
 import com.tesch.games.quiz.musicle.MusicleManager;
 import com.tesch.games.quiz.trivia.TriviaManager;
 import com.tesch.music.MusicPlayer;
 
+import dev.lavalink.youtube.YoutubeAudioSourceManager;
 import net.dv8tion.jda.api.entities.Guild;
 
 public class ManagerFactory {
@@ -17,10 +17,11 @@ public class ManagerFactory {
         this.guild = guild;
     }
 
+    @SuppressWarnings("deprecation")
     public DefaultAudioPlayerManager buildAudioPlayerManager() {
         DefaultAudioPlayerManager playerManager = new DefaultAudioPlayerManager();
-        playerManager.registerSourceManager(new YoutubeAudioSourceManager(true, System.getenv("BOT_GMAIL"), "BOT_GMAIL_PASSWORD"));
-        AudioSourceManagers.registerRemoteSources(playerManager);
+        playerManager.registerSourceManager(new YoutubeAudioSourceManager());
+        AudioSourceManagers.registerRemoteSources(playerManager, com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager.class);
         return playerManager;
     }
 

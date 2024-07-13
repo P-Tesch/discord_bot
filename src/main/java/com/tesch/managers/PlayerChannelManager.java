@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.awt.Color;
 import java.io.IOException;
 import java.net.URL;
+import java.net.URI;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.tesch.exceptions.MusicleException;
@@ -28,7 +29,7 @@ import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
 
 public class PlayerChannelManager extends MusicManager {
 
-    public static final String CHANNEL_NAME = "musica";
+    public static final String CHANNEL_NAME = "musica-test";
 
     private TaskScheduler scheduler;
     private TextChannel text;
@@ -109,7 +110,7 @@ public class PlayerChannelManager extends MusicManager {
         String videoId = playing.getInfo().uri.split("=")[1];
         String thumbURL = "http://img.youtube.com/vi/" + videoId + "/hq720.jpg";
         try {
-            URL thumbAsURL = new URL(thumbURL);
+            URL thumbAsURL = URI.create(thumbURL).toURL();
             thumbAsURL.getContent().toString();
         } 
         catch (IOException e) {

@@ -56,7 +56,7 @@ public class EpicGamesRequester {
                 string.append("```lua\n");
                 string.append("\"Jogo\": " + game.getTitle().replace("'", "`") + "\n");
                 string.append("\"Lugar\": Epic Games\n");
-                string.append("\"Período\": Até " + game.getFreeEndDate().format(DateTimeFormatter.ofPattern("dd-LLLL", new Locale("pt", "BR"))).replace("-", " de ") + "\n");
+                string.append("\"Período\": Até " + game.getFreeEndDate().format(DateTimeFormatter.ofPattern("dd-LLLL", Locale.of("pt", "br"))).replace("-", " de ") + "\n");
                 string.append("```");
                 messageString.add(string.toString());
             });

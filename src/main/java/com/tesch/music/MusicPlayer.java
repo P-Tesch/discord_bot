@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
@@ -15,14 +14,17 @@ import com.neovisionaries.i18n.CountryCode;
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
-import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
-import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioTrack;
 import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeSearchProvider;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.BasicAudioPlaylist;
 import com.tesch.exceptions.MusicleException;
 import com.tesch.utils.DiscordUtils;
 
+import dev.lavalink.youtube.YoutubeAudioSourceManager;
+import dev.lavalink.youtube.clients.Music;
+import dev.lavalink.youtube.clients.TvHtml5Embedded;
+import dev.lavalink.youtube.clients.Web;
+import dev.lavalink.youtube.clients.skeleton.Client;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
@@ -50,8 +52,8 @@ public class MusicPlayer {
         this.playerManager = playerManager;
         this.queue = queue;
         this.youtubeSearch = youtubeSearch;
-        this.youtubeSource = new YoutubeAudioSourceManager(true, System.getenv("BOT_GMAIL"), System.getenv("BOT_GMAIL_PASSWORD"));
-
+        this.youtubeSource = new YoutubeAudioSourceManager(true, new Client[] {new Music(), new Web(), new TvHtml5Embedded()});
+        
         try {
             spotifyApi = new SpotifyApi.Builder().setClientId(System.getenv("SPOTIFY_CLIENT_ID")).setClientSecret(System.getenv("SPOTIFY_CLIENT_SECRET")).setRedirectUri(new URI("https://github.com/P-Tesch/discord_bot")).build();
         } catch (URISyntaxException e) {
@@ -101,7 +103,9 @@ public class MusicPlayer {
 
         if (this.isUrl(message)) {
             if (this.isSpotify(message)) {
-                this.playFromSpotify(message, resultHandler);
+                SpotifyResultHandler spotifyResultHandler = new SpotifyResultHandler(this.queue, this.queue.getPlayerChannelManager());
+                spotifyResultHandler.setLastRequester(member.getUser());
+                this.playFromSpotify(message, spotifyResultHandler);
             }
             else {
                 this.playFromUrl(message, resultHandler);
@@ -202,7 +206,7 @@ public class MusicPlayer {
 
     public boolean isUrl(String test) {
         try {
-            new URL(test);
+            URI.create(test).toURL();
             return true;
         } 
         catch (MalformedURLException e) {
@@ -219,9 +223,9 @@ public class MusicPlayer {
     }
 
     public void playFromSearch(String search, AudioLoadResultHandler resultHandler) {
-        BasicAudioPlaylist songs = (BasicAudioPlaylist) youtubeSearch.loadSearchResult(search, info -> new YoutubeAudioTrack(info, this.youtubeSource));
+        BasicAudioPlaylist songs = (BasicAudioPlaylist) youtubeSearch.loadSearchResult(search, info -> this.youtubeSource.buildAudioTrack(info));
         AudioTrack song = songs.getTracks().get(0);
-        
+
         playerManager.loadItem(song.getInfo().uri, resultHandler);
     }
 
@@ -236,6 +240,7 @@ public class MusicPlayer {
                 total -= tracks.getLimit();
                 offset += offset == 0 ? tracks.getLimit() + 1 : tracks.getLimit();
                 Stream.of(tracks.getItems()).forEach(item -> {
+                    new Thread(() -> {
                     Track track = (Track) item.getTrack();
                     StringBuffer stringBuffer = new StringBuffer();
                     stringBuffer.append(track.getName());
@@ -243,8 +248,9 @@ public class MusicPlayer {
                     stringBuffer.append(track.getArtists()[0].getName());
                     stringBuffer.append(" ");
                     stringBuffer.append(track.getAlbum().getName());
-                    playerManager.loadItem(((BasicAudioPlaylist) youtubeSearch.loadSearchResult(stringBuffer.toString(), info -> new YoutubeAudioTrack(info, this.youtubeSource))).getTracks().get(0).getInfo().uri, resultHandler);
-               });
+                    playerManager.loadItem(((BasicAudioPlaylist) youtubeSearch.loadSearchResult(stringBuffer.toString(), info -> this.youtubeSource.buildAudioTrack(info))).getTracks().get(0).getInfo().uri, resultHandler);
+                    }).start();
+                });
             } while (total > 0);
             this.queue.getPlayerChannelManager().setFooter("Loaded playlist from spotify", 5);
         } 
