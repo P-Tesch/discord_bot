@@ -52,7 +52,7 @@ public class MusicPlayer {
         this.playerManager = playerManager;
         this.queue = queue;
         this.youtubeSearch = youtubeSearch;
-        this.youtubeSource = new YoutubeAudioSourceManager(true, new Client[] {new Music(), new Web(), new TvHtml5Embedded()});
+        this.youtubeSource = new YoutubeAudioSourceManager(true, new Client[] {new Web()});
         
         try {
             spotifyApi = new SpotifyApi.Builder().setClientId(System.getenv("SPOTIFY_CLIENT_ID")).setClientSecret(System.getenv("SPOTIFY_CLIENT_SECRET")).setRedirectUri(new URI("https://github.com/P-Tesch/discord_bot")).build();
